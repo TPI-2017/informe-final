@@ -48,7 +48,7 @@ En la parte \ref{part:analisis} se explicitará las funcionalidades que debe ten
 \section{Requerimientos}
 \subsection{Funcionales}
 \begin{itemize}
-	\item La aplicación de escritorio deberá ser capaz de poder iniciar una conexión segura con el sistema utilizando la misma para enviar los mensajes que el cliente desee.
+	\item La aplicación de PC deberá ser capaz de poder iniciar una conexión segura con el sistema utilizando la misma para enviar los mensajes que el cliente desee.
 	\item La aplicación podrá enviar peticiones de forma de obtener el mensaje actual del cartel o incluso establecer uno nuevo. Por otra parte, también podrá pedir los datos de la red a la que el sistema estará conectado o cambiarlos.
 	\item La aplicación deberá ser capaz de modificar parámetros de animación tales como frecuencia de parpadeo y velocidad de desplazamiento lateral o estaticidad.
 	\item La aplicación permitirá al usuario, ingresar por teclado el mensaje que desea mostrar mediante los caracteres que se establecen en el estándar de codificación de caracteres ISO/IEC 8859-1 (ver \cite{CodifChar}).
@@ -70,28 +70,53 @@ En la parte \ref{part:analisis} se explicitará las funcionalidades que debe ten
 \clearpage
 
 \part{Diseño}\label{part:diseno}
-\section{Software}
-\subsection{Interacción PC-Cartel}
-\begin{figure}
-	\centering
-	\includegraphics[width=\linewidth]{imagenes/petri-net.pdf}
-	\caption{Red de Petri modelando la interacción entre la aplicación de escritorio y el cartel.}
-	\label{fig:petri-net}
-\end{figure}
-\subsection{Firmware}
-\subsubsection{Arquitectura de software}
-\subsection{Aplicación de escritorio}
-\subsubsection{Arquitectura de software}
-\subsection{Protocolo de comunicación}\label{sec:protocolo}
-\subsubsection{Transport Layer Security}
-
-\section{Hardware}
+\section{Hardware}\label{sec:hw}
 \subsection{Diagrama en bloques general}
 \subsection{Fuente de alimentación}
 \subsection{Módulo maestro}
 \subsection{Módulo esclavo}
 \subsection{Matriz de LEDs}
 \subsection{Comunicación entre los módulos}
+
+\section{Software}\label{sec:sw}
+El software del sistema está formado por dos componentes: el firmware que corre sobre el controlador del cartel y la aplicación de PC que corre en una PC.
+
+El cartel ser alcanzable por la PC a través de una red IP. Esto significa que no es estrictamente necesario que la PC y el cartel estén en una misma red física, sino que basta con que exista una ruta entre ellos. Sin embargo, el cartel está asociado a la red estrictamente mediante 802.11 (WiFi), mientras que la PC puede tener conectividad al cartel mediante diversas formas. Detalles básicos sobre el Internet Protocol y mecanismos de routeo no se discutirán en este informe.
+
+\subsection{Interacción PC-Cartel}
+La comunicación que se da entre la PC y el cartel sigue el modelo de Cliente-Servidor donde la PC es el cliente y el cartel es el servidor. Esto significa que es la PC quien comienza a interactuar con el cartel, estableciéndose un circuito virtual que permanecera activo cada vez que se quiera hacer un cambio de mensaje o configuración en el cartel, o incluso cuando se quiera recuperar el mensaje del cartel.
+
+El tiempo que permanece activa la conexión debe ser, en lo posible, lo más corto posible. El cartel debe cerrar una conexión que permanezca ociosa por más de un tiempo configurable. La razón de esto es que un individuo malintencionado puede iniciar una conexión hacia el cartel y no mandar ningún mensaje, efectivamente bloqueando el uso legítimo del cartel (por limitaciones técnicas que se explicarán mas adelante, el controlador del cartel sólo puede aceptar una conexión a la vez). Se debe elegir un tiempo (a partir de ahora, tiempo de timeout) lo suficientemente corto para que esta medida sea efectiva pero no tan corto que descarte conexiones que legítimamente tienen un retardo (por ejemplo, por congestión de la red). Este tiempo es una constante ajustable en el código del firmware del cartel.
+
+La figura \ref{fig:petri-net} describe el mecanismo de interacción entre la PC y el cartel mediante una red de Petri.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=\linewidth]{imagenes/petri-net.pdf}
+	\caption{Red de Petri modelando la interacción entre la aplicación de PC y el cartel.}
+	\label{fig:petri-net}
+\end{figure}
+
+\subsection{Firmware}
+El firmware del controlador del cartel es quien se encarga de aceptar pedidos de la aplicación de PC y ejecutar las acciones de cambio de mensaje, parámetros de animacion, configuración WiFi o de contraseña. Además, como se explicó en la sección \ref{sec:hw}, el ESP8266EX envía la configuración de las matrices de LED por serie.
+
+\subsection{Plataformas de desarrollo}
+El System on Chip ESP8266EX es muy popular y existen diversas formas de desarrollar para él, entre ellas están:
+\begin{itemize}
+	\item El SDK oficial \enquote{OS} de Espressif. Es un SDK privativo. Utiliza internamente FreeRTOS con lo que se puede programar con tareas y las primitivas de sincronización que FreeRTOS ofrece.
+	\item El SDK oficial \enquote{NON-OS} de Espressif. Tiene \enquote{NON-OS} en su nombre porque con este SDK el programador no puede especificar ni crear tareas propias. Sino que se limita a registrar funciones callbacks que son llamadas por el firmware de Espressif cuando suceden eventos. La programación termina siendo basada en eventos.
+	\item La implementación de la plataforma Arduino para el ESP8266EX. Es la más sencilla de utilizar. Tiene las mismas abstracciones que se utilizan en la plataforma Arduino original. Incluye clases C++ que implementan servidores HTTP y hay mucho software y soporte disponible.
+\end{itemize}
+
+Todas estas formas de desarrollar tienen en común que el software del programador corre sobre un firmware privativo, es decir, no es viable programarlo \enquote{bare-metal} porque los registros y todos la información del hardware necesario para realizar algo no trivial no está disponible.
+
+Para el este proyecto se decidió utilizar el SDK \enquote{NON-OS}, donde las funciones que define el programador se ejecutan siempre enteramente, de forma cooperativa. Esto elimina toda una clase de problemas de interferencia de datos a causa de la concurrencia, con lo que no es necesario utilizar primitivas de sincronización.
+\subsubsection{Arquitectura del software}
+\subsection{Aplicación de PC}
+\subsubsection{Arquitectura del software}
+\subsection{Protocolo de comunicación}\label{sec:protocolo}
+\subsubsection{Transport Layer Security}
+
 
 \clearpage
 \part{Ensayos y mediciones}\label{part:ensayos}
