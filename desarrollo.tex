@@ -11,7 +11,7 @@ En este informe se describe todas las fases del desarrollo de un proyecto para l
 
 El proyecto utilizó un proceso de desarrollo de cascada, como se muestra en la figura \ref{fig:waterfall}.
 
-\begin{figure}[!htbp]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=0.8\linewidth]{imagenes/waterfall.pdf}
 	\caption{Modelo en cascada de desarrollo.}
@@ -43,6 +43,8 @@ El objetivo puede ser divido en los siguientes subobjetivos:
 
 En la parte \ref{part:analisis} se explicitará las funcionalidades que debe tener el sistema y la interfaz de usuario que expone.
 
+
+% ==============================================================
 \clearpage
 \part{Análisis de requerimientos}\label{part:analisis}
 \section{Requerimientos}
@@ -67,15 +69,43 @@ En la parte \ref{part:analisis} se explicitará las funcionalidades que debe ten
 % TODO: Hacer diagramas de caso de uso
 \subsection{Interacción con el usuario}
 \section{Especificaciones físicas}
-\clearpage
 
+
+
+% ==============================================================
+\clearpage
 \part{Diseño}\label{part:diseno}
 \section{Hardware}\label{sec:hw}
 \subsection{Diagrama en bloques general}
+El sistema se compone de módulos funcionales que interactúan entre sí, estos son \emph{master} y \emph{slave}, en la figura \ref{fig:diagrama-bloques-general} se puede observar el diagrama en bloques de todo el sistema. Por un lado, el modulo master el cual contiene el microcontrolador NodeMCU, recibe los datos del cliente, procesa los datos y enviá a los módulos esclavos para que actualicen el cartel.
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=\linewidth]{imagenes/hw/diagrama-bloques-general.pdf}
+	\caption{Esquema general entre todos los componentes del sistema.}
+	\label{fig:diagrama-bloques-general}
+\end{figure}
+
 \subsection{Fuente de alimentación}
 \subsection{Módulo maestro}
 \subsection{Módulo esclavo}
 \subsection{Matriz de LEDs}
+La matriz posee 64 LEDs organizados en ocho filas y ocho columnas, con cátodo común en las columnas como se observa en la \ref{fig:modulo-led}. Las medidas estan especificadas en la figura 
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=0.7\linewidth]{imagenes/hw/modulo-led.pdf}
+	\caption{Esquema de conexiones de la matriz de LEDs.}
+	\label{fig:modulo-led}
+\end{figure}
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=0.7\linewidth]{imagenes/hw/modulo-led-dimensiones.pdf}
+	\caption{Esquema de conexiones de la matriz de LEDs.}
+	\label{fig:modulo-led}
+\end{figure}
+
+
 \subsection{Comunicación entre los módulos}
 
 \section{Software}\label{sec:sw}
