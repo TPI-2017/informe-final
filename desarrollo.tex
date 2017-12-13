@@ -248,7 +248,66 @@ Por último, almacena el nuevo texto en la clase Settings para persistir la nuev
 A lo largo de esta sección se detalla cada clase mencionada, mostrando cuáles son sus interfaces de software y la forma en que se interconectan entre ellas.
 
 
+\subsubsection{Archivo principal} \label{sec:archivo_principal}
 
+%TODO mostrar pseudocodigo del user_init.cpp. pseudo:user_init.
+
+El Archivo principal del programa que corre sobre el microcontrolador es el archivo main.cpp.
+Dentro tiene un método denominado user\_init( ) que actúa como punto de entrada de la aplicación y no contiene parámetros.
+En su definición se inicializa cada clase mencionada en la sección previa, ejecutando el método init( ) de cada una de ellas.
+Dicho método es el encargado de asignar los valores iniciales a las variables internas de cada módulo de software, de forma de poder usar sus servicios públicos, posteriormente.
+Éstas clases son las que se observan en la figura \ref{fig:flujo_de_datos}: WiFiManager, LedSign, Server y Settings.
+
+Adicionalmente se establece %TODO decir lo del baudrate%. por medio de la función uart_div_modify( ), que es propia del SDK utilizado para el desarrollo.
+Por último para utilizar los pines del micro, se inicializan los GPIO del microcontrolador, a través de la función gpio\_init( ) que también es propia del SDK.
+En la figura \ref{pseudo:user_init} se muestra un pseudocódigo del método user\_init( ).
+
+Por último, se observa que para la clase Settings, se ejecuta el método loadSettings( ).
+El mismo se encarga de cargar desde la memoria no volátil del microcontrolador, la última información almacenada respecto del texto a mostrar en el cartel, sus parámetros de configuración, y sus valores de red.
+
+
+\subsubsection{Settings}
+
+La clase Settings es la encargada de mantener en memoria RAM, la información principal respecto del cartel.
+Entre ellas, contiene el texto a mostrar, su velocidad de parpadeo y desplazamiento y la información de la red a la que actualmente se encuentra conectado el sistema.
+Además posee funcionalidades para almacenar dichos datos en memoria no volátil a fin de persistirlos ante un reinicio.
+En la figura \ref{uml:settings}, se observa un diagrama UML con los principales métodos de la clase en cuestión, y a continuación se describe cada uno de ellos.
+
+%TODO mostrar diagrama UML de la clase. uml:settings.
+
+%TODO mostrar init( ). pseudo:settings_init.
+
+El método init( ) de settings se encarga de inicializar el puntero de la estructura de la FLASH de donde lee y almacena los datos.
+Adicionalmente, la clase provee funcionalidad para establecer las configuraciones por defecto del sistema, presionando el botón de RST durante 5 segundos.
+Para lograr eso, dentro del método init( ) también se inicializa el pin que se va a utilizar como reset (pin %TODO agregar pin%) y se establece el callback para cuando dicho evento ocurra.
+Se recomienda revisar la sección \ref{sec:callback} donde se explica el mecanismo de callbacks que utiliza el microcontrolador.
+
+%TODO mostrar loadSettings( ). pseudo:settings_loadSettings.
+
+El método loadSettings( ) se encarga de cargar en memoria RAM la información necesaria del cartel utilizando el puntero previamente incializado en init( ).
+Adicionalmente se le envía, dicha información, a la clase LedSign quien es la encargada de mostrar el contenido anteriormente almacenado en la memoria.
+
+En caso de que la información leída estuviese corrupta, la clase contiene un método privado para cargar los datos por defecto del sistema.
+El método no posee parámetros.
+
+%TODO mostrar storeSettings( ). pseudo:settings_storeSettings.
+
+El método storeSettings( ) de la clase Settings provee funcionalidad para almacenar en la memoria no volátil la información actual del sistema.
+Para la persistencia de los datos, se utiliza la librería propietaria del SDK denominada spi\_flash.h.
+Este método no contiene parámetros.
+
+
+
+\subsubsection{WiFiManager}
+
+La clase WiFiManager es la encargada de administrar todas las configuraciones WiFi que necesita el microcontrolador para conectarse a una red.
+Posee un sólo método público enunciado en el apartado \ref{sec:archivo_principal}, denominado init( ).
+
+%TODO mostrar init( ). pseudo:wifiManager_init.
+
+El método no contiene parámetros y su principal tarea consiste en leer los datos de la clase Settings relacionados a la información de la red.
+Dichos valores corresponden al SSID, contraseña de WiFi, ip, y máscara de subred y son utilizados para permitir al sistema conectarse a la red WiFi correspondiente.
+La librería propia del SDK osapi.h permite realizar estas acciones.
 
 \subsection{Aplicación de PC}
 \subsubsection{Arquitectura del software}
