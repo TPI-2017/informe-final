@@ -1,6 +1,23 @@
 
 \setcounter{figure}{0}
 \section{Guía de puesta en marcha}
+En esta anexo se explicará paso a paso como poner en marcha el sistema. Se asume que el lector de esta guía tiene conocimientos básicos de manejo de bash en GNU/Linux.
+Para proceder se necesitan los siguientes elementos:
+\begin{itemize}
+	\item PC corriendo Debian 9 \enquote{Stretch} con ambiente de escritorio GNOME. No es necesario que sea precisamente esta distribución de GNU/Linux pero esta guía explicara los pasos para esta distribución en particular.
+	\item Un módulo maestro.
+	\item Al menos un modulo esclavo.
+	\item Cable Micro-USB.
+	% Herramientas?
+\end{itemize}
+
 \subsection{Compilación y carga del firmware}
+En esta sección se explicará como instalar el kit de desarrollo de software de Espressif y cómo cargar el firmware al SoC (System on Chip). Para esto es necesario instalar software para traer el repositorio git y compilar el compilador que se utilizará. El compilador es el gcc pero configurado para generar código para el procesador Tonsillica Xtensa LX106, que es el que utiliza el ESP8266EX.
+
+Los comandos que comiencen con \enquote{\#} deben hacerse siendo el superusuario. Una manera de abrir una sesión 
+\begin{enumerate}
+	\item Descargar git para poder clonar el repositorio.
+\end{enumerate}
+
 \subsection{Compilación de la aplicación de escritorio}
 \subsection{Configuración del hardware}
