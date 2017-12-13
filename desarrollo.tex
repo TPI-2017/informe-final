@@ -130,6 +130,8 @@ La figura \ref{fig:petri-net} describe el mecanismo de interacción entre la PC 
 \subsection{Firmware}
 El firmware del controlador del cartel es quien se encarga de aceptar pedidos de la aplicación de PC y ejecutar las acciones de cambio de mensaje, parámetros de animacion, configuración WiFi o de contraseña. Además, como se explicó en la sección \ref{sec:hw}, el ESP8266EX envía la configuración de las matrices de LED por serie.
 
+
+
 \subsection{Plataformas de desarrollo}
 El System on Chip ESP8266EX es muy popular y existen diversas formas de desarrollar para él, entre ellas están:
 \begin{itemize}
@@ -141,7 +143,113 @@ El System on Chip ESP8266EX es muy popular y existen diversas formas de desarrol
 Todas estas formas de desarrollar tienen en común que el software del programador corre sobre un firmware privativo, es decir, no es viable programarlo \enquote{bare-metal} porque los registros y todos la información del hardware necesario para realizar algo no trivial no está disponible.
 
 Para el este proyecto se decidió utilizar el SDK \enquote{NON-OS}, donde las funciones que define el programador se ejecutan siempre enteramente, de forma cooperativa. Esto elimina toda una clase de problemas de interferencia de datos a causa de la concurrencia, con lo que no es necesario utilizar primitivas de sincronización.
-\subsubsection{Arquitectura del software}
+
+Un ejemplo de esta técnica de programación se puede ver en la figura \ref{fig:callbacks}, donde se muestra como se registra la función que debe ejecutarse al recibir datos a través de una conexión TCP sobre 802.11. La aplicación llama a \code{espconn\_regist\_recvcb}, pasándole un puntero a función a \code{callback} y el firmware se encarga de llamar a \code{callback} cuando corresponda.
+
+\begin{figure}[ht!]
+	\begin{center}
+		\centering
+		\includegraphics[scale=0.8]{imagenes/callbacks.pdf}
+		\caption{Ejemplo de uso de callbacks.}
+		\label{fig:callbacks}
+	\end{center}
+\end{figure}
+
+
+
+\subsubsection{Modelado  general del programa}
+
+El software que corre en el microcontrolador del cartel debe escuchar conexiones TLS, y una vez establecida una conexión iniciada por la aplicación de escritorio, debe esperar a recibir un mensaje de autenticación antes de permitir cambios del mensaje.
+
+Una vez que el usuario se autentica, el cartel espera un pedido de la aplicación de escritorio. Las interacciones posibles están descritas en el apéndice \ref{sec:protocolo}.
+
+El comportamiento del microcontrolador puede describirse como una máquina de estado finita jerárquica, como lo muestra la figura \ref{fig:fsm-micro}.
+
+\begin{figure}[ht!]
+	\begin{center}
+		\centering
+		\includegraphics[scale=0.8]{imagenes/fsm-micro.pdf}
+		\caption{Máquina de estados finitos jerárquica del manejo de conexión en el microcontrolador.}
+		\label{fig:fsm-micro}
+	\end{center}
+\end{figure}
+
+
+
+\subsubsection{Requerimientos generales}
+
+El programa que corre sobre el microcontrolador ESP8266 necesita conectarse a una red WiFi preexistente a fin de poder establecer una comunicación cifrada bajo el protocolo TLS con el cliente.
+En esta sección, se hace referencia al cliente como el usuario de la aplicación QT.
+
+El software debe actuar como servidor y manejar las peticiones que el cliente realice por medio de la aplicación QT, detallada anteriormente.
+Dichas peticiones se clasifican en dos categorías: del tipo get y del tipo set. Las mismas se explican a continuación.
+
+Las primeras corresponden a pedidos que solicitan información del sistema, mientras que las segundas permiten modificar dicha información.
+Dentro de la categoría get, por un lado, el cliente puede loguearse en el sistema, obtener el texto que actualmente se muestra en el cartel, capturar la velocidad con la que se desplaza y con la que parpadea el contenido y pedir la configuración WiFi de la red a la que se encuentra conectado el microcontrolador.
+
+A su vez, el cliente puede cambiar el contenido que desea representar, así como también modificar los parámetros relacionados a la velocidad de desplazamiento y parpadeo del texto.
+Adicionalmente es posible modificar la configuración de la red a la que se autenticará la próxima vez que el ESP8266 se reinicie.
+Por otra parte, el sistema posee una contraseña que es necesaria para realizar la acción de logueo.
+Una vez logueado, dicha clave puede ser modificada. Estas acciones pertenecen a la cateogría set.
+
+Respecto de la información de la red, cabe destacar que los posibles parámetros que se pueden solicitar y cambiar son: el SSID, la contraseña WiFi, la dirección IP y la máscara de subred.
+
+La figura \ref{fig:diagrama_casos_de_uso} muestra un diagrama de casos de uso, que describe todas las funcionalidades que el cliente puede realizar.
+Adicionalmente, se observa como interactúan dichos pedidos, con el cartel.
+
+%TODO mostrar diagrama de casos de uso. fig:diagrama_casos_de_uso.
+
+En la figura \ref{fig:diagrama_casos_de_uso} se observa, que entre las funcionalidades que el cliente realiza, se encuentra la de modificar los datos del cartel, tal como su contenido, su configuración WiFi y su contraseña del sistema.
+Como el sistema puede, eventualmente, ser desprovisto de su alimentación o reseteado, es necesario que dichos cambios persistan aún cuando éstos eventos ocurren.
+
+Por otra parte, el programa debe ser capaz de interpretar los pedidos que realiza el cliente y procesarlos a fin de generar la información que necesita el cartel para encender cada columna de luces.
+Es necesario recordar que la matriz de LEDs está compuesta por módulos MAX7219 que son los encargados de recibir los datos enviados por el microcontrolador, mediante SPI, y encender las columnas de luces según corresponda.
+
+
+
+\subsubsection{Secuencia de eventos del lado del microcontrolador}
+
+En esta sección se enuncia brevemente, la secuencia de eventos que el usuario puede realizar con el sistema y cómo el programa responde ante los diferentes pedidos.
+Es importante tener presente la figura \ref{fig:diagrama_casos_de_uso} donde se observa el diagrama de casos de uso que describe todas las funcionalidades que el cliente puede efectuar.
+
+En primer lugar, el cartel se conecta a la red WiFi presentando las credenciales previamente almacenadas en la memoria no volátil del microcontrolador.
+Esta acción es llevada a cabo gracias a una clase a nivel software denominada WiFiManager.
+A su vez, el cliente accede a la aplicación QT, con el ordenador conectado a la misma red.
+
+El sistema le solicita la contraseña antes de realizar cualquier acción.
+Una vez logueado, el cliente puede realizar cualquiera de las funcionalidades previamente enunciadas en la subsección anterior (tanto del tipo get como del tipo set).
+Entre las acciones disponibles puede pedir información del texto que actualmente se encuentra representado en el cartel, o las credenciales de la red WiFi a la que el sistema se conecta.
+Estas acciones, leen de la memoria no volátil del microcontrolador los datos necesarios y se la devuelven a la aplicación QT.
+El manejo de esta memoria persistente la realiza la clase conocida como Settings.
+
+En caso de que el usuario desee modificar alguno de esos valores, puede hacerlo a través de la misma aplicación.
+El mismo módulo de software que se encarga de leer de la memoria no volátil, obtiene los nuevos requerimientos que le provee el cliente, modifica sus variables internas y las almacena a fin de mantenerlas ante un futuro pedido.
+
+El cartel, es decir el programa que corre sobre el microcontrolador, actúa de servidor atendiendo las peticiones que realiza el cliente de la aplicación QT.
+Esta funcionalidad es manejada por una clase de software denominada Server.
+La misma es la encargada de recibir la cadena de bytes vía TCP y enviarla hacia el módulo MessageHandler.
+
+En otras palabras MessageHandler toma la secuencia de bytes que le pasa la clase Server e interpreta esos datos utilizando el protocolo que se detalla en la sección \ref{sec:protocolo}.
+Este protocolo ofrece soporte para interpretar cada acción que el cliente realiza ya que posee métodos para codificar y decodificar dichas peticiones.
+
+MessageHandler decodifica los pedidos y los envía a la clase Settings o LedSign según pertenezcan a la cateogría de get o set respectivamente.
+La clase Settings, ha sido enunciada previamente en esta sección, la misma se encarga de todos los pedidos que no requieran configurar la matriz de LEDs.
+Mientras que LedSign obtiene los valores de configuración del tipo set y procesa los datos a fin de convertirlos en comandos que puedan ser interpretados por los dispositivos MAX7219, encargados de encender las luces del cartel.
+
+En la figura \ref{fig:flujo_de_datos} se observa los distintos módulos de software previamente enunciados, y el intercambio de información que se realiza entre ellos.
+
+%TODO mostrar flujo de datos con módulos de sw. fig:flujo_de_datos.
+
+A modo complementario se detalla un ejemplo relacionado a una secuencia de eventos que un cliente puede realizar.
+En este caso, un usuario pide cambiar el texto que se muestra en la matriz. Este pedido es capturado por la clase Server quien le pasa la secuencia de bytes a MessageHandler.
+Ésta interpreta la secuencia y obtiene el nuevo texto a representar. La información es enviada a LedSign quien desglosa el texto en letras y determina como deben encenderse las diferentes filas de la matriz de LEDs.
+Por último, almacena el nuevo texto en la clase Settings para persistir la nueva información proporcionada.
+
+A lo largo de esta sección se detalla cada clase mencionada, mostrando cuáles son sus interfaces de software y la forma en que se interconectan entre ellas.
+
+
+
+
 \subsection{Aplicación de PC}
 \subsubsection{Arquitectura del software}
 \subsection{Protocolo de comunicación}\label{sec:protocolo}
