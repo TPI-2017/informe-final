@@ -15,7 +15,7 @@ Para proceder se necesitan los siguientes elementos:
 	% Herramientas?
 \end{itemize}
 
-\subsection{Compilación y carga del firmware}
+\subsection{Compilación del firmware}\label{sec:comp-firmware}
 En esta sección se explicará como instalar el kit de desarrollo de software de Espressif y cómo cargar el firmware al SoC (System on Chip). Para esto es necesario instalar software para traer el repositorio git y compilar el compilador que se utilizará. El compilador es el gcc de GNU pero modificado para generar código para el procesador Tonsillica Xtensa LX106, que es el que utiliza el ESP8266EX.
 
 \subsubsection{Compilación del toolchain}
@@ -119,7 +119,7 @@ Espressif ESP8266 SDK is installed, its libraries and headers are merged with th
 
 Una vez terminada la compilación, hay que realizar un paso que soluciona un problema en el que el software del cartel falla en la etapa de linkeo por no entrar en una RAM dedicada a instrucciones que utiliza el ESP8266EX. Lamentablemente no hay mucha información disponible de por qué pasa esto. Como se menciono anteriormente, el SDK es privativo y no muy bien documentado, con lo que la información que circula en Internet es un mejor caso especulativa. Este paso consiste en mover un archivo (específicamente, la implementación de la libreria estándar de C) del directorio del SDK al directorio del compilador.
 
-Estando en el directorio \code{esp-open-sdk}, ingrese los siguientes comandos:
+Estando en el directorio \code{esp-open-sdk}, ingrese el siguiente comando:
 \begin{lstlisting}
 	cp sdk/lib/libgcc.a xtensa-lx106-elf/lib/gcc/xtensa-lx106-elf/4.8.5/
 \end{lstlisting}
@@ -140,6 +140,24 @@ Los últimos dos pasos se encargan de que los paths de los directorios donde se 
 
 Reinicie la PC o máquina virtual para que los últimos cambios tomen efecto.
 
+\subsubsection{Cambio de librería de TLS}
+El módulo que implementa las conexiones TLS en el ESP8266EX tiene unos problemas de implementación que provocan que el microcontrolador se congele por completo. Este problema es reconocido por Espressif y su solución consiste en aplicar un parche al SDK que reemplaza esa librería por una alternativa.
+
+Para descargar el parche ingrese:
+\begin{lstlisting}
+$ cd
+$ wget http://espressif.com/sites/default/files/sdks/esp8266_nonos_sdk_mbedtls_20160718.zip
+$ unzip esp8266_nonos_sdk_mbedtls_20160718.zip
+\end{lstlisting}
+
+Luego, como root:
+
+\begin{lstlisting}
+# cp -rf ESP8266_NONOS_SDK_MBEDTLS/lib /opt/espressif/sdk/
+\end{lstlisting}
+
+Hecho esto, ya se puede proceder a compilar el firmware.
+
 \subsubsection{Compilación del firmware}
 A este punto ya se pueden escribir programas para el ESP8266EX y compilarlos. Ahora falta descargar el código del software del cartel. El mismo se encuentra en un repositorio de Github.
 
@@ -152,10 +170,21 @@ $ cd esp
 $ make
 \end{lstlisting}
 
-La salida del comando \code{make} debería ser el siguiente:
+La salida del comando \code{make} incluir lo siguiente en las últimas líneas:
 \begin{lstlisting}
+xtensa-lx106-elf-g++ main.o server.o message_handler.o wifi_manager.o settings.o protocolo/Message.o led_sign.o font.o -nostdlib -Wl,--start-group -lmain -lnet80211 -lwpa -llwip -lpp -lphy -lmbedtls -lc -Wl,--end-group -lgcc -L/opt/espressif/sdk/lib -Teagle.app.v6.ld -o node
+esptool.py elf2image node
+esptool.py v1.2
 \end{lstlisting}
 
-
 \subsection{Compilación de la aplicación de escritorio}
+
 \subsection{Configuración del hardware}
+\subsubsection{Carga del firmware}
+Una vez que se han completado los pasos en la sección \ref{sec:comp-firmware}, se puede proceder a cargar el firmware al cartel ya preparado.
+
+Para hacer esto es necesario ir hacia el directorio donde se haya descargado el firmware y correr:
+% falta explicar como configurar sudo...
+\begin{lstlisting}
+$ sudo "PATH=$PATH" make flash
+\end{lstlisting}
