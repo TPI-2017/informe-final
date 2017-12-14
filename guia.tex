@@ -156,17 +156,52 @@ Luego, como root:
 # cp -rf ESP8266_NONOS_SDK_MBEDTLS/lib /opt/espressif/sdk/
 \end{lstlisting}
 
-Hecho esto, ya se puede proceder a compilar el firmware.
+
+\subsection{Generación de certificados TLS}\label{sec:cert-gen}
+Como se explicó en la sección \ref{sec:tls}, la dirección de IP que toma el dispositivo está asociada al certificado público que exhibe y por lo tanto debe ser estática. En esta sección se explicarán los pasos para, una vez decidida una dirección IP para el cartel, generar el certificado con la clave pública, además de la clave privada.
+
+El SDK provee un script que genera automáticamente el certificado y la clave privada. La clave privada y el certificado se almacenarán en el firmware del cartel y el certificado se almacenará en el ejecutable de la aplicación de PC. Esto es porque, normalmente, los certificados están firmados electrónicamente por una \enquote{Certificate Authority} o CA. En este caso el certificado de este proyecto se denomina \emph{self-signed}, con lo que es necesario \enquote{notificar} a la aplicación de PC que ese certificado es confiable.
+
+En el directorio \code{/opt/espressif/sdk/tools} hay un archivo \code{makefile.sh}. Este es el script que generará el certificado y clave primaria. Hay que modificar el contenido de \code{makefile.sh} para definir la IP que utilizará el cartel.
+
+Ingrese el siguiente comando para realizar una copia de seguridad del script:
+\begin{lstlisting}
+$ cp makefile.sh makefile.sh.bak
+\end{lstlisting}
+
+Y luego, edite \code{makefile.sh} tomando como guía la figura \ref{fig:guia-cert}.
+
+\begin{figure}[!hbpt]
+	\centering
+	\includegraphics[height=10cm]{imagenes/cert-screenshot.jpg}
+	\caption{El archivo \code{makefile.sh} con los datos que hay cambiar señalados.}
+	\label{fig:guia-cert}
+\end{figure}
+
+Hecho esto, ejecute:
+
+\begin{lstlisting}
+$ chmod +x makefile.sh
+$ ./makefile.sh
+\end{lstlisting}
+
+Esto produce el certificado y clave privada en distintos formatos. Para el sistema solo se necesitan \code{private\_key.h}, \code{cert.h} y \code{TLS.ca\_x509.cer}. Los primeros dos se utilizan en el firmware del cartel y el último es para la aplicación de PC, con lo que no debe eliminarse ya que se utilizará mas adelante en esta guía.
 
 \subsubsection{Compilación del firmware}
 A este punto ya se pueden escribir programas para el ESP8266EX y compilarlos. Ahora falta descargar el código del software del cartel. El mismo se encuentra en un repositorio de Github.
 
-Ingrese los siguientes comandos para descargar y compilar el código fuente:
+
+Ingrese los siguientes comandos para descargar el código fuente del firmware y copiar el certificado y clave privada:
 
 \begin{lstlisting}
 $ cd
 $ git clone --recursive https://github.com/tpi-2017/esp
 $ cd esp
+$ cp /opt/espressif/sdk/tools/cert.h /opt/espressif/sdk/tools/private_key.h .
+\end{lstlisting}
+
+Para compilar ingrese:
+\begin{lstlisting}
 $ make
 \end{lstlisting}
 
@@ -177,14 +212,66 @@ esptool.py elf2image node
 esptool.py v1.2
 \end{lstlisting}
 
-\subsection{Compilación de la aplicación de escritorio}
-
 \subsection{Configuración del hardware}
+% Nahuel y/o santi
 \subsubsection{Carga del firmware}
 Una vez que se han completado los pasos en la sección \ref{sec:comp-firmware}, se puede proceder a cargar el firmware al cartel ya preparado.
 
+La carga del firmware tiene que hacerse como usuario root, pero antes de realizar la carga es necesario correr un comando extra que vuelve a definir la variable de entorno PATH para incluir a la herramienta de carga del firmware.
 Para hacer esto es necesario ir hacia el directorio donde se haya descargado el firmware y correr:
-% falta explicar como configurar sudo...
 \begin{lstlisting}
-$ sudo "PATH=$PATH" make flash
+# source /etc/profile
+# make flash
 \end{lstlisting}
+
+La salida debe ser:
+\begin{lstlisting}
+root@tpi:/home/ramiro/esp# make flash
+esptool.py write_flash 0 node-0x00000.bin 0x10000 node-0x10000.bin
+esptool.py v1.2
+Connecting...
+Auto-detected Flash size: 32m
+Running Cesanta flasher stub...
+Flash params set to 0x0040
+Writing 45056 @ 0x0... 45056 (100 %)
+Wrote 45056 bytes at 0x0 in 3.9 seconds (91.6 kbit/s)...
+Writing 294912 @ 0x10000... 294912 (100 %)
+Wrote 294912 bytes at 0x10000 in 25.7 seconds (91.9 kbit/s)...
+Leaving...
+\end{lstlisting}
+
+Si el firmware se cargó correctamente, el sistema debería ya estar funcionando, conectado a la red por defecto y esperando una conexión para ser configurado.
+
+\subsection{Compilación de la aplicación de PC}
+En esta sección se mostrarán los pasos para compilar y correr la aplicación de PC.
+
+La aplicación de PC también se encuentra en un repositorio de Github, con lo que si ya se realizó la sección anterior, no es necesario instalar git.
+
+Para traer el repositorio ingrese:
+\begin{lstlisting}
+$ cd
+$ git clone --recursive https://github.com/tpi-2017/Panel
+$ cd Panel
+\end{lstlisting}
+
+Antes de compilar es necesario instalar las dependencias y copiar el certificado público (ver sección \ref{sec:cert-gen}):
+
+\begin{lstlisting}
+# apt install qt5-default -y
+$ cp /opt/espressif/tools/TLS.ca_x509.cer res/
+\end{lstlisting}
+
+El siguiente paso es la compilación en sí:
+
+\begin{lstlisting}
+$ qmake
+$ make
+\end{lstlisting}
+
+Esto producirá un archivo llamado \code{Panel}, este es el ejecutable y se puede correr haciendo:
+
+\begin{lstlisting}
+$ ./Panel
+\end{lstlisting}
+
+Con esto concluye la puesta en marcha del software del sistema.
