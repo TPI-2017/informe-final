@@ -190,7 +190,7 @@ Dentro de la categoría get, por un lado, el cliente puede loguearse en el siste
 A su vez, el cliente puede cambiar el contenido que desea representar, así como también modificar los parámetros relacionados a la velocidad de desplazamiento y parpadeo del texto.
 Adicionalmente es posible modificar la configuración de la red a la que se autenticará la próxima vez que el ESP8266 se reinicie.
 Por otra parte, el sistema posee una contraseña que es necesaria para realizar la acción de logueo.
-Una vez logueado, dicha clave puede ser modificada. Estas acciones pertenecen a la cateogría set.
+Una vez logueado, dicha clave puede ser modificada. Estas acciones pertenecen a la categoría set.
 
 Respecto de la información de la red, cabe destacar que los posibles parámetros que se pueden solicitar y cambiar son: el SSID, la contraseña WiFi, la dirección IP y la máscara de subred.
 
@@ -203,7 +203,7 @@ En la figura \ref{fig:diagrama_casos_de_uso} se observa, que entre las funcional
 Como el sistema puede, eventualmente, ser desprovisto de su alimentación o reseteado, es necesario que dichos cambios persistan aún cuando éstos eventos ocurren.
 
 Por otra parte, el programa debe ser capaz de interpretar los pedidos que realiza el cliente y procesarlos a fin de generar la información que necesita el cartel para encender cada columna de luces.
-Es necesario recordar que la matriz de LEDs está compuesta por módulos MAX7219 que son los encargados de recibir los datos enviados por el microcontrolador, mediante SPI, y encender las columnas de luces según corresponda.
+Es necesario recordar que la matriz de LEDs está compuesta por módulos MAX7219 que son los encargados de recibir los datos enviados por el microcontrolador y encender las columnas de luces según corresponda.
 
 
 
@@ -258,7 +258,7 @@ En su definición se inicializa cada clase mencionada en la sección previa, eje
 Dicho método es el encargado de asignar los valores iniciales a las variables internas de cada módulo de software, de forma de poder usar sus servicios públicos, posteriormente.
 Éstas clases son las que se observan en la figura \ref{fig:flujo_de_datos}: WiFiManager, LedSign, Server y Settings.
 
-Adicionalmente se establece %TODO decir lo del baudrate%. por medio de la función uart_div_modify( ), que es propia del SDK utilizado para el desarrollo.
+Adicionalmente se establece %TODO decir lo del baudrate%. por medio de una función propia del SDK utilizado para el desarrollo.
 Por último para utilizar los pines del micro, se inicializan los GPIO del microcontrolador, a través de la función gpio\_init( ) que también es propia del SDK.
 En la figura \ref{pseudo:user_init} se muestra un pseudocódigo del método user\_init( ).
 
@@ -308,6 +308,115 @@ Posee un sólo método público enunciado en el apartado \ref{sec:archivo_princi
 El método no contiene parámetros y su principal tarea consiste en leer los datos de la clase Settings relacionados a la información de la red.
 Dichos valores corresponden al SSID, contraseña de WiFi, ip, y máscara de subred y son utilizados para permitir al sistema conectarse a la red WiFi correspondiente.
 La librería propia del SDK osapi.h permite realizar estas acciones.
+
+
+
+\subsubsection{Server}
+
+Una vez conectado a la red WiFi, la clase Server es la encargada de colocar al microcontrolador en modo servidor, de forma de poder atender las peticiones que realiza el usuario.
+Provee funcionalidades para inicializar el servidor, desconectar la sesión, enviar mensajes TCP hacia el cliente, y notificar cuando se recibe un paquete.
+En el UML de la figura \ref{uml:server} se observan los métodos públicos de la clase que abstrae las funcionalidades mencionadas anteriormente.
+
+%TODO mostrar UML de Server. uml:server.
+
+Cabe destacar que en la figura \ref{uml:server} aparece una función privada relacionada a la recepción de mensajes denominada receiveCallback( ).
+Como bien su nombre lo indica, ésto es un callback que se setea dentro del método listen( ) y se ejecuta cuando algún paquete llega al servidor (para más información, revisar la sección \ref{sec:callbacks} donde se explica el método de callbacks).
+A pesar de que sea un método privado, se decide mostrar en el UML debido a su reelevancia en esta solución.
+Más adelanete, en esta sección, se explica su implementación.
+
+%TODO mostrar pseudocódigo del método init( ). pseudo:server_init.
+
+El método init( ) de la clase Server se ejecuta en el archivo principal y su función esencial consiste en inicializar las variables internas de la estructura de modo de permitir, posteriormente, colocar al microcontrolador en modo servidor.
+Cabe aclarar que esta función debe ejecutarse después de haberse autenticado a una red WiFi; por ese motivo, primero se ejecta el init( ) de la clase WiFiManager.
+Por otra parte, éste método no coloca al programa en modo servidor, es decir, no permite que distintos clientes se conecten todavía; para ello debe ejecutarse el método listen( ) que se describe a continuación.
+
+%TODO mostrar pseudocódigo del método listen( ). pseudo:server_listen.
+
+En primer lugar, el método listen( ) configura el certificado y la clave de seguridad del protocolo SSL que se utiliza en el intercambio de mensajes entre el servidor y el cliente de forma de que los mismos permanezcan cifrados hasta llegar a destino.
+Adicionalmente, activa el mecanismo de Keep Alive propio de TCP, limita el número de conexiones simultáneas a uno y registrar los callbacks necesarios para su correcto funcionamiento (entre ellos el correspondiente a la recepción de paquetes).
+El método no contiene parámetros.
+
+%TODO mostrar pseudocódigo del método send( ). pseudo:server_send.
+
+El método send( ) provee funcionalidad para enviar mediante TCP, hacia el cliente, un arreglo de bytes de manera cifrada.
+Para su utilización, es necesario haber ejecutado el método listen( ) previamente y haber establecido una conexión con un cliente.
+
+Recibe como parámetro un puntero a void que contiene la dirección del mensaje a enviar y el tamaño de dicho paquete.
+
+%TODO mostrar pseudocódigo del método receiveCallback( ). pseudo:server_receive_callback.
+
+Como ya se mencionó anteriormente, el método receiveCallback( ) es una función privada que se ejecuta sólo cuando se reciben datos desde el cliente (size).
+Contiene un buffer interno donde almacena los bytes que obtiene.
+Los parámetros que recibe corresponden con la conexión vía TCP que envía los datos (conn), un puntero a la cadena de bytes recibido (data) y por último el tamaño de dicho arreglo.
+
+Dicha estructura posee una capacidad limitada y, en este caso, su tamaño máximo se especifica en el protocolo de software (ver sección\ref{sec:protocolo}).
+Cabe aclarar que la tarea de este método es apilar bytes crudos hasta llenar el buffer. La clase Server no tiene las herramientas necesarias para interpretar la información que recibe.
+Por ese motivo cuando la estructura se llena, se notifica a la clase MessageHandler quien es la que implementa el protocolo de comunicación diseñado para este proyecto y es capaz de interpretar la cadena de bytes recibida.
+
+
+
+\subsubsection{MessageHandler}
+
+La clase MessageHandler implementa el protocolo de comunicación entre el servidor y el cliente, y es capaz de interpretar el arreglo de bytes que recibe desde la clase Server.
+Posee un sólo método denominado handle( ) que atiende el mensaje que le envía el usuario y elabora una respuesta hacia éste.
+En la figura \ref{pseudo:messageHandler_handle} se muestra un pseudocódigo del método a fin de brindar mayor claridad en la comprensión de la función.
+
+%TODO mostrar pseudocódigo del método handle( ). pseudo:messageHandler_handle.
+
+Cabe recrodar que cualquier relacionada a la implementación de este método, se recomienda recurrir a la sección \ref{sec:protocolo} donde se detalla el protocolo de comunicación diseñado para este proyecto.
+
+
+
+\subsubsection{LedSign}
+
+La última clase de la arquitectura del programa del microcontrolador es LedSign.
+La misma se encarga de recibir los datos que envía MessageHandler por parámetro, procesarlos y armar un buffer de salida con la información necesaria para encender las luces de la matriz.
+Cabe recordar que el programa del microcontrolador solo se comunica con el primer MAX7219 como lo indica la figura \ref{fig:flujo_de_datos}.
+En la figura \ref{uml:ledSign} se muestra un UML con los métodos públicos que componen la clase.
+
+%TODO mostrar uml de la clase. uml:ledSign.
+
+%TODO mostrar pseudocódigo del método init( ). pseudo:ledSign_init.
+
+En primer lugar, el método init( ) se encarga de configurar los pines LATCH, CLCK y DATA que se utilizan para la comunicación entre el microcontrolador y el MAX7219.
+Para mayor información respecto de los pines, se sugiere visitar la sección \ref{sec:} %TODO poner la sección donde se explica los pines esos.
+
+Adicionalmente se configura cómo salida los pines que se utilizan para los jumpers, se les habilita su pull up interno y se lee su valor a la salida.
+De esta forma, se indica cuántos módulos de 8x8 LEDs componen el cartel.
+
+Por otra parte, el método, se encarga de configurar todos los registros necesarios de cada MAX7219 para iniciar su funcionamiento.
+Entre las acciones que realiza, el programa se encarga de sacarlo del modo test, setearle la intensidad de los LEDs, indicarle que se van a usar las ocho columnas que posee el chip, limpiarle la pantalla apagando todos los LEDs y encenderlo.
+Dichas configuraciones se realizan través del método sendCommand( ).
+La función toma dos parámetros, en el primero se especifica el registro a configurar y en el segundo el valor que se desea establecer.
+Para más información respecto de la configuración de los registros consultar el datasheet del MAX7219 haciendo click en el siguiente \href{https://datasheets.maximintegrated.com/en/ds/MAX7219-MAX7221.pdf}{link}.
+
+Finalmente se limpia el cartel, apagando todas las luces de cada módulo.
+
+%TODO mostrar pseudocódigo del método messageChanged(). pseudo:ledSign_messageChanged.
+
+El método messageChanged( ) se invoca cuando el mensaje o algún parámetro de configuración (tiempo de parpadeo o velocidad de desplazamiento) es modificado.
+
+Recibe tres parámetros de configuración, el primero es el texto a mostrar.
+Éste es un puntero a char donde se encuentra la información del contenido.
+Es necesario que tenga un terminador nulo.
+En caso de que no lo tenga, el comportamiento del método queda indefinido.
+
+El segundo parámetro es brate, es un entero positivo que indica la velocidad de parpadeo que posee el texto.
+En caso de que no se requiera se debe colocar un 0.
+
+El último parámetro es srate que también es un entero que indica la velocidad a la que se desplaza el contenido.
+La diferencia con el anterior radica en que este sí puede tomar valores negativos.
+Un valor negativo indica que el contenido se desplaza a la izquierda, mientras que un positivo lo hace hacia la derecha.
+En caso de que no se requiera el uso de esta funcionalidad, se debe colocar un 0. 
+
+La función principal de este método es tomar los datos de configuración que se reciben por parámetro y armar un buffer de salida con la información de cada columna del cartel, respecto del estado de cada LED.
+Para realizar el desplazamineto del contenido, la estrategia que se adopta es periódicamente, mover el índice del buffer y enviar nuevamente la información al MAX7219.
+Para el tiempo se utiliza una estructura propia del SDK del microcontrolador denominado timer\_t.
+La misma permite ejecutar un callback cuando se cumple un determinado lapso de tiempo.
+
+Para realizar el parpadeo del mensaje, se adopta una estrategia similar.
+Basándose en otro timer\_t se envía periódicamente un comando a cada MAX7219 que le indica que debe encenderse o apagarse, según corresponda.
+
 
 \subsection{Aplicación de PC}
 \subsubsection{Arquitectura del software}
