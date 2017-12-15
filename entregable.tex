@@ -23,7 +23,6 @@
 \loadglsentries[main]{glosario.tex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{appendix}
-\allsectionsfont{\normalfont\sffamily\bfseries}
 \renewcommand{\appendixname}{Anexo}
 \renewcommand{\appendixtocname}{Anexo}
 \renewcommand{\appendixpagename}{\normalfont\bfseries Anexo}
@@ -48,6 +47,17 @@
 	linktoc=all,
 	pdftitle={Informe de proyecto 1}
 }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\allsectionsfont{\normalfont\sffamily\bfseries}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{multirow}
+\usepackage{adjustbox}
+
 \usepackage{cite}
 \usepackage{apacite}
 \bibliographystyle{apacite}
