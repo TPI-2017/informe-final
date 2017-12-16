@@ -227,8 +227,18 @@ A la hora de efectuar las conexiones, se debe prestar principal atención a la o
 \subsection{Comunicación entre los módulos}
 
 \subsubsection{Entre maestro y esclavo}
-Como el microcontrolador entrega los datos a 3.3V es necesario convertir estas señales a un voltage que el MAX7219 acepte, la solución que se optó fue incorporar transistores que capaces de transformar 3.3V a 5V (ver figura \ref{fig:transistors}).
-% TODO: hacer diagrama en kicad de los transistores 
+Como el microcontrolador entrega los datos a 3.3V es necesario convertir estas señales a un voltage que el MAX7219 acepte, la solución que se optó fue incorporar transistores que capaces de transformar 3.3V a 5V. Para ello se conecta tres transistores NPN al circuito, uno por cada señal (DATAIN, LOAD, CLK), se puede observar en la figura \ref{fig:transistors} la conexión.
+
+Los transistores utilizados en el prototipo final son los 2n2369 %(http://www.pci-card.com/2n2369.pdf)
+.La base es el pin 2, el colector el pin 1 y el emisor el pin 3.
+\begin{figure}[ht!]
+	\centering
+	\begin{center}
+		\includegraphics[width=0.7\textwidth]{imagenes/hw/transistor.pdf}
+		\caption{Conexión de un transistor, junto con los valores de las resistencias.}
+		\label{fig:transistors}
+	\end{center}
+\end{figure}
 
 \subsubsection{Protocolo de comunicación SPI entre los MAX7219} \label{sec:comunicacion}
 Es posible expandir el cartel con N esclavos. En la figura \ref{fig:MAX-MAX} se observa la forma en que se debe realizar la interconexión de los dispositivos integrados.
