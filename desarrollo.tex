@@ -291,7 +291,7 @@ firstnumber=12]
 
 El método init( ) de settings se encarga de inicializar el puntero de la estructura de la FLASH de donde lee y almacena los datos.
 Adicionalmente, la clase provee funcionalidad para establecer las configuraciones por defecto del sistema, presionando el botón de RST durante 5 segundos.
-Para lograr eso, dentro del método init( ) también se inicializa el pin que se va a utilizar como reset (pin %TODO agregar pin%) y se establece el callback para cuando dicho evento ocurra.
+Para lograr eso, dentro del método init( ) también se inicializa el pin que se va a utilizar como reset (pin GPIO2) y se establece el callback para cuando dicho evento ocurra.
 Se recomienda revisar la sección \ref{sec:callback} donde se explica el mecanismo de callbacks que utiliza el microcontrolador.
 
 \lstinputlisting[label{pseudo:settingsLoadSettings},
