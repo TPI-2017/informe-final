@@ -264,7 +264,7 @@ En su definición se inicializa cada clase mencionada en la sección previa, eje
 Dicho método es el encargado de asignar los valores iniciales a las variables internas de cada módulo de software, de forma de poder usar sus servicios públicos, posteriormente.
 Éstas clases son las que se observan en la figura \ref{fig:flujo_de_datos}: WiFiManager, LedSign, Server y Settings.
 
-Adicionalmente se establece %TODO decir lo del baudrate%. por medio de una función propia del SDK utilizado para el desarrollo.
+Adicionalmente se establece tasa de bits por segundo a 115200 por medio de una función propia del SDK utilizado para el desarrollo.
 Por último para utilizar los pines del micro, se inicializan los GPIO del microcontrolador, a través de la función gpio\_init( ) que también es propia del SDK.
 En la figura \ref{pseudo:userInit} se muestra un pseudocódigo del método user\_init( ).
 
@@ -473,10 +473,11 @@ Recibe tres parámetros de configuración, el primero es el texto a mostrar.
 Es necesario que tenga un terminador nulo.
 En caso de que no lo tenga, el comportamiento del método queda indefinido.
 
-El segundo parámetro es brate, es un entero positivo que indica la velocidad de parpadeo que posee el texto.
+El segundo parámetro es brate, es un float que indica la velocidad de parpadeo que posee el texto.
+Un valor negativo, repercute en comportamiento indefinido.
 En caso de que no se requiera se debe colocar un 0.
 
-El último parámetro es srate que también es un entero que indica la velocidad a la que se desplaza el contenido.
+El último parámetro es srate que también es un float que indica la velocidad a la que se desplaza el contenido.
 La diferencia con el anterior radica en que este sí puede tomar valores negativos.
 Un valor negativo indica que el contenido se desplaza a la izquierda, mientras que un positivo lo hace hacia la derecha.
 En caso de que no se requiera el uso de esta funcionalidad, se debe colocar un 0. 
@@ -598,6 +599,9 @@ De la misma forma, si SRATE es cero, no se debe deslizar el contenido.
 
 El tipo de dato ufp844 es un número en punto fijo sin signo con 4 bits de parte entera y 4 bits de parte fraccionaria.
 El tipo de dato sfp844 es lo mismo que ufp844 pero en complemento a dos.
+
+Por último, en content se encuentra el campo text asociado al mensaje a mostrar en el cartel.
+El mismo debe tener un terminador nulo para indicar el fin del contenido.
 
 La respuesta que se recibe es del tipo GenericResponse.
 
