@@ -1,0 +1,111 @@
+void user_init()
+{
+	set_bitrate(115200);
+	gpio_init();
+	LEDSign::init();
+	Settings::init();
+	Settings::loadSettings();
+	WifiManager::init();
+	Server::init();
+}
+
+void Settings::init();
+
+void Settings::loadSettings();
+
+void Settings::storeSettings();
+
+void WifiManager::init();
+
+void Server::init();
+
+void Server::listen();
+
+void Server::send(const void *data, uint16_t len);
+
+void Server::receiveCallback(void *conn, char *data, uint16 size)
+{
+	buffer.write(data, size);
+	if (buffer.isFull()) {
+		MessageHandler::handleMessage(buffer);
+	}
+}
+
+void Server::disconnect();
+
+void MessageHandler::handle(const Message &msg)
+{
+	if (msg.empty()) {
+		printf("El mensaje está vacío\n");
+		Server::send(MalformedPacket);
+		return;
+	}
+
+	if (msg.version() > Message::SUPPORTED_PROTOCOL_VERSION) {
+		printf("Version de protocolo no soportada\n");
+		Server::send(BadProtocolVersion);
+		return;
+	}
+
+	if (msg.password(), != Settings::password()) {
+		printf("Password incorrecto\n");
+		Server::send(BadPassword);
+		return;
+	}
+
+	switch(msg.type()) {
+
+		case Message::Type::SetPassword:
+			os_printf("SetPassword request\n");
+			Settings::setPassword(msg.newPassword());
+			Settings::storeSettings();
+			Server::send(OK);
+			break;
+
+		case Message::Type::GetText:
+			os_printf("GetText request\n");
+			Server::send(Message::createGetTextResponse(Settings::blinkRate(), Settings::slideRate(), Settings::text());
+			break;
+
+		case Message::Type::SetText:
+			os_printf("SetText request\n");
+			Settings::setText(msg.text(), msg.blinkRate(), msg.slideRate());
+			Settings::storeSettings();
+			Server::send(OK);
+			break;
+
+		case Message::Type::GetWiFiConfig:
+			os_printf("GetWifiConfig request\n");
+			Server::send(Message::createGetWiFiConfigResponse(Settings::ssid(), Settings::wifiPassword(), Settings::ip(), Settings::subnetMask());
+			break;
+
+		case Message::Type::SetWiFiConfig:
+			os_printf("SetWifiConfig request\n");
+			Settings::setSSID(msg.wifiSSID());
+			Settings::setWiFiPassword(msg.wifiPassword());
+			Settings::setIP(msg.wifiIP());
+			Settings::setSubnetMask(msg.wifiSubnet());
+			Settings::storeSettings();
+			Server::send(OK);
+			break;
+			
+	}
+}
+
+void LEDSign::init()
+{
+	inicializarPinDeSalida(DOUT, CLCK, LATCH);
+	inicializarPinDeSalida(JUMPERS);
+	activarPullUp(JUMPERS);
+	modulos = readJumpers();
+
+	sendCommand(0x0F00); // No test mode
+	sendCommand(0x0C00); // Shutdown
+	sendCommand(0x0900); // No decode
+	sendCommand(0x0A06); // Medium intensity
+	sendCommand(0x0B07); // Scan all columns
+	clearScreen();
+	sendCommand(0x0C01); // Turn on
+}
+
+void LEDSign::messageChanged(const char *text, float brate, float srate);
