@@ -536,6 +536,12 @@ Todos los valores numéricos se transmiten con orden de bytes Big-Endian.
 Cada mensaje respeta un formato base común. Se puede ver este formato en la figura \ref{fig:paquete-base}.
 
 %TODO incluir header. fig:paquete-base.
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=\linewidth]{imagenes/protocolo/paquete-base.pdf}
+	\caption{Esquema general entre todos los componentes del sistema.}
+	\label{fig:paquete-base}
+\end{figure}
 
 \begin{itemize}
 	\item version: es un número de 8 bits que identifica la versión del protocolo, por si se hicieran cambios y se quiera mantener retrocompatibilidad.
@@ -619,9 +625,15 @@ Se espera una respuesta del servidor del tipo GetTextResponse donde el contenido
 \subsubsection{SetText}
 
 El paquete de este tipo permite establecer un nuevo mensaje a representar en el cartel, así como también sus parámetros de configuración.
-El campo content debe respetar la estructura que se observa en la figura \ref{fig:paquete-text}
+El campo content debe respetar la estructura que se observa en la figura \ref{fig:paquete-anim}
 
 %TODO colocar figura relacionada a la estructura del contenido de un settext. fig:paquete-text.
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=\linewidth]{imagenes/protocolo/paquete-anim.pdf}
+	\caption{Esquema general entre todos los componentes del sistema.}
+	\label{fig:paquete-anim}
+\end{figure}
 
 BRATE y SRATE son la frequencia de parpadeo en Hz y la velocidad de deslizamiento en píxeles por segundo.
 Se asume que si BRATE es cero, no se debe parpadear el contenido.
@@ -652,6 +664,12 @@ El paquete de este tipo permite establecer un nuevo SSID, contraseña WiFi, ip y
 El campo content debe respetar la estructura que se observa en la figura \ref{fig:paquete-wifi}
 
 %TODO colocar figura relacionada a la estructura del contenido de un settext. fig:paquete-wifi.
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=\linewidth]{imagenes/protocolo/paquete-wifi.pdf}
+	\caption{Esquema general entre todos los componentes del sistema.}
+	\label{fig:paquete-wifi}
+\end{figure}
 
 La respuesta que se recibe es del tipo GenericResponse.
 
