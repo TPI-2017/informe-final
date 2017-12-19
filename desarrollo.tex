@@ -526,6 +526,7 @@ Basándose en otro timer\_t se envía periódicamente un comando a cada MAX7219 
 
 
 
+\clearpage
 \subsection{Protocolo de comunicación} \label{sec:protocolo}
 
 \subsubsection{Codificación}
@@ -535,10 +536,10 @@ Dentro de esa longitud está incluido el header.
 Todos los valores numéricos se transmiten con orden de bytes Big-Endian.
 Cada mensaje respeta un formato base común. Se puede ver este formato en la figura \ref{fig:paquete-base}.
 
-%TODO incluir header. fig:paquete-base.
+
 \begin{figure}[!ht]
 	\centering
-	\includegraphics[width=\linewidth]{imagenes/protocolo/paquete-base.pdf}
+	\includegraphics[width=0.6\linewidth]{imagenes/protocolo/paquete-base.pdf}
 	\caption{Esquema general entre todos los componentes del sistema.}
 	\label{fig:paquete-base}
 \end{figure}
@@ -550,13 +551,6 @@ Cada mensaje respeta un formato base común. Se puede ver este formato en la fig
 	\item password: es la contraseña del sistema. Debe incluirse en cada paquete que se envía hacia el microcontrolador. Los paquetes que envía éste como respuesta dejan dicho campo vacío.
 	\item content: es una estructura cuya interpretación depende de type y se define más adelante.
 \end{itemize}
-
-
-
-\subsubsection{Strings}
-
-Los strings tienen un límite de longitud dado por el lugar remanente en el mensaje y están codificados según el estándar ISO/IEC 8859-1:1998.
-El último byte del contenido, es necesario colocar un caracter nulo de modo que indique el final de la cadena de texto.
 
 
 
@@ -574,7 +568,6 @@ A continuación, el usuario envía un mensaje denominado request y que puede tom
 \end{itemize}
 
 Así mismo, el cliente, debe especificar la versión de protocolo que utiliza, la firma y la contraseña del sistema.
-
 Por su parte, el servidor, recibe el paquete, analiza todos los campos del header y emite una respuesta hacia el cliente de acuerdo al pedido realizado por éste.
 El campo type de la respuesta puede obtener los siguientes valores.
 
@@ -597,9 +590,7 @@ Respecto de este último tipo de mensajes, los códigos de respuesta posibles so
 
 Luego de obtener la respuesta, el cliente debe cerrar la conexión inmediatamente.
 De esta forma se completa una interacción entre el usuario y servidor.
-
 En caso de que la conexión no fuera cerrada por el usuario, el servidor pasado un cierto tiempo la finaliza.
-
 A lo largo de esta sección se detallan las distintas estructuras del campo content, de forma de mostrar a qué corresponde cada campo.
 
 
@@ -608,7 +599,6 @@ A lo largo de esta sección se detallan las distintas estructuras del campo cont
 
 El paquete de este tipo permie cambiar la contraseña del sistema.
 En content se encuentra la nueva contraseña, tiene un máximo de 40 caracteres sin incluir al caracter nulo.
-
 La respuesta que se recibe es del tipo GenericResponse.
 
 
@@ -627,10 +617,10 @@ Se espera una respuesta del servidor del tipo GetTextResponse donde el contenido
 El paquete de este tipo permite establecer un nuevo mensaje a representar en el cartel, así como también sus parámetros de configuración.
 El campo content debe respetar la estructura que se observa en la figura \ref{fig:paquete-anim}
 
-%TODO colocar figura relacionada a la estructura del contenido de un settext. fig:paquete-text.
+
 \begin{figure}[!ht]
 	\centering
-	\includegraphics[width=\linewidth]{imagenes/protocolo/paquete-anim.pdf}
+	\includegraphics[width=0.3\linewidth]{imagenes/protocolo/paquete-anim.pdf}
 	\caption{Esquema general entre todos los componentes del sistema.}
 	\label{fig:paquete-anim}
 \end{figure}
@@ -638,13 +628,10 @@ El campo content debe respetar la estructura que se observa en la figura \ref{fi
 BRATE y SRATE son la frequencia de parpadeo en Hz y la velocidad de deslizamiento en píxeles por segundo.
 Se asume que si BRATE es cero, no se debe parpadear el contenido.
 De la misma forma, si SRATE es cero, no se debe deslizar el contenido.
-
 El tipo de dato ufp844 es un número en punto fijo sin signo con 4 bits de parte entera y 4 bits de parte fraccionaria.
 El tipo de dato sfp844 es lo mismo que ufp844 pero en complemento a dos.
-
 Por último, en content se encuentra el campo text asociado al mensaje a mostrar en el cartel.
 El mismo debe tener un terminador nulo para indicar el fin del contenido.
-
 La respuesta que se recibe es del tipo GenericResponse.
 
 
@@ -663,15 +650,22 @@ Se espera una respuesta del servidor del tipo GetWiFiConfigResponse donde el con
 El paquete de este tipo permite establecer un nuevo SSID, contraseña WiFi, ip y máscara subred respeco de la red que se conectará la próxima vez que se incie el sistema.
 El campo content debe respetar la estructura que se observa en la figura \ref{fig:paquete-wifi}
 
-%TODO colocar figura relacionada a la estructura del contenido de un settext. fig:paquete-wifi.
+
 \begin{figure}[!ht]
 	\centering
-	\includegraphics[width=\linewidth]{imagenes/protocolo/paquete-wifi.pdf}
+	\includegraphics[width=0.5\linewidth]{imagenes/protocolo/paquete-wifi.pdf}
 	\caption{Esquema general entre todos los componentes del sistema.}
 	\label{fig:paquete-wifi}
 \end{figure}
 
 La respuesta que se recibe es del tipo GenericResponse.
+
+
+
+\subsubsection{Strings}
+
+Los strings tienen un límite de longitud dado por el lugar remanente en el mensaje y están codificados según el estándar ISO/IEC 8859-1:1998.
+El último byte del contenido, es necesario colocar un caracter nulo de modo que indique el final de la cadena de texto.
 
 
 \subsubsection{Transport Layer Security}
