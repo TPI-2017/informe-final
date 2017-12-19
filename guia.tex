@@ -121,7 +121,7 @@ Una vez terminada la compilación, hay que realizar un paso que soluciona un pro
 
 Estando en el directorio \code{esp-open-sdk}, ingrese el siguiente comando:
 \begin{lstlisting}
-	cp sdk/lib/libgcc.a xtensa-lx106-elf/lib/gcc/xtensa-lx106-elf/4.8.5/
+$ cp sdk/lib/libgcc.a xtensa-lx106-elf/lib/gcc/xtensa-lx106-elf/4.8.5/
 \end{lstlisting}
 
 Ahora hay que dejar el compilador y las librerías en un lugar fijo, para poder invocar a los comandos y que el código linkee correctamente.
@@ -258,7 +258,7 @@ Antes de compilar es necesario instalar las dependencias y copiar el certificado
 
 \begin{lstlisting}
 # apt install qt5-default -y
-$ cp /opt/espressif/tools/TLS.ca_x509.cer res/
+$ cp /opt/espressif/sdk/tools/TLS.ca_x509.cer res/
 \end{lstlisting}
 
 El siguiente paso es la compilación en sí:
