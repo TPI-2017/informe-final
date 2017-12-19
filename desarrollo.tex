@@ -278,7 +278,7 @@ Dicho método es el encargado de asignar los valores iniciales a las variables i
 
 Adicionalmente se establece tasa de bits por segundo a 115200 por medio de una función propia del SDK utilizado para el desarrollo.
 Por último para utilizar los pines del micro, se inicializan los GPIO del microcontrolador, a través de la función gpio\_init( ) que también es propia del SDK.
-En la figura \ref{pseudo:userInit} se muestra un pseudocódigo del método user\_init( ).
+En la figura \ref{pseudo:userInit} se muestra un pseudocódigo del método user\_init\( \).
 
 Por último, se observa que para la clase Settings, se ejecuta el método loadSettings( ).
 El mismo se encarga de cargar desde la memoria no volátil del microcontrolador, la última información almacenada respecto del texto a mostrar en el cartel, sus parámetros de configuración, y sus valores de red.
