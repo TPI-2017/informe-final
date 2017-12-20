@@ -197,11 +197,10 @@ Respecto de la información de la red, cabe destacar que los posibles parámetro
 La figura \ref{fig:diagrama_casos_de_uso} muestra un diagrama de casos de uso, que describe todas las funcionalidades que el cliente puede realizar.
 Adicionalmente, se observa como interactúan dichos pedidos, con el cartel.
 
-%TODO mostrar diagrama de casos de uso. fig:diagrama_casos_de_uso.
 \begin{figure}[!ht]
 	\centering
-	\includegraphics[width=0.8\linewidth]{imagenes/sistema-caso-de-uso.pdf}
-	\caption{Modelo en cascada de desarrollo.}
+	\includegraphics[width=1\linewidth]{imagenes/sistema-caso-de-uso.pdf}
+	\caption{Diagrama de casos de usos.}
 	\label{fig:diagrama_casos_de_uso}
 \end{figure}
 
@@ -244,11 +243,11 @@ Mientras que LedSign obtiene los valores de configuración del tipo set y proces
 
 En la figura \ref{fig:flujo_de_datos} se observa los distintos módulos de software previamente enunciados, y el intercambio de información que se realiza entre ellos.
 
-%TODO mostrar flujo de datos con módulos de sw. fig:flujo_de_datos.
+
 \begin{figure}[!ht]
 	\centering
-	\includegraphics[width=0.8\linewidth]{imagenes/diagrama-bloque.pdf}
-	\caption{Modelo en cascada de desarrollo.}
+	\includegraphics[width=1\linewidth]{imagenes/diagrama-bloque.pdf}
+	\caption{Flujo de datos del lado del microcontrolador.}
 	\label{fig:flujo_de_datos}
 \end{figure}
 
@@ -291,11 +290,10 @@ Entre ellas, contiene el texto a mostrar, su velocidad de parpadeo y desplazamie
 Además posee funcionalidades para almacenar dichos datos en memoria no volátil a fin de persistirlos ante un reinicio.
 En la figura \ref{uml:settings}, se observa un diagrama UML con los principales métodos de la clase en cuestión, y a continuación se describe cada uno de ellos.
 
-%TODO mostrar diagrama UML de la clase. uml:settings.
 \begin{figure}[!ht]
 	\centering
-	\includegraphics[width=0.8\linewidth]{imagenes/uml/settings.pdf}
-	\caption{Modelo en cascada de desarrollo.}
+	\includegraphics[width=0.3\linewidth]{imagenes/uml/settings.pdf}
+	\caption{UML de la clase Settings.}
 	\label{uml:settings}
 \end{figure}
 
@@ -365,11 +363,10 @@ Una vez conectado a la red WiFi, la clase Server es la encargada de colocar al m
 Provee funcionalidades para inicializar el servidor, desconectar la sesión, enviar mensajes TCP hacia el cliente, y notificar cuando se recibe un paquete.
 En el UML de la figura \ref{uml:server} se observan los métodos públicos de la clase que abstrae las funcionalidades mencionadas anteriormente.
 
-%TODO mostrar UML de Server. uml:server.
 \begin{figure}[!ht]
 	\centering
-	\includegraphics[width=0.8\linewidth]{imagenes/uml/server.pdf}
-	\caption{Modelo en cascada de desarrollo.}
+	\includegraphics[width=0.4\linewidth]{imagenes/uml/server.pdf}
+	\caption{UML de la clase Server.}
 	\label{uml:server}
 \end{figure}
 
@@ -458,11 +455,10 @@ La misma se encarga de recibir los datos que envía MessageHandler por parámetr
 Cabe recordar que el programa del microcontrolador solo se comunica con el primer MAX7219 como lo indica la figura \ref{fig:flujo_de_datos}.
 En la figura \ref{uml:ledSign} se muestra un UML con los métodos públicos que componen la clase.
 
-%TODO mostrar uml de la clase. uml:ledSign.
 \begin{figure}[!ht]
 	\centering
-	\includegraphics[width=0.8\linewidth]{imagenes/uml/LEDSign.pdf}
-	\caption{Modelo en cascada de desarrollo.}
+	\includegraphics[width=0.5\linewidth]{imagenes/uml/LEDSign.pdf}
+	\caption{UML de la clase LEDSign.}
 	\label{uml:ledSign}
 \end{figure}
 
