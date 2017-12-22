@@ -12,6 +12,7 @@
 \usepackage{spreadtab}
 \usepackage{import}
 \usepackage{sectsty}
+\usepackage[final]{microtype}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage[dvipsnames]{xcolor}
 \definecolor{azulOscuro}{rgb}{0.0, 0.28, 0.67}
@@ -78,7 +79,7 @@
 	numbers=none
 }
 
-\newcommand{\code}[1]{\mbox{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
 
 \begin{document}
 	\renewcommand\refname{Referencias}
@@ -90,7 +91,14 @@
 	\hypersetup{pageanchor=true}
 
 	\setcounter{page}{1}
-	\input{desarrollo.tex}
+
+	\input{introduccion.tex}
+	\clearpage
+	\input{requerimientos.tex}
+	\clearpage
+	\input{diseno.tex}
+	\clearpage
+	\input{ensayos.tex}
 
 	\clearpage
 	\printglossary[type=\acronymtype, title=Siglas y acrónimos, toctitle=Siglas y acrónimos]

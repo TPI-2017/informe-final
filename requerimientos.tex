@@ -1,0 +1,23 @@
+\part{Análisis de requerimientos}\label{part:analisis}
+\section{Requerimientos}
+\subsection{Funcionales}
+\begin{itemize}
+	\item La aplicación de PC deberá ser capaz de poder iniciar una conexión segura con el sistema utilizando la misma para enviar los mensajes que el cliente desee.
+	\item La aplicación podrá enviar peticiones de forma de obtener el mensaje actual del cartel o incluso establecer uno nuevo. Por otra parte, también podrá pedir los datos de la red a la que el sistema estará conectado o cambiarlos.
+	\item La aplicación deberá ser capaz de modificar parámetros de animación tales como frecuencia de parpadeo y velocidad de desplazamiento lateral o estaticidad.
+	\item La aplicación permitirá al usuario, ingresar por teclado el mensaje que desea mostrar mediante los caracteres que se establecen en el estándar de codificación de caracteres ISO/IEC 8859-1 (ver \cite{CodifChar}).
+	\item El cartel deberá poder procesar sólo mensajes a través del protocolo diseñado específicamente para este proyecto (ver sección \ref{sec:protocolo})
+	\item El cartel deberá mostrar los mensajes que desee el usuario.
+	\item El cartel deberá poder almacenar y modificar sus credenciales de red de forma de poder conectarse al WiFi que el cliente desee.
+	\item El cartel deberá mantener los datos de configuración y del mensaje que muestra, aún cuando el mismo haya sido desconectado de la red inalámbrica o de la red eléctrica.
+\end{itemize}
+
+\subsection{No funcionales}
+\begin{itemize}
+	\item El tiempo de respuesta del cartel no debe exceder los cinco segundos.
+	\item El sistema entero no debe consumir mas de 30 Watts bajo operación normal.
+	\item El sistema deberá ser capaz de aceptar sólo conexiones por TLS \cite{TLS} de forma que las conexiones y el intercambio de paquetes sea cifrado y seguro.
+\end{itemize}
+% TODO: Hacer diagramas de caso de uso
+\subsection{Interacción con el usuario}
+\section{Especificaciones físicas}
