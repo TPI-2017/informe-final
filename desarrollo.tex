@@ -1,12 +1,11 @@
-% Para estilizar código
+
 \section{Introducción}
-% TODO: insertar chamu sobre sistemas similares disponibles, etc.
 En el ámbito universitario resulta necesario mantener informadas a las personas sobre una amplia variedad de hechos, noticias y acontecimientos que sucedieron o sucederán, desde la ubicación de un aula hasta la notificación de la cancelación de una clase. Muchas veces estas notificaciones son sobre cuestiones muy efímeras, lo que requiere rapidez para empezar a transmitirlas y facilidad para tener el alcance necesario.
 
 En las facultades de la Universidad Nacional de La Plata se consumen muchos recursos para cumplir este fin, a través de afiches, pancartas, panfletos, etc. los cuales, pese a ser de barata fabricación, no tienen una vida útil muy extensa. Además todas estas formas de comunicación se basan en el uso de papel, que tras ser utilizado debe desecharse debido a la imposibilidad de reutilizarlo, generando una cantidad de residuos significativa. Si se tiene en cuenta que también generan una polución visual considerable, por la gran cantidad de estos distribuidos en todos los lugares transitables, resulta prudente considerar una nueva forma de comunicación.
 
 % TODO: Mencionar sobre otros carteles comercialmente disponibles
-Surge así la idea de desarrollar de un cartel electrónico reutilizable, capaz de ser configurado remotamente por las autoridades competentes, con el fin de proveer una forma de comunicación masiva más limpia, clara y menos dañina para el medio ambiente.
+Surge así la idea de desarrollar de un cartel electrónico, capaz de ser configurado remotamente por las autoridades competentes, con el fin de proveer una forma de comunicación masiva más limpia, clara y menos dañina para el medio ambiente.
 
 En este informe se describe todas las fases del desarrollo de un proyecto para la asignatura Taller de Proyecto 1. El proyecto consiste en el diseño y desarrollo de un sistema de cartel luminoso cuyo contenido es configurable de forma remota. El cartel tiene conectividad WiFi, con lo que es capaz de formar parte de una red IP.
 
@@ -282,7 +281,6 @@ El pin conectado al DATAIN del micro, se utiliza para enviar los datos, empezand
 \end{figure}
 
 
-% ==============================================================
 \section{Software}\label{sec:sw}
 El software del sistema está formado por dos componentes: el firmware que corre sobre el controlador del cartel y la aplicación de PC que corre en una PC.
 
@@ -305,6 +303,8 @@ La figura \ref{fig:petri-net} describe el mecanismo de interacción entre la PC 
 \subsection{Firmware}
 El firmware del controlador del cartel es quien se encarga de aceptar pedidos de la aplicación de PC y ejecutar las acciones de cambio de mensaje, parámetros de animacion, configuración WiFi o de contraseña. Además, como se explicó en la sección \ref{sec:hw}, el ESP8266EX envía la configuración de las matrices de LED por serie.
 
+
+
 \subsection{Plataformas de desarrollo}
 El System on Chip ESP8266EX es muy popular y existen diversas formas de desarrollar para él, entre ellas están:
 \begin{itemize}
@@ -316,8 +316,305 @@ El System on Chip ESP8266EX es muy popular y existen diversas formas de desarrol
 Todas estas formas de desarrollar tienen en común que el software del programador corre sobre un firmware privativo, es decir, no es viable programarlo \enquote{bare-metal} porque los registros y todos la información del hardware necesario para realizar algo no trivial no está disponible.
 
 Para el este proyecto se decidió utilizar el SDK \enquote{NON-OS}, donde las funciones que define el programador se ejecutan siempre enteramente, de forma cooperativa. Esto elimina toda una clase de problemas de interferencia de datos a causa de la concurrencia, con lo que no es necesario utilizar primitivas de sincronización.
-\subsubsection{Arquitectura del software}
-\subsection{Aplicación de PC}
+
+Un ejemplo de esta técnica de programación se puede ver en la figura \ref{fig:callbacks}, donde se muestra como se registra la función que debe ejecutarse al recibir datos a través de una conexión TCP sobre 802.11. La aplicación llama a \code{espconn\_regist\_recvcb}, pasándole un puntero a función a \code{callback} y el firmware se encarga de llamar a \code{callback} cuando corresponda.
+
+\begin{figure}[ht!]
+	\begin{center}
+		\centering
+		\includegraphics[scale=0.8]{imagenes/callbacks.pdf}
+		\caption{Ejemplo de uso de callbacks.}
+		\label{fig:callbacks}
+	\end{center}
+\end{figure}
+
+
+
+\subsubsection{Arquitectura general del programa}
+
+El software que corre en el microcontrolador del cartel debe escuchar conexiones, y una vez establecida una conexión iniciada por la aplicación de PC, debe esperar a recibir un mensaje de autenticación con contraseña antes de permitir cambios del contenido del cartel.
+
+Una vez que el usuario se autentica, el cartel espera un pedido de la aplicación de escritorio. Las interacciones posibles están descritas en mayor detalle en la sección \ref{sec:protocolo}.
+
+El comportamiento del microcontrolador puede describirse como una máquina de estado finita jerárquica, como lo muestra la figura \ref{fig:fsm-micro}.
+
+\begin{figure}[ht!]
+	\begin{center}
+		\centering
+		\includegraphics[scale=0.8]{imagenes/fsm-micro.pdf}
+		\caption{Máquina de estados finitos jerárquica del manejo de conexión en el microcontrolador.}
+		\label{fig:fsm-micro}
+	\end{center}
+\end{figure}
+
+
+
+\subsubsection{Requerimientos generales del programa embebido}
+
+El programa que corre sobre el microcontrolador ESP8266 necesita conectarse a una red WiFi preexistente a fin de poder establecer una comunicación cifrada bajo el protocolo TLS con el cliente.
+En esta sección, se hace referencia al cliente como la aplicación de PC.
+
+El software debe actuar como servidor y manejar las peticiones que el cliente realice por medio de la aplicación de PC, detallada en la sección \ref{sec:pc}.
+Dichas peticiones se clasifican en dos categorías: del tipo \enquote{get} y del tipo \enquote{get}. Las mismas se explican a continuación.
+
+Las primeras corresponden a pedidos que solicitan información del sistema, mientras que las segundas permiten modificar dicha información.
+Dentro de la categoría get, por un lado, el cliente puede loguearse en el sistema, obtener el texto que actualmente se muestra en el cartel, capturar la velocidad con la que se desplaza y con la que parpadea el contenido y pedir la configuración WiFi de la red a la que se encuentra conectado el microcontrolador.
+
+A su vez, el cliente puede cambiar el contenido que desea representar, así como también modificar los parámetros relacionados a la velocidad de desplazamiento y parpadeo del texto.
+Adicionalmente es posible modificar la configuración de la red a la que se autenticará la próxima vez que el ESP8266 se reinicie.
+Por otra parte, el sistema posee una contraseña que es necesaria para realizar la acción de logueo.
+Una vez logueado, dicha clave puede ser modificada. Estas acciones pertenecen a la categoría set.
+
+Respecto de la información de la red, cabe destacar que los posibles parámetros que se pueden solicitar y cambiar son: el SSID, la contraseña WiFi, la dirección IP y la máscara de subred.
+
+La figura \ref{fig:diagrama_casos_de_uso} muestra un diagrama de casos de uso, que describe todas las funcionalidades que el cliente puede realizar.
+Adicionalmente, se observa como interactúan dichos pedidos, con el cartel.
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=1\linewidth]{imagenes/sistema-caso-de-uso.pdf}
+	\caption{Diagrama de casos de usos.}
+	\label{fig:diagrama_casos_de_uso}
+\end{figure}
+
+En la figura \ref{fig:diagrama_casos_de_uso} se observa, que entre las funcionalidades que el cliente realiza, se encuentra la de modificar los datos del cartel, tal como su contenido, su configuración WiFi y su contraseña del sistema.
+Como el sistema puede, eventualmente, ser desprovisto de su alimentación o reseteado, es necesario que dichos cambios persistan aún cuando éstos eventos ocurren.
+
+Por otra parte, el programa debe ser capaz de interpretar los pedidos que realiza el cliente y procesarlos a fin de generar la información que necesita el cartel para encender cada columna de luces.
+Es necesario recordar que la matriz de LEDs está compuesta por módulos MAX7219 que son los encargados de recibir los datos enviados por el microcontrolador y encender las columnas de luces según corresponda.
+
+
+
+\subsubsection{Secuencia de eventos del lado del microcontrolador}
+
+En esta sección se enuncia brevemente, la secuencia de eventos que el usuario puede realizar con el sistema y cómo el programa responde ante los diferentes pedidos.
+Es importante tener presente la figura \ref{fig:diagrama_casos_de_uso} donde se observa el diagrama de casos de uso que describe todas las funcionalidades que el cliente puede efectuar.
+
+En primer lugar, el cartel se conecta a la red WiFi presentando las credenciales previamente almacenadas en la memoria no volátil del microcontrolador.
+Esta acción es llevada a cabo gracias a una clase a nivel software denominada WiFiManager.
+A su vez, el cliente accede a la aplicación QT, con el ordenador conectado a la misma red.
+
+El sistema le solicita la contraseña antes de realizar cualquier acción.
+Una vez logueado, el cliente puede realizar cualquiera de las funcionalidades previamente enunciadas en la subsección anterior (tanto del tipo get como del tipo set).
+Entre las acciones disponibles puede pedir información del texto que actualmente se encuentra representado en el cartel, o las credenciales de la red WiFi a la que el sistema se conecta.
+Estas acciones, leen de la memoria no volátil del microcontrolador los datos necesarios y se la devuelven a la aplicación QT.
+El manejo de esta memoria persistente la realiza la clase conocida como Settings.
+
+En caso de que el usuario desee modificar alguno de esos valores, puede hacerlo a través de la misma aplicación.
+El mismo módulo de software que se encarga de leer de la memoria no volátil, obtiene los nuevos requerimientos que le provee el cliente, modifica sus variables internas y las almacena a fin de mantenerlas ante un futuro pedido.
+
+El cartel, es decir el programa que corre sobre el microcontrolador, actúa de servidor atendiendo las peticiones que realiza el cliente de la aplicación QT.
+Esta funcionalidad es manejada por una clase de software denominada Server.
+La misma es la encargada de recibir la cadena de bytes vía TCP y enviarla hacia el módulo MessageHandler.
+
+En otras palabras MessageHandler toma la secuencia de bytes que le pasa la clase Server e interpreta esos datos utilizando el protocolo que se detalla en la sección \ref{sec:protocolo}.
+Este protocolo ofrece soporte para interpretar cada acción que el cliente realiza ya que posee métodos para codificar y decodificar dichas peticiones.
+
+MessageHandler decodifica los pedidos y los envía a la clase Settings o LedSign según pertenezcan a la cateogría de get o set respectivamente.
+La clase Settings, ha sido enunciada previamente en esta sección, la misma se encarga de todos los pedidos que no requieran configurar la matriz de LEDs.
+Mientras que LedSign obtiene los valores de configuración del tipo set y procesa los datos a fin de convertirlos en comandos que puedan ser interpretados por los dispositivos MAX7219, encargados de encender las luces del cartel.
+
+En la figura \ref{fig:flujo_de_datos} se observa los distintos módulos de software previamente enunciados, y el intercambio de información que se realiza entre ellos.
+
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=1\linewidth]{imagenes/diagrama-bloque.pdf}
+	\caption{Flujo de datos del lado del microcontrolador.}
+	\label{fig:flujo_de_datos}
+\end{figure}
+
+A modo complementario se detalla un ejemplo relacionado a una secuencia de eventos que un cliente puede realizar.
+En este caso, un usuario pide cambiar el texto que se muestra en la matriz. Este pedido es capturado por la clase Server quien le pasa la secuencia de bytes a MessageHandler.
+Ésta interpreta la secuencia y obtiene el nuevo texto a representar. La información es enviada a LedSign quien desglosa el texto en letras y determina como deben encenderse las diferentes filas de la matriz de LEDs.
+Por último, almacena el nuevo texto en la clase Settings para persistir la nueva información proporcionada.
+
+A lo largo de esta sección se detalla cada clase mencionada, mostrando cuáles son sus interfaces de software y la forma en que se interconectan entre ellas.
+
+\subsubsection{Archivo principal} \label{sec:archivo_principal}
+
+\lstinputlisting[linerange=1-10, firstnumber=1] {codigo/pseudocodigo/microcontrolador.pseudo}
+
+El Archivo principal del programa que corre sobre el microcontrolador es el archivo main.cpp.
+Dentro tiene un método denominado \code{user\_init()} que actúa como punto de entrada de la aplicación y no contiene parámetros.
+En su definición se inicializa cada clase mencionada en la sección previa, ejecutando el método init( ) de cada una de ellas.
+Dicho método es el encargado de asignar los valores iniciales a las variables internas de cada módulo de software, de forma de poder usar sus servicios públicos, posteriormente.
+Éstas clases son las que se observan en la figura \ref{fig:flujo_de_datos}: WiFiManager, LedSign, Server y Settings.
+
+Adicionalmente se establece tasa de bits por segundo a 115200 por medio de una función propia del SDK utilizado para el desarrollo.
+Por último para utilizar los pines del micro, se inicializan los GPIO del microcontrolador, a través de la función gpio\_init( ) que también es propia del SDK.
+En la figura \ref{pseudo:userInit} se muestra un pseudocódigo del método user\_init\( \).
+
+Por último, se observa que para la clase Settings, se ejecuta el método loadSettings( ).
+El mismo se encarga de cargar desde la memoria no volátil del microcontrolador, la última información almacenada respecto del texto a mostrar en el cartel, sus parámetros de configuración, y sus valores de red.
+
+
+\subsubsection{Settings}
+
+La clase Settings es la encargada de mantener en memoria RAM, la información principal respecto del cartel.
+Entre ellas, contiene el texto a mostrar, su velocidad de parpadeo y desplazamiento y la información de la red a la que actualmente se encuentra conectado el sistema.
+Además posee funcionalidades para almacenar dichos datos en memoria no volátil a fin de persistirlos ante un reinicio.
+En la figura \ref{uml:settings}, se observa un diagrama UML con los principales métodos de la clase en cuestión, y a continuación se describe cada uno de ellos.
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[scale=0.8]{imagenes/uml/settings.pdf}
+	\caption{UML de la clase Settings.}
+	\label{uml:settings}
+\end{figure}
+
+\lstinputlisting[linerange=12-12, firstnumber=12] {codigo/pseudocodigo/microcontrolador.pseudo}
+
+El método \code{init()} de settings se encarga de inicializar el puntero de la estructura de la flash de donde lee y almacena los datos.
+Adicionalmente, la clase provee funcionalidad para establecer las configuraciones por defecto del sistema, presionando el botón de RST durante 5 segundos.
+Para lograr eso, dentro del método \code{init()} también se inicializa el pin que se va a utilizar como reset (pin GPIO2) y se establece el callback para cuando dicho evento ocurra.
+Se recomienda revisar la sección \ref{sec:callback} donde se explica el mecanismo de callbacks que utiliza el microcontrolador.
+
+\lstinputlisting[linerange=14-14, firstnumber=14] {codigo/pseudocodigo/microcontrolador.pseudo}
+
+El método \code{loadSettings()} se encarga de cargar en memoria RAM la información necesaria del cartel utilizando el puntero previamente incializado en \code{init()}.
+Adicionalmente se le envía, dicha información, a la clase LedSign quien es la encargada de mostrar el contenido anteriormente almacenado en la memoria.
+
+En caso de que la información leída estuviese corrupta, la clase contiene un método privado para cargar los datos por defecto del sistema.
+El método no posee parámetros.
+
+\lstinputlisting[linerange=16-16, firstnumber=16] {codigo/pseudocodigo/microcontrolador.pseudo}
+
+El método \code{storeSettings()} de la clase Settings provee funcionalidad para almacenar en la memoria no volátil la información actual del sistema.
+Para la persistencia de los datos, se utiliza la librería propietaria del SDK denominada spi\_flash.h.
+Este método no contiene parámetros.
+
+
+\subsubsection{WiFiManager}
+
+La clase WiFiManager es la encargada de administrar todas las configuraciones WiFi que necesita el microcontrolador para conectarse a una red.
+Posee un sólo método público enunciado en el apartado \ref{sec:archivo_principal}, denominado init( ).
+
+\lstinputlisting[linerange=18-18, firstnumber=18] {codigo/pseudocodigo/microcontrolador.pseudo}
+
+El método no contiene parámetros y su principal tarea consiste en leer los datos de la clase Settings relacionados a la información de la red.
+Dichos valores corresponden al SSID, contraseña de WiFi, ip, y máscara de subred y son utilizados para permitir al sistema conectarse a la red WiFi correspondiente.
+La librería propia del SDK osapi.h permite realizar estas acciones.
+
+
+
+\subsubsection{Server}
+
+Una vez conectado a la red WiFi, la clase Server es la encargada de colocar al microcontrolador en modo servidor, de forma de poder atender las peticiones que realiza el usuario.
+Provee funcionalidades para inicializar el servidor, desconectar la sesión, enviar mensajes hacia el cliente, y notificar cuando se recibe un paquete.
+En el UML de la figura \ref{uml:server} se observan los métodos públicos de la clase que abstrae las funcionalidades mencionadas anteriormente.
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[scale=0.8]{imagenes/uml/server.pdf}
+	\caption{UML de la clase Server.}
+	\label{uml:server}
+\end{figure}
+
+Cabe destacar que en la figura \ref{uml:server} aparece una función privada relacionada a la recepción de mensajes denominada \code{receiveCallback()}.
+Como bien su nombre lo indica, esto es un callback que se setea dentro del método \code{listen()} y se ejecuta cuando algún paquete llega al servidor (para más información, revisar la sección \ref{sec:callbacks} donde se explica el método de callbacks).
+A pesar de que sea un método privado, se decide mostrar en el UML debido a su reelevancia en esta solución.
+Más adelanete, en esta sección, se explica su implementación.
+
+\lstinputlisting[linerange=20-20, firstnumber=20] {codigo/pseudocodigo/microcontrolador.pseudo}
+
+El método \code{init()} de la clase Server se ejecuta en el archivo principal y su función esencial consiste en inicializar las variables internas de la estructura de modo de permitir, posteriormente, colocar al microcontrolador en modo servidor.
+Cabe aclarar que esta función debe ejecutarse después de haberse autenticado a una red WiFi; por ese motivo, primero se ejecta el \code{init()} de la clase WiFiManager.
+Por otra parte, éste método no coloca al programa en modo servidor, es decir, no permite que distintos clientes se conecten todavía; para ello debe ejecutarse el método \code{listen()} que se describe a continuación.
+
+\lstinputlisting[linerange=22-22, firstnumber=22] {codigo/pseudocodigo/microcontrolador.pseudo}
+
+En primer lugar, el método \code{listen()} configura el certificado y la clave de seguridad del protocolo SSL que se utiliza en el intercambio de mensajes entre el servidor y el cliente de forma de que los mismos permanezcan cifrados hasta llegar a destino.
+Adicionalmente, activa el mecanismo de Keep Alive propio de TCP, limita el número de conexiones simultáneas a uno y registrar los callbacks necesarios para su correcto funcionamiento (entre ellos el correspondiente a la recepción de paquetes).
+El método no contiene parámetros.
+
+\lstinputlisting[linerange=24-24, firstnumber=24] {codigo/pseudocodigo/microcontrolador.pseudo}
+
+El método \code{send()} provee funcionalidad para enviar mediante TCP, hacia el cliente, un arreglo de bytes de manera cifrada.
+Para su utilización, es necesario haber ejecutado el método \code{listen()} previamente y haber establecido una conexión con un cliente.
+
+Recibe como parámetro un puntero que contiene la dirección del mensaje a enviar y el tamaño de dicho paquete.
+
+\lstinputlisting[linerange=26-32, firstnumber=26] {codigo/pseudocodigo/microcontrolador.pseudo}
+
+Como ya se mencionó anteriormente, el método \code{receiveCallback()} es una función privada que se ejecuta sólo cuando se reciben datos desde el cliente (size).
+Contiene un buffer interno donde almacena los bytes que obtiene.
+Los parámetros que recibe corresponden con la conexión vía TCP que envía los datos (conn), un puntero a la cadena de bytes recibido (data) y por último el tamaño de dicho arreglo.
+
+Dicha estructura posee una capacidad limitada y, en este caso, su tamaño máximo se especifica en el protocolo de software (ver sección\ref{sec:protocolo}).
+Cabe aclarar que la tarea de este método es apilar bytes crudos hasta llenar el buffer. La clase Server no tiene las herramientas necesarias para interpretar la información que recibe.
+Por ese motivo cuando la estructura se llena, se notifica a la clase MessageHandler quien es la que implementa el protocolo de comunicación diseñado para este proyecto y es capaz de interpretar la cadena de bytes recibida.
+
+
+
+\subsubsection{MessageHandler}
+
+La clase MessageHandler implementa el protocolo de comunicación entre el servidor y el cliente, y es capaz de interpretar el arreglo de bytes que recibe desde la clase Server.
+Posee un sólo método denominado \code{handle()} que atiende el mensaje que le envía el usuario y elabora una respuesta hacia éste.
+En la figura \ref{pseudo:messageHandlerHandle} se muestra un pseudocódigo del método a fin de brindar mayor claridad en la comprensión de la función.
+
+\lstinputlisting[linerange=36-93, firstnumber=36] {codigo/pseudocodigo/microcontrolador.pseudo}
+
+
+
+\subsubsection{LedSign}
+
+La última clase de la arquitectura del programa del microcontrolador es LedSign.
+La misma se encarga de recibir los datos que envía MessageHandler por parámetro, procesarlos y armar un buffer de salida con la información necesaria para encender las luces de la matriz.
+Cabe recordar que el programa del microcontrolador solo se comunica con el primer MAX7219 como lo indica la figura \ref{fig:flujo_de_datos}.
+En la figura \ref{uml:ledSign} se muestra un UML con los métodos públicos que componen la clase.
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[scale=0.8]{imagenes/uml/LEDSign.pdf}
+	\caption{UML de la clase LEDSign.}
+	\label{uml:ledSign}
+\end{figure}
+
+\lstinputlisting[linerange=95-109, firstnumber=95] {codigo/pseudocodigo/microcontrolador.pseudo}
+
+En primer lugar, el método \code{init()} se encarga de configurar los pines LATCH, CLK y DATA que se utilizan para la comunicación entre el microcontrolador y el MAX7219.
+Para mayor información respecto de los pines, se sugiere visitar la sección \ref{sec:} %TODO poner la sección donde se explica los pines esos.
+
+Adicionalmente se configura como salida los pines que se utilizan para los jumpers, se les habilita su pull up interno y se lee su valor a la salida.
+De esta forma, se indica cuántos módulos de 8x8 LEDs componen el cartel.
+
+Por otra parte, el método se encarga de configurar todos los registros necesarios de cada MAX7219 para iniciar su funcionamiento.
+Entre las acciones que realiza, el programa se encarga de sacarlo del modo test, configurar la intensidad de los LEDs, indicarle que se van a usar las ocho columnas que posee el chip, limpiarle la pantalla apagando todos los LEDs y encenderlo.
+Dichas configuraciones se realizan través del método \code{sendCommand()}.
+La función toma dos parámetros, en el primero se especifica el registro a configurar y en el segundo el valor que se desea establecer.
+Para más información respecto de la configuración de los registros consultar el datasheet del MAX7219 haciendo click en el siguiente \href{https://datasheets.maximintegrated.com/en/ds/MAX7219-MAX7221.pdf}{link}.
+
+Finalmente se limpia el cartel, apagando todas las luces de cada módulo.
+
+\lstinputlisting[linerange=111-111, firstnumber=111] {codigo/pseudocodigo/microcontrolador.pseudo}
+
+El método \code{messageChanged()} se invoca cuando el mensaje o algún parámetro de configuración (tiempo de parpadeo o velocidad de desplazamiento) es modificado.
+
+Recibe tres parámetros de configuración, el primero es el texto a mostrar.
+Éste es un puntero a char donde se encuentra la información del contenido.
+Es necesario que tenga un terminador nulo.
+En caso de que no lo tenga, el comportamiento del método queda indefinido.
+
+El segundo parámetro es brate, es un float que indica la velocidad de parpadeo que posee el texto.
+Un valor negativo, repercute en comportamiento indefinido.
+En caso de que no se requiera se debe colocar un 0.
+
+El último parámetro es srate que también es un float que indica la velocidad a la que se desplaza el contenido.
+La diferencia con el anterior radica en que este sí puede tomar valores negativos.
+Un valor negativo indica que el contenido se desplaza a la izquierda, mientras que un positivo lo hace hacia la derecha.
+En caso de que no se requiera el uso de esta funcionalidad, se debe colocar un 0. 
+
+La función principal de este método es tomar los datos de configuración que se reciben por parámetro y armar un buffer de salida con la información de cada columna del cartel, respecto del estado de cada LED.
+Para realizar el desplazamineto del contenido, la estrategia que se adopta es periódicamente, mover el índice del buffer y enviar nuevamente la información al MAX7219.
+Para el tiempo se utiliza una estructura propia del SDK del microcontrolador denominado timer\_t.
+La misma permite ejecutar un callback cuando se cumple un determinado lapso de tiempo.
+
+Para realizar el parpadeo del mensaje, se adopta una estrategia similar.
+Basándose en otro timer\_t se envía periódicamente un comando a cada MAX7219 que le indica que debe encenderse o apagarse, según corresponda.
+
+
+\subsection{Aplicación de PC}\label{sec:pc}
 La aplicación de PC es un programa con interfaz gráfica que permite al usuario administrar el contenido y configuración del cartel de forma remota. En el marco del protocolo definido en el \ref{sec:protocolo}, la aplicación de PC es el cliente.
 
 \subsubsection{Plataforma de desarrollo}
@@ -459,19 +756,159 @@ Esta clase es más pequeña que las anteriores. Provee una interfaz simple para 
 \end{description}
 
 Todos estos métodos tienen un tiempo de timeout dado por la constante estática \code{Connection::TIMEOUT\_MS}
-\subsection{Protocolo de comunicación}\label{sec:protocolo}
+
+\subsection{Protocolo de comunicación} \label{sec:protocolo}
+
+\subsubsection{Codificación}
+
+Cada mensaje del protocolo es un paquete de tamaño fijo de tamaño igual a 256 bytes.
+Dentro de esa longitud está incluido el header.
+Todos los valores numéricos se transmiten con orden de bytes Big-Endian.
+Cada mensaje respeta un formato base común. Se puede ver este formato en la figura \ref{fig:paquete-base}.
+
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=0.6\linewidth]{imagenes/protocolo/paquete-base.pdf}
+	\caption{Esquema general entre todos los componentes del sistema.}
+	\label{fig:paquete-base}
+\end{figure}
+
+\begin{itemize}
+	\item version: es un número de 8 bits que identifica la versión del protocolo, por si se hicieran cambios y se quiera mantener retrocompatibilidad.
+	\item type: es un enumerativo que codifica el tipo de mensaje. Más adelante se detalla los diferentes tipos posibles.
+	\item signature: es una palabra de 4 caracteres que siempre tiene que ser ANRS.
+	\item password: es la contraseña del sistema. Debe incluirse en cada paquete que se envía hacia el microcontrolador. Los paquetes que envía éste como respuesta dejan dicho campo vacío.
+	\item content: es una estructura cuya interpretación depende de type y se define más adelante.
+\end{itemize}
+
+
+
+\subsubsection{Interacción}
+
+El primer paso para comenzar una interacción debe hacerla el cliente, iniciando una conexión TLS con el servidor.
+A continuación, el usuario envía un mensaje denominado request y que puede tomar alguno de los siguiente valores en su campo type.
+
+\begin{itemize}
+	\item SetPassword: establece una nueva contraseña del sistema.
+	\item GetText: pide, al servidor, el contenido del cartel, su velocidad de parpadeo y desplazamiento.
+	\item SetText: establece el nuevo contenido del cartel, su velocidad de parpadeo y desplazamiento.
+	\item GetWiFiConfig: pide, al servidor, la configuración WiFi relacionada a la red a la que actualmente se encuentra conectado el microcontrolador.
+	\item SetWiFiConfig: establece la nueva configuración WiFi respecto de la nueva red a la que el microcontrolador debe conectarse la próxima vez que se inicie el sistema.
+\end{itemize}
+
+Así mismo, el cliente, debe especificar la versión de protocolo que utiliza, la firma y la contraseña del sistema.
+Por su parte, el servidor, recibe el paquete, analiza todos los campos del header y emite una respuesta hacia el cliente de acuerdo al pedido realizado por éste.
+El campo type de la respuesta puede obtener los siguientes valores.
+
+\begin{itemize}
+	\item GetTextResponse: envia hacia el usuario la información del contenido y los parámetros de configuración del cartel.
+	\item GetWiFiConfigResponse: envia hacia el usuario la información respecto de la red WiFi a la que actualmente se encuentra conectado el servidor.
+	\item GenericResponse: es un tipo de paquete que se envía de vuelta, cuando alguno de los datos proporcionados por el cliente no son válido.
+\end{itemize}
+
+Respecto de este último tipo de mensajes, los códigos de respuesta posibles son los que se listan a continuación.
+
+\begin{itemize}
+	\item OK: se envía ante un pedido de cambio de algún parámetro enunciado previamente, cuando la operación fue realizada satisfactoriamente.
+	\item MalformedPacket: se envía cuando el paquete recibido de parte del cliente contiene una firma o un tipo inválido.
+	\item BadPassword: se envía cuando la contraseña proporcionada por parte del cliente es incorrecta.
+	\item BadProtocolVersion: se envía cuando el protocolo del programa es superior al que soporta el servidor.
+	\item BadIP: se envía cuando la nueva ip proporcionada es incorrecta.
+	\item BadSubnetMask: se envía cuando la nueva máscara de red proporcionada es incorrecta.
+\end{itemize}
+
+Luego de obtener la respuesta, el cliente debe cerrar la conexión inmediatamente.
+De esta forma se completa una interacción entre el usuario y servidor.
+En caso de que la conexión no fuera cerrada por el usuario, el servidor pasado un cierto tiempo la finaliza.
+A lo largo de esta sección se detallan las distintas estructuras del campo content, de forma de mostrar a qué corresponde cada campo.
+
+
+
+\subsubsection{SetPassword}
+
+El paquete de este tipo permie cambiar la contraseña del sistema.
+En content se encuentra la nueva contraseña, tiene un máximo de 40 caracteres sin incluir al caracter nulo.
+La respuesta que se recibe es del tipo GenericResponse.
+
+
+
+\subsubsection{GetText}
+
+El paquete de este tipo permite obtener el contenido actual del cartel, así como también sus configuraciones relacionadas a la velocidad de parpadeo y desplazamiento del mensaje.
+El campo content queda vacío puesto que su contenido no es utilizado para procesar la petición.
+
+Se espera una respuesta del servidor del tipo GetTextResponse donde el contenido posee toda la información previamente mencionada.
+
+
+
+\subsubsection{SetText}
+
+El paquete de este tipo permite establecer un nuevo mensaje a representar en el cartel, así como también sus parámetros de configuración.
+El campo content debe respetar la estructura que se observa en la figura \ref{fig:paquete-anim}
+
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=0.3\linewidth]{imagenes/protocolo/paquete-anim.pdf}
+	\caption{Esquema general entre todos los componentes del sistema.}
+	\label{fig:paquete-anim}
+\end{figure}
+
+BRATE y SRATE son la frequencia de parpadeo en Hz y la velocidad de deslizamiento en píxeles por segundo.
+Se asume que si BRATE es cero, no se debe parpadear el contenido.
+De la misma forma, si SRATE es cero, no se debe deslizar el contenido.
+El tipo de dato ufp844 es un número en punto fijo sin signo con 4 bits de parte entera y 4 bits de parte fraccionaria.
+El tipo de dato sfp844 es lo mismo que ufp844 pero en complemento a dos.
+Por último, en content se encuentra el campo text asociado al mensaje a mostrar en el cartel.
+El mismo debe tener un terminador nulo para indicar el fin del contenido.
+La respuesta que se recibe es del tipo GenericResponse.
+
+
+
+\subsubsection{GetWiFiConfig}
+
+El paquete de este tipo permite obtener el SSID, contraseña WiFi, ip y máscara de subred respecto de la red a la que actualmente se encuentra cnectado el servidor.
+El campo content queda vacío puesto que su contenido no es utilizado para procesar la petición.
+
+Se espera una respuesta del servidor del tipo GetWiFiConfigResponse donde el contenido posee toda la información previamente mencionada.
+
+
+
+\subsubsection{SetWiFiConfig}
+
+El paquete de este tipo permite establecer un nuevo SSID, contraseña WiFi, ip y máscara subred respeco de la red que se conectará la próxima vez que se incie el sistema.
+El campo content debe respetar la estructura que se observa en la figura \ref{fig:paquete-wifi}
+
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=0.5\linewidth]{imagenes/protocolo/paquete-wifi.pdf}
+	\caption{Esquema general entre todos los componentes del sistema.}
+	\label{fig:paquete-wifi}
+\end{figure}
+
+La respuesta que se recibe es del tipo GenericResponse.
+
+
+\subsubsection{Strings}
+
+Los strings tienen un límite de longitud dado por el lugar remanente en el mensaje y están codificados según el estándar ISO/IEC 8859-1:1998.
+El último byte del contenido, es necesario colocar un caracter nulo de modo que indique el final de la cadena de texto.
+
+
 \subsubsection{Transport Layer Security}\label{sec:tls}
 
 
-\clearpage
 \part{Ensayos y mediciones}\label{part:ensayos}
 \section{Conclusiones}
 
 Pudo comprobarse a través de este proyecto la viabilidad tanto en términos de hardware como de software del diseño planteado como implementación del cartel programable de LEDs. 
 La totalidad del protocolo de comunicación pudo ser implementada de acuerdo a lo pautado en los objetivos iniciales, y en tiempo y forma respecto al cronograma propuesto. El desarrollo del hardware se vio demorado por falta de disposición de recursos, ya que algunos componentes no se encuentran disponibles en todas las tiendas de electrónica (Node MCU y MAX7219). Aún así pudo implementarse un prototipo del circuito maestro y dos prototipos de los circuitos esclavos, con las debidas interfaces para las conexiones externas e internas, tanto de datos como de alimentación, y cumpliendo los patrones de diseño recomendados por el personal técnico de la Facultad.
+
 En términos de consumo, se comprobó que la potencia consumida por el circuito coincidía con la calculada mediante los datos indicados en la hoja de datos del MAX7219. Dicho consumo es relativamente bajo, por lo que no se lo considera un impedimento relevante a la hora de conseguir nuevas fuentes de alimentación para el sistema. 
+
 Aunque no estaba planificado en el proyecto inicial el equipo también adaptó un cargador móvil en desuso para alimentar el circuito.
-((como hacemo lo de las horas?))
 
 El presupuesto del proyecto cumplió con exactitud con lo planteado en la sección homónima del anexo.
 % Explicar el grado de cumplimiento de objetivos planteados para el trabajo.
