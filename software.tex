@@ -22,7 +22,7 @@ El firmware del controlador del cartel es quien se encarga de aceptar pedidos de
 
 
 
-\subsection{Plataformas de desarrollo}
+\subsection{Plataformas de desarrollo}\label{sec:sdk}
 El System on Chip ESP8266EX es muy popular y existen diversas formas de desarrollar para él, entre ellas están:
 \begin{itemize}
 	\item El SDK oficial \enquote{OS} de Espressif. Es un SDK privativo. Utiliza internamente FreeRTOS con lo que se puede programar con tareas y las primitivas de sincronización que FreeRTOS ofrece.
@@ -150,7 +150,7 @@ A lo largo de esta sección se detalla cada clase mencionada, mostrando cuáles 
 
 \subsubsection{Archivo principal} \label{sec:archivo_principal}
 
-\lstinputlisting[linerange=1-10, firstnumber=1] {codigo/pseudocodigo/microcontrolador.pseudo}
+\lstinputlisting[label=pseudo:userInit, linerange=1-10, firstnumber=1] {codigo/pseudocodigo/microcontrolador.pseudo}
 
 El Archivo principal del programa que corre sobre el microcontrolador es el archivo main.cpp.
 Dentro tiene un método denominado \code{user\_init()} que actúa como punto de entrada de la aplicación y no contiene parámetros.
@@ -160,7 +160,7 @@ Dicho método es el encargado de asignar los valores iniciales a las variables i
 
 Adicionalmente se establece tasa de bits por segundo a 115200 por medio de una función propia del SDK utilizado para el desarrollo.
 Por último para utilizar los pines del micro, se inicializan los GPIO del microcontrolador, a través de la función gpio\_init( ) que también es propia del SDK.
-En la figura \ref{pseudo:userInit} se muestra un pseudocódigo del método user\_init\( \).
+En el fragmento \ref{pseudo:userInit} se muestra un pseudocódigo del método user\_init\( \).
 
 Por último, se observa que para la clase Settings, se ejecuta el método loadSettings( ).
 El mismo se encarga de cargar desde la memoria no volátil del microcontrolador, la última información almacenada respecto del texto a mostrar en el cartel, sus parámetros de configuración, y sus valores de red.
@@ -185,7 +185,7 @@ En la figura \ref{uml:settings}, se observa un diagrama UML con los principales 
 El método \code{init()} de settings se encarga de inicializar el puntero de la estructura de la flash de donde lee y almacena los datos.
 Adicionalmente, la clase provee funcionalidad para establecer las configuraciones por defecto del sistema, presionando el botón de RST durante 5 segundos.
 Para lograr eso, dentro del método \code{init()} también se inicializa el pin que se va a utilizar como reset (pin GPIO2) y se establece el callback para cuando dicho evento ocurra.
-Se recomienda revisar la sección \ref{sec:callback} donde se explica el mecanismo de callbacks que utiliza el microcontrolador.
+Se recomienda revisar la sección \ref{sec:sdk} donde se explica el mecanismo de callbacks que utiliza el microcontrolador.
 
 \lstinputlisting[linerange=14-14, firstnumber=14] {codigo/pseudocodigo/microcontrolador.pseudo}
 
@@ -229,7 +229,7 @@ En el UML de la figura \ref{uml:server} se observan los métodos públicos de la
 \end{figure}
 
 Cabe destacar que en la figura \ref{uml:server} aparece una función privada relacionada a la recepción de mensajes denominada \code{receiveCallback()}.
-Como bien su nombre lo indica, esto es un callback que se setea dentro del método \code{listen()} y se ejecuta cuando algún paquete llega al servidor (para más información, revisar la sección \ref{sec:callbacks} donde se explica el método de callbacks).
+Como bien su nombre lo indica, esto es un callback que se setea dentro del método \code{listen()} y se ejecuta cuando algún paquete llega al servidor (para más información, revisar la sección \ref{sec:sdk} donde se explica el método de callbacks).
 A pesar de que sea un método privado, se decide mostrar en el UML debido a su reelevancia en esta solución.
 Más adelanete, en esta sección, se explica su implementación.
 
@@ -252,25 +252,25 @@ Para su utilización, es necesario haber ejecutado el método \code{listen()} pr
 
 Recibe como parámetro un puntero que contiene la dirección del mensaje a enviar y el tamaño de dicho paquete.
 
-\lstinputlisting[linerange=26-32, firstnumber=26] {codigo/pseudocodigo/microcontrolador.pseudo}
+\lstinputlisting[label=pseudo:receiveCallback, linerange=26-32, firstnumber=26] {codigo/pseudocodigo/microcontrolador.pseudo}
 
 Como ya se mencionó anteriormente, el método \code{receiveCallback()} es una función privada que se ejecuta sólo cuando se reciben datos desde el cliente (size).
 Contiene un buffer interno donde almacena los bytes que obtiene.
 Los parámetros que recibe corresponden con la conexión vía TCP que envía los datos (conn), un puntero a la cadena de bytes recibido (data) y por último el tamaño de dicho arreglo.
 
-Dicha estructura posee una capacidad limitada y, en este caso, su tamaño máximo se especifica en el protocolo de software (ver sección\ref{sec:protocolo}).
-Cabe aclarar que la tarea de este método es apilar bytes crudos hasta llenar el buffer. La clase Server no tiene las herramientas necesarias para interpretar la información que recibe.
-Por ese motivo cuando la estructura se llena, se notifica a la clase MessageHandler quien es la que implementa el protocolo de comunicación diseñado para este proyecto y es capaz de interpretar la cadena de bytes recibida.
+Dicha estructura posee una capacidad limitada y, en este caso, su tamaño máximo se especifica en el protocolo de software (ver sección \ref{sec:protocolo}).
+Cabe aclarar que la tarea de este método es acumular bytes hasta llenar el buffer. La clase Server no tiene las herramientas necesarias para interpretar la información que recibe.
+Por ese motivo cuando la estructura se llena, se notifica a la clase MessageHandler quien es la que implementa el protocolo de comunicación diseñado para este proyecto y es quien es capaz de interpretar la secuencia de bytes recibida.
 
 
 
 \subsubsection{MessageHandler}
 
 La clase MessageHandler implementa el protocolo de comunicación entre el servidor y el cliente, y es capaz de interpretar el arreglo de bytes que recibe desde la clase Server.
-Posee un sólo método denominado \code{handle()} que atiende el mensaje que le envía el usuario y elabora una respuesta hacia éste.
-En la figura \ref{pseudo:messageHandlerHandle} se muestra un pseudocódigo del método a fin de brindar mayor claridad en la comprensión de la función.
+Esta clase contiene un sólo método denominado \code{handle()} que atiende el mensaje que le envía el usuario y genera una respuesta para el cliente.
+En el fragmento \ref{pseudo:messageHandlerHandle} se muestra un pseudocódigo del método a fin de brindar mayor claridad en la comprensión de la función.
 
-\lstinputlisting[linerange=36-93, firstnumber=36] {codigo/pseudocodigo/microcontrolador.pseudo}
+\lstinputlisting[label=pseudo:messageHandlerHandle,linerange=36-93, firstnumber=36] {codigo/pseudocodigo/microcontrolador.pseudo}
 
 
 
@@ -413,9 +413,9 @@ Un flujo típico de ejecución es el siguiente:
 \begin{enumerate}
 	\item La clase se inicializa a su misma y sus objetos asociados (entre ellos, una instancia de Client y una de SignModel).
 	\item Se muestra el diálogo en el cual se ingresa la dirección de IP o nombre de host del cartel a cual conectarse. Ver figura \ref{fig:login}
-	\item Asumiendo que no se seleccionó Cancelar en el diálogo anterior, el objeto Panel inicia una interacción para traer el estado del cartel. Hace esto emitiendo la señal \code{restoreRequested()}, que está conectada al \emph{slot} \code{apply()} del objeto de clase Client.
-	\item Desactiva todos los elementos de la interfaz gráfica de forma que no se pueda realizar otra operación mientras haya una interacción en curso.
-	\item Continua procesando los eventos de la cola de eventos normalmente. Uno de estos eventos será una señal \code{done(ClientError)} de Client, conectada al \emph{slot} \code{clientDone(ClientError)} de Panel. El argumento es un enumerativo que representa un error o éxito. También, durante el transcurso de una interacción, Client va emitiendo señales para notificar de cambios de su estado interno, para poder mostrar mensajes al usuario sobre la fase de la interacción actual (\enquote{Conectando},\enquote{Esperando respuesta...}, etc).
+	\item Asumiendo que no se seleccionó \enquote{Cancelar} en el diálogo anterior, el objeto Panel inicia una interacción para traer el estado (contenido y configuración) del cartel. Hace esto emitiendo la señal \code{restoreRequested()}, que está conectada al \emph{slot} \code{apply()} del objeto de clase Client.
+	\item El objeto de tipo Panel desactiva todos los elementos de la interfaz gráfica de forma que no se pueda realizar otra operación mientras haya una interacción en curso.
+	\item El objeto de tipo Panel continúa procesando los eventos de la cola de eventos normalmente. Uno de estos eventos será una señal \code{done(ClientError)} de Client, conectada al \emph{slot} \code{clientDone(ClientError)} de Panel. El argumento es un enumerativo que representa un error o éxito. También, durante el transcurso de una interacción, Client va emitiendo señales para notificar de cambios de su estado interno, para poder mostrar mensajes al usuario sobre la fase de la interacción actual (\enquote{Conectando},\enquote{Esperando respuesta...}, etc).
 \end{enumerate}
 
 \begin{figure}[hbtp]
@@ -472,7 +472,7 @@ Esta clase es más pequeña que las anteriores. Provee una interfaz simple para 
 	\item[\code{QAbstractSocket::SocketError lastError()}:] Retorna un enumerativo con el último error de red. Este enumerativo es propio de Qt y luego se mapea a un valor del enumerativo \code{Client::ClientError}.
 \end{description}
 
-Todos estos métodos tienen un tiempo de timeout dado por la constante estática \code{Connection::TIMEOUT\_MS}
+Todos estos métodos tienen un tiempo de expiración o \emph{timeout} definido por la constante estática \code{Connection::TIMEOUT\_MS}
 
 \subsection{Protocolo de comunicación} \label{sec:protocolo}
 
