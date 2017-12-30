@@ -109,18 +109,18 @@ Es importante tener presente la figura \ref{fig:diagrama_casos_de_uso} donde se 
 
 En primer lugar, el cartel se conecta a la red WiFi presentando las credenciales previamente almacenadas en la memoria no volátil del microcontrolador.
 Esta acción es llevada a cabo gracias a una clase a nivel software denominada WiFiManager.
-A su vez, el cliente accede a la aplicación QT, con el ordenador conectado a la misma red.
+A su vez, el cliente accede a la aplicación de PC, con el ordenador conectado a la misma red.
 
 El sistema le solicita la contraseña antes de realizar cualquier acción.
 Una vez logueado, el cliente puede realizar cualquiera de las funcionalidades previamente enunciadas en la subsección anterior (tanto del tipo get como del tipo set).
 Entre las acciones disponibles puede pedir información del texto que actualmente se encuentra representado en el cartel, o las credenciales de la red WiFi a la que el sistema se conecta.
-Estas acciones, leen de la memoria no volátil del microcontrolador los datos necesarios y se la devuelven a la aplicación QT.
+Estas acciones, leen de la memoria no volátil del microcontrolador los datos necesarios y se la devuelven a la aplicación de PC.
 El manejo de esta memoria persistente la realiza la clase conocida como Settings.
 
 En caso de que el usuario desee modificar alguno de esos valores, puede hacerlo a través de la misma aplicación.
 El mismo módulo de software que se encarga de leer de la memoria no volátil, obtiene los nuevos requerimientos que le provee el cliente, modifica sus variables internas y las almacena a fin de mantenerlas ante un futuro pedido.
 
-El cartel, es decir el programa que corre sobre el microcontrolador, actúa de servidor atendiendo las peticiones que realiza el cliente de la aplicación QT.
+El cartel, es decir el programa que corre sobre el microcontrolador, actúa de servidor atendiendo las peticiones que realiza el cliente de la aplicación de PC.
 Esta funcionalidad es manejada por una clase de software denominada Server.
 La misma es la encargada de recibir la cadena de bytes vía TCP y enviarla hacia el módulo MessageHandler.
 
@@ -291,7 +291,7 @@ En la figura \ref{uml:ledSign} se muestra un UML con los métodos públicos que 
 \lstinputlisting[linerange=95-109, firstnumber=95] {codigo/pseudocodigo/microcontrolador.pseudo}
 
 En primer lugar, el método \code{init()} se encarga de configurar los pines LATCH, CLK y DATA que se utilizan para la comunicación entre el microcontrolador y el MAX7219.
-Para mayor información respecto de los pines, se sugiere visitar la sección \ref{sec:} %TODO poner la sección donde se explica los pines esos.
+Para mayor información respecto de los pines, se sugiere visitar la sección \ref{sec:hw} %TODO poner la sección donde se explica los pines esos.
 
 Adicionalmente se configura como salida los pines que se utilizan para los jumpers, se les habilita su pull up interno y se lee su valor a la salida.
 De esta forma, se indica cuántos módulos de 8x8 LEDs componen el cartel.
@@ -351,7 +351,7 @@ Una clase puede tener opcionalmente uno o más métodos que sean \emph{signal} o
 
 En Qt, las clases que necesiten utilizar el sistema de eventos deben heredar de una clase provista por la librería llamada \code{QObject}. Esta clase provee distintas funcionalidades al resto de las clases definidas por Qt. Entre los objetos que heredan de QObject puede existir una relación de parentesco, en la cual un objeto $B$ puede tener como padre a otro objeto $A$. Esto, por ejemplo, sirve para liberar al programador del manejo de memoria: un objeto puede destruir a sus hijos antes de destruirse a sí mismo (por destrucción se entiende la liberación de todo recurso asociado al objeto, como memoria o archivos).
 
-El mecanismo de \emph{signal} y \emph{slots} tiene como una de sus ventajas el hecho de que la ejecución de un \emph{slot} darse en otro hilo. Esto esta relacionado con la idea que promueve Qt de que un objeto puede "pertenecer" a un hilo de ejecución (encapsulado por la clase \code{QThread}), esto permite que no haya interferencia de datos causada por la concurrencia ya que no hay accesos explícitos a variables compartidas entre hilos sino que pueden enviar datos como argumentos a los \emph{slots}, de forma similar al paradigma de pasaje de mensajes en programación concurrentes.
+El mecanismo de \emph{signal} y \emph{slots} tiene como una de sus ventajas el hecho de que la ejecución de un \emph{slot} darse en otro hilo. Esto esta relacionado con la idea que promueve Qt de que un objeto puede \enquote{pertenecer} a un hilo de ejecución (encapsulado por la clase \code{QThread}), esto permite que no haya interferencia de datos causada por la concurrencia ya que no hay accesos explícitos a variables compartidas entre hilos sino que pueden enviar datos como argumentos a los \emph{slots}, de forma similar al paradigma de pasaje de mensajes en programación concurrentes.
 
 Por ejemplo, en el caso del objeto \code{Object1} en la figura \ref{fig:signals-slots}, en algún método suyo se podría tener código como el siguiente:
 \begin{lstlisting}[language=c++]
