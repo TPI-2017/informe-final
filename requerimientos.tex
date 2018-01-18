@@ -7,7 +7,7 @@
 	\item La aplicación deberá ser capaz de modificar parámetros de animación tales como frecuencia de parpadeo y velocidad de desplazamiento lateral o estaticidad.
 	\item La aplicación permitirá al usuario, ingresar por teclado el mensaje que desea mostrar mediante los caracteres que se establecen en el estándar de codificación de caracteres ISO/IEC 8859-1 (ver \cite{CodifChar}).
 	\item El cartel deberá poder procesar sólo mensajes a través del protocolo diseñado específicamente para este proyecto (ver sección \ref{sec:protocolo})
-	\item El cartel deberá mostrar los mensajes que desee el usuario.
+	\item El cartel deberá mostrar los mensajes que desee el usuario de forma legible.
 	\item El cartel deberá poder almacenar y modificar sus credenciales de red de forma de poder conectarse al WiFi que el cliente desee.
 	\item El cartel deberá mantener los datos de configuración y del mensaje que muestra, aún cuando el mismo haya sido desconectado de la red inalámbrica o de la red eléctrica.
 \end{itemize}
@@ -20,4 +20,11 @@
 \end{itemize}
 % TODO: Hacer diagramas de caso de uso
 \subsection{Interacción con el usuario}
+	
+	Se considera usuario del sistema a toda persona con acceso autorizado a su configuración y puesta en marcha. El usuario tendrá la posibilidad de agregar o quitar módulos esclavos al cartel con el fin de proveerle mayor longitud, de acceder al panel de configuración del cartel para modificar su mensaje y características del mismo, Los requisitos que debe poder cumplir el usuario para operar correctamente el cartel constan unicamente de la capacidad de utilizar una computadora para operar el panel de configuración, oportunamente desarrollado con una interfaz gráfica de usuario fácil de entender, y para poder seguir los pasos indicados en el manual del sistema para preparar todo para su instalación y uso. No es necesario que el usuario tenga conocimientos de programación pero una noción básica de electrónica es deseable para garantizar que ningun componente o conexión física del sistema se vea perjudicada durante su instalación.
+	
 \section{Especificaciones físicas}
+
+	El sistema está conformado por módulos de dos tipos claramente distinguibles. Por un lado tenemos los módulos maestro, que se caracterizan por tener la ficha de alimentación y no tener pantalla. Solo un módulo de este tipo es necesario por cartel. Por otro lado, están los módulos esclavos, encargados principalmente de mostrar de forma ordenada la información del mensaje controlado por el módulo maestro. Estos módulos se conectan en cadena dando lugar a un cartel que se extiende en longitud a medida que varios módulos esclavos se acoplan a lo largo del mismo. 
+	
+	%TODO agregar dibujo?
