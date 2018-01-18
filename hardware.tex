@@ -149,10 +149,11 @@ A la hora de efectuar las conexiones, se debe prestar principal atención a la o
 \subsection{Comunicación entre los módulos}
 
 \subsubsection{Entre maestro y esclavo}
-Como el microcontrolador entrega los datos a 3.3V es necesario convertir estas señales a un voltage que el MAX7219 acepte, la solución que se optó fue incorporar transistores que capaces de transformar 3.3V a 5V. Para ello se conecta tres transistores NPN al circuito, uno por cada señal (DATAIN, LOAD, CLK), se puede observar en la figura \ref{fig:transistors} la conexión.
+Como el microcontrolador entrega los datos a 3.3V es necesario convertir estas señales a un voltage que el MAX7219 acepte, la solución que se optó fue incorporar transistores que capaces de transformar 3.3V a 5V. Para ello se conecta tres transistores NPN al circuito, uno por cada señal (DATAIN, LOAD, CLK), se puede observar en la figura \ref{fig:transistors} la conexión de cada transistor con sus respectivas resistencias.
 
-Los transistores utilizados en el prototipo final son los 2N2369 %(http://www.pci-card.com/2n2369.pdf)
-La base es el pin 2, el colector el pin 1 y el emisor el pin 3.
+Los transistores utilizados en el prototipo final son los 2N2369. %(http://www.pci-card.com/2n2369.pdf)
+La base es el pin 2, el colector el pin 1 y el emisor el pin 3 (ver figura \ref{fig:transistors}).
+
 \begin{figure}[ht!]
 	\centering
 	\begin{center}
