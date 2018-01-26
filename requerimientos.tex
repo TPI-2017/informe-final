@@ -18,13 +18,30 @@
 	\item El sistema entero no debe consumir mas de 30 Watts bajo operación normal.
 	\item El sistema deberá ser capaz de aceptar sólo conexiones por TLS \cite{TLS} de forma que las conexiones y el intercambio de paquetes sea cifrado y seguro.
 \end{itemize}
-% TODO: Hacer diagramas de caso de uso
+
 \subsection{Interacción con el usuario}
 	
-	Se considera usuario del sistema a toda persona con acceso autorizado a su configuración y puesta en marcha. El usuario tendrá la posibilidad de agregar o quitar módulos esclavos al cartel con el fin de proveerle mayor longitud, de acceder al panel de configuración del cartel para modificar su mensaje y características del mismo, Los requisitos que debe poder cumplir el usuario para operar correctamente el cartel constan unicamente de la capacidad de utilizar una computadora para operar el panel de configuración, oportunamente desarrollado con una interfaz gráfica de usuario fácil de entender, y para poder seguir los pasos indicados en el manual del sistema para preparar todo para su instalación y uso. No es necesario que el usuario tenga conocimientos de programación pero una noción básica de electrónica es deseable para garantizar que ningun componente o conexión física del sistema se vea perjudicada durante su instalación.
+	Se denomina usuario del sistema a toda persona con acceso autorizado a su configuración y puesta en marcha.	El usuario tendrá la posibilidad de agregar o quitar módulos esclavos al cartel con el fin de proveerle mayor longitud, de acceder al panel de configuración del cartel para modificar su mensaje y características del mismo.
 	
+	Para operar correctamente el cartel, únicamente es necesario que el usuario tenga a su disposición una PC, en la cual utilizará un aplicativo desarrollado con una interfaz gráfica para controlar el cartel. Para realizar la instalación del sistema, se requiere solamente al manual de instalación (ver \ref{sec:inst-hw}).
+
+	No es necesario que el usuario tenga conocimientos de programación.
+	Sin embargo, una noción básica de electrónica es deseable para evitar que algún componente o conexión eléctrica del sistema se vea perjudicada durante su instalación.
+
 \section{Especificaciones físicas}
 
-	El sistema está conformado por módulos de dos tipos claramente distinguibles. Por un lado tenemos los módulos maestro, que se caracterizan por tener la ficha de alimentación y no tener pantalla. Solo un módulo de este tipo es necesario por cartel. Por otro lado, están los módulos esclavos, encargados principalmente de mostrar de forma ordenada la información del mensaje controlado por el módulo maestro. Estos módulos se conectan en cadena dando lugar a un cartel que se extiende en longitud a medida que varios módulos esclavos se acoplan a lo largo del mismo. 
+	El sistema está conformado por módulos de dos tipos claramente distinguibles.
+
+	El módulo maestro, que se caracteriza por tener la ficha de alimentación y no estar conectada a una matriz de LEDs, se encarga de controlar la cadena de módulos esclavos. Sólo un módulo de este tipo es necesario por cartel.
+
+	Por otro lado, están los módulos esclavos, que se encargan de controlar su matriz de LEDs para representar un mapa de bits y de funcionar como eslabón en la cadena de módulos esclavos. Se puede ver en la figura \ref{fig:dibujo-real}.
 	
-	%TODO agregar dibujo?
+	\begin{figure}[ht!]
+		\begin{center}
+			\centering
+			%\includegraphics[scale=0.8]{imagenes/dibujoreal}
+			\caption{Dibujo ilustrativo del hardware del sistema.}
+			%\label{fig:dibujo-real}
+			% Dejo label comentado para dejar un warning en las referencias rotas.
+		\end{center}
+	\end{figure}
