@@ -1,6 +1,8 @@
 \section{Hardware}\label{sec:hw}
 \subsection{Diagrama en bloques general}
-El sistema se compone de módulos funcionales que interactúan entre sí, estos son: el \emph{maestro}, el cual recibe los datos recibidos y los \emph{esclavos} que actualizan una matriz, en la figura \ref{fig:diagrama-bloques-general} se puede observar el diagrama en bloques de todo el sistema.
+El sistema se compone de módulos funcionales que interactúan entre sí, inetracambiando datos entre ellos. En primer lugar el \emph{maestro}, es el encargado de recibir los datos que el cliente le proporciona. Es el que posee el microcontrolador que comanda todo el sistema (ver figura \ref{ig:dibujo-real}).
+
+Por otra parte los \emph{esclavos} obtienen la información que les proporciona el microcontrolador y actualizan la matriz de LEDs que tienen asociada. En la figura \ref{fig:diagrama-bloques-general} se observa una diagrama en bloques de todo el sistema.
 
 \begin{figure}[!ht]
 	\centering
@@ -9,9 +11,26 @@ El sistema se compone de módulos funcionales que interactúan entre sí, estos 
 	\label{fig:diagrama-bloques-general}
 \end{figure}
 
+En la figura \ref{fig:diagrama-bloques-general}, leyendo de izquierda a derecha, se observa en primer lugar un cliente. Ésto se representa a través de una aplicación de PC, siendo ésta, una de las formas que el cliente tiene para interactuar con el sistema.
+
+Conectando su computadora a la misma red que se encuentra vinculado el cartel, el cliente puede, por medio de dicha aplicación, enviar los comandos para que el sistema satisfaga sus necesidades.
+
+Por medio del protocolo de comunicación WiFi, los datos llegan hacia el microcontrolador que se encuentra en el módulo maestro. Cabe destacar que el protocolo de red que encapsula las distintas acciones que el usuario puede realizar ha sido diseñado completamente para este proyecto y se explica en mayor detalle en el apéndice \ref{sec:protocolo}.
+Dicho protocolo se implementa tanto del lado de la aplicación de PC, como del microcontrolador que controla el cartel.
+
+Tras recibir y desencriptar los datos, el microcontrolador procesa la información y la transmite vía protocolo serie, sincrónico hacia el primer shifter MAX7219 que controla la primera matriz de LEDs.
+
+Resulta necesario aclarar que cada módulo esclavo posee un MAX7219 y la información que le proporciona el microcontrolador se transmite sólo al primer shifter. Luego la misma se desplaza entre los diferentes MAX7219 utilizando determinados pines de dicho módulo.
+De esta forma, el microcontrolador solo mantiene una conexión física directa con el primer shifter.
+
+Finalmente, cada módulo esclavo enciende en su respectiva matriz de LEDs, la información suministrada por el maestro, de forma de mostrar el mensaje que el cliente había enviado inicialmente por medio de la aplicación de PC.
+
+Cabe destacar que la comunicación entre la aplicación de PC y el cartel es bidireccionall, debido a que todas las operaciones que el cliente realice, necesitan de una respuesta.
+En algunos casos, dicha respuesta es solo para indicar éxito o error, mientras que en otros casos el usuario recibe parámetros de configuración y las credenciales de red a las que el sistema se encuentra actualmente conectado.
+
 \subsection{Fuente de alimentación}
 El cartel requiere una alimentación de 5V de corrriente continua. Para esto se expone un conector hembra (de 5.5mm x 2.1mm), el cual se conecta a un transformador externo de 220V AC a 5V DC. El sistema no posee batería de ningún tipo.
-%TODO: falta poner consumo
+%TODO AMG - falta poner análisis de consumo. Todo lo que se hizo, incluso lo que después se descartó.
 
 \subsection{Módulo maestro}
 Como se mencionó anteriormente, este modulo se encarga de procesar los datos enviados desde el cliente y controlar los demás módulos.
