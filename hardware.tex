@@ -92,7 +92,7 @@ Como se mencionó anteriormente, se necesita de flash externa para correr progra
 \subsection{Módulo esclavo}
 Un modulo esclavo posee un driver MAX7219, que es el componente principal junto con una interfaz que permite conectarse a otro módulo esclavo o en su defecto al master.
 
-\subsubsection{MAX7219}
+\subsubsection{MAX7219}\label{sec:max7219}
 El MAX7219 es un controlador compacto, de entrada y salida en serie de cátodo común que conectan, indirectamente, microcontroladores a LEDs numéricos de siete segmentos de hasta ocho dígitos, pantallas de gráfico de barras o, en este caso, 64 LED individuales dispuestos de forma matricial. Se incluye en el chip, un decodificador BCD, circuitos de multiplexación, controladores de segmentos y dígitos, y una RAM estática de 8x8 que almacena cada número, o en este caso, mapas de bits. Solo se necesita una resistencia externa para configurar la corriente para todos los LEDs.
 
 Las matrices individuales se pueden actualizar sin reescribir toda la pantalla.
@@ -186,24 +186,11 @@ A la hora de efectuar las conexiones, se debe prestar principal atención a la o
 
 
 \subsection{Comunicación entre los módulos}
+Para la comunicación maestro-esclavo y esclavo-esclavo se utiliza un protocolo serie de un bit sincrónico. Cada módulo esclavo tiene en su MAX7219 una entrada de serie junto a un clock, de manera que se toma el valor del bit en el flanco ascendente del reloj. A su vez, cada MAX7219 tiene un registro de desplazamiento de 16 bits, que en cada flanco ascendente del clock inserta en orden FIFO al registro un bit (DIN) y, en el flanco descendente del reloj, coloca en su salida el valor del bit más viejo en el registro de desplazamiento (DOUT). Por último, el MAX7219 tiene una entrada llamada LATCH que al pasar a alto, provoca que el MAX7219 \enquote{tome} la palabra de 16 bits, interpretándola como se describió en la sección \ref{sec:max7219}.
 
-\subsubsection{Entre maestro y esclavo}
-Como el microcontrolador transmite los datos con un valor alto de 3.3V es necesario convertir estas señales a una tensión que el MAX7219 acepte, la solución que se optó fue incorporar transistores que capaces de transformar 3.3V a 5V. Para ello se conecta tres transistores NPN al circuito, uno por cada señal (DATAIN, LOAD, CLK), se puede observar en la figura \ref{fig:transistors} la conexión de cada transistor con sus respectivas resistencias.
+De esta manera es posible dirigir una palabra arbitraria a cualquier esclavo, y es particularmente eficiente en el caso en que se debe mandar una palabra a cada MAX7219 y se desea que todas la interpreten a la vez. Es cuestión de simplemente transmitir los datos dirigidos a cada esclavo, uno tras otro, hasta llenar todos los registros de desplazamiento y levantar LATCH. Alternativamente, si se quisiera mandar un sólo comando a un esclavo en particular, basta con insertar \enquote{burbujas} (comandos que no realizan ninguna operación) en la secuencia de bits.
 
-Los transistores utilizados en el prototipo final son los 2N2369. %(http://www.pci-card.com/2n2369.pdf)
-La base es el pin 2, el colector el pin 1 y el emisor el pin 3 (ver figura \ref{fig:transistors}).
-
-\begin{figure}[ht!]
-	\centering
-	\begin{center}
-		\includegraphics[scale=2]{imagenes/hw/transistor.pdf}
-		\caption{Conexión de un transistor, junto con los valores de las resistencias.}
-		\label{fig:transistors}
-	\end{center}
-\end{figure}
-
-\subsubsection{Protocolo de comunicación SPI entre los MAX7219} \label{sec:comunicacion}
-Es posible expandir el cartel con N esclavos. En la figura \ref{fig:MAX-MAX} se observa la forma en que se debe realizar la interconexión de los dispositivos integrados.
+Es posible expandir el cartel con $N$ esclavos. En la figura \ref{fig:MAX-MAX} se observa la forma en que se debe realizar la interconexión de los dispositivos integrados.
 
 \begin{figure}[ht!]
 	\centering
@@ -213,13 +200,12 @@ Es posible expandir el cartel con N esclavos. En la figura \ref{fig:MAX-MAX} se 
 		\label{fig:MAX-MAX}
 	\end{center}
 \end{figure}
-Es importante destacar la forma en la que se comunican el microcontrolador con el primer driver de LEDs, y a su vez, el protocolo que utilizan para comunicarse entre los distintos MAX7219.
 
-La idea general consiste en indicarle a cada chip, los leds que debe encender y apagar en cada columna. Para ello debe enviar palabras de dos bytes de manera serial. Es decir, primero envía la información de la columna 1, después la 2, y así siguiendo hasta la 8. El protocolo utilizado es SPI y corresponde a la trama previamente detallada (ver figura \ref{table:trama-spi}).
+El procedimiento que se realiza para cargar los mapas de bits en cada esclavo consiste en transmitir a cada MAX7219 los LEDs que debe encender y apagar en cada columna. Para ello debe enviar palabras de 16 bits por serie. Es decir, primero envía la información de la columna 1, después la 2, y así hasta la 8.
 
 \begin{table}[ht]
 	\centering
-	\caption{Trama SPI y su significado.}
+	\caption{Formato de la palabra de comando del MAX7219.}
 	\label{table:trama-spi}
 	\begin{adjustbox}{max width=\textwidth}
 	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
@@ -230,9 +216,9 @@ La idea general consiste en indicarle a cada chip, los leds que debe encender y 
 	\end{adjustbox}
 \end{table}
 
-Para realizar este proceso, la figura \ref{fig:spi-timing-diagram} muestra un diagrama a lo largo del tiempo de la forma de enviar cada bit. En ella se puede observar que el primer paso consiste en bajar la señal de LOAD y esperar un instánte de tiempo (aproximadamente un microsegundo). Luego se debe generar una señal de CLCK de onda cuadrada y de frecuencia de 1Mhz con la mitad de ciclo de trabajo.
+Para realizar este proceso, la figura \ref{fig:spi-timing-diagram} muestra un diagrama a lo largo del tiempo de la forma de enviar cada bit. En ella se puede observar que el primer paso consiste en bajar la señal de LOAD y esperar un instante de tiempo (aproximadamente un microsegundo). Luego se genera una señal de CLK de onda cuadrada y de frecuencia de a lo sumo 1Mhz con ciclo de trabajo de $50 \%$. No es necesario que CLK sea una señal periódica, es suficiente que se respeten los tiempos de setup y hold, llevando CLK a alto luego de haber transcurrido $t_{DS}$ con el dato ya en DIN y mantenerlo por $t_{DH}$.
 
-El pin conectado al DATAIN del micro, se utiliza para enviar los datos, empezando por el bit más significativo primero. Los datos van a ser leídos por los MAX7219 en el flanco ascendente del CLOCK. Cuando finaliza el envío de los 16 bits, se debe subir la señal de LOAD. En ese momento, el MAX2719 almacena, en sus registros internos, el comando recibido. Todos los comandos son de dos bytes, sin embargo, se puede enviar más de esa cantidad. Esta funcionalidad se utiliza para enviar instrucciones a los demás MAX7219 que están conectados en serie. Lo que ocurre es que la información se recibe en el flanco ascendente de CLK y se envía, hacia el siguiente chip, por el pin DATAOUT en el flanco descendente. De esta forma, en una iteración se pueden configurar una columna de cada módulo de 8x8 LEDs.
+% Cuando finaliza el envío de los 16 bits, se debe subir la señal de LATCH. En ese momento, el MAX7219 almacena, en sus registros internos, el comando recibido. Todos los comandos son de dos bytes, sin embargo, se puede enviar más de esa cantidad. Esta funcionalidad se utiliza para enviar instrucciones a los demás MAX7219 que están conectados en serie. Lo que ocurre es que la información se recibe en el flanco ascendente de CLK y se envía, hacia el siguiente chip, por el pin DATAOUT en el flanco descendente. De esta forma, en una iteración se pueden configurar una columna de cada módulo de 8x8 LEDs.
 
 \begin{figure}[ht!]
 	\centering
@@ -243,7 +229,22 @@ El pin conectado al DATAIN del micro, se utiliza para enviar los datos, empezand
 	\end{center}
 \end{figure}
 
+\subsubsection{Problema de incompatibilidad de tensiones}
+Como el microcontrolador transmite los datos con un valor alto de 3.3V, es necesario convertir estas señales para que este dentros de los rangos del MAX7219. La solución por la cual se optó fue incorporar transistores configurados de manera que ante una entrada de 0V, produzcan 5V y ante una entrada de 3.3V, produzcan 0V (aproximado). Se conectan tres transistores NPN al circuito del módulo maestro, uno para cada señal (DATAIN, LOAD, CLK). Se puede observar en la figura \ref{fig:transistors} la conexión de cada transistor con sus respectivas resistencias. 
 
+Esta solución tiene como consecuencia el hecho de que la señal digital se invierte, para eliminar este problema, fue necesario modificar el firmware del cartel para invertir el valor lógico de sus salidas.
+
+Los transistores utilizados en el prototipo final son los 2N2369. %(http://www.pci-card.com/2n2369.pdf)
+La base es el pin 2, el colector el pin 1 y el emisor el pin 3 (ver figura \ref{fig:transistors}).
+
+\begin{figure}[ht!]
+	\centering
+	\begin{center}
+		\includegraphics[scale=2]{imagenes/hw/transistor.pdf}
+		\caption{Conexión de un transistor junto con los valores de las resistencias.}
+		\label{fig:transistors}
+	\end{center}
+\end{figure}
 
 % ========================  Fabricación  ========================
 
