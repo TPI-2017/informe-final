@@ -50,15 +50,26 @@
 	Adicionalmente este componente posee un microcontrolador que gobierna la totalidad del sistema y un conjunto de jumpers que permiten establecer la cantidad de módulos esclavos con los que se operará.
 	Por último esté módulo, posee un botón de reset que permite enviar al sistema a un estado conocido, ya sea ante un fallo o incluso, ante un cambio en alguno de los valores relacionados a sus credenciales de red.
 
-	Por otro lado, están los módulos esclavos, que se encargan de controlar su matriz de LEDs para representar un mapa de bits y de funcionar como eslabón en la cadena de módulos esclavos. Se puede ver en la figura \ref{fig:dibujo-real}.
+	Por otro lado, están los módulos esclavos, que se encargan de controlar su matriz de LEDs para representar un mapa de bits y de funcionar como eslabón en la cadena de módulos esclavos. Se puede ver en la figura \ref{fig:dibujo-real} un dibujo ilustrativo exhibiendo los componentes más relevantes del sistema.
+	\begin{description}
+		\item[A: ] Fuente de alimentación (AC 220V a 5V DC).
+		\item[B: ] Cables de interconexión maestro-esclavo y esclavo-esclavo.
+		\item[C: ] Módulo esclavo.
+		\item[D: ] Módulo maestro.
+		\item[E: ] Cables de conexión a la matriz de LEDs.
+		\item[F: ] Matriz de LEDs.
+		\item[G: ] Pulsador de reset.
+		\item[H: ] Jumpers de configuración.
+		\item[I: ] NodeMCU ESP-12
+		\item[J: ] MAX7219.
+	\end{description}
 	
 	\begin{figure}[ht!]
 		\begin{center}
 			\centering
-			%\includegraphics[scale=0.8]{imagenes/dibujoreal}
+			\includegraphics[width=\linewidth]{imagenes/dibujo-fisico.pdf}
 			\caption{Dibujo ilustrativo del hardware del sistema.}
-			%\label{fig:dibujo-real}
-			% Dejo label comentado para dejar un warning en las referencias rotas.
+			\label{fig:dibujo-real}
 		\end{center}
 	\end{figure}
 
