@@ -1,12 +1,12 @@
 \section{Hardware}\label{sec:hw}
 \subsection{Diagrama en bloques general}
-El sistema se compone de módulos que interactúan entre sí, intercambiando datos entre ellos. En primer lugar el maestro, es el encargado de recibir los datos que el cliente le proporciona. Es el que posee el microcontrolador que comanda todo el sistema (ver figura \ref{ig:dibujo-real}).
+El sistema se compone de módulos que interactúan entre sí, intercambiando datos entre ellos. En primer lugar el maestro, es el encargado de recibir los datos que el cliente le proporciona. Es el que posee el microcontrolador que comanda todo el sistema (ver figura \ref{fig:dibujo-real}).
 
 Por otra parte los esclavos obtienen la información que les transmite el microcontrolador y actualizan la matriz de LEDs que tienen asociada. En la figura \ref{fig:diagrama-bloques-general} se puede observar un diagrama en bloques de todo el sistema.
 
 \begin{figure}[!ht]
 	\centering
-	\includegraphics[scale=0.8]{imagenes/esquema-general.pdf}
+	\includegraphics[scale=1]{imagenes/esquema-general.pdf}
 	\caption{Esquema general entre todos los componentes del sistema.}
 	\label{fig:diagrama-bloques-general}
 \end{figure}
@@ -18,10 +18,10 @@ Conectando su computadora a la misma red que se encuentra vinculado el cartel, e
 Por medio del protocolo de comunicación WiFi, los datos llegan hacia el microcontrolador que se encuentra en el módulo maestro. Cabe destacar que el protocolo de red que encapsula las distintas acciones que el usuario puede realizar ha sido diseñado completamente para este proyecto y se explica en mayor detalle en el apéndice \ref{sec:protocolo}.
 Dicho protocolo se implementa tanto del lado de la aplicación de PC, como del microcontrolador que controla el cartel.
 
-Tras recibir y decifrar los datos, el microcontrolador procesa la información y la transmite vía protocolo serie, sincrónico hacia el primer shifter MAX7219 que controla la primera matriz de LEDs.
+Tras recibir y decifrar los datos, el microcontrolador procesa la información y la transmite vía protocolo serie, sincrónico hacia el primer driver MAX7219 que controla la primera matriz de LEDs.
 
-Resulta necesario aclarar que cada módulo esclavo posee un MAX7219 y la información que le proporciona el microcontrolador se transmite sólo al primer shifter. Luego la misma se desplaza entre los diferentes MAX7219 utilizando determinados pines de dicho módulo.
-De esta forma, el microcontrolador solo mantiene una conexión física directa con el primer shifter.
+Resulta necesario aclarar que cada módulo esclavo posee un MAX7219 y la información que le proporciona el microcontrolador se transmite sólo al primerero de ellos. Luego la misma se desplaza entre los diferentes MAX7219 utilizando determinados pines de dicho módulo.
+De esta forma, el microcontrolador solo mantiene una conexión física directa con el primer driver.
 
 Finalmente, cada módulo esclavo enciende en su respectiva matriz de LEDs, la información suministrada por el maestro, de forma de mostrar el mensaje que el cliente había enviado inicialmente por medio de la aplicación de PC.
 
@@ -33,9 +33,9 @@ El cartel requiere una alimentación de 5V de corriente continua. Para esto se e
 %TODO AMG - falta poner análisis de consumo. Todo lo que se hizo, incluso lo que después se descartó.
 
 \subsection{Módulo maestro}
-Como se mencionó anteriormente, este módulo se encarga de procesar los datos enviados desde el cliente y controlar los demás módulos. El módulo maestro puede almacenar los parámetros de configuración previamente establecidos desde la aplicación de PC. Uno de esos parámetros es la red WiFi a la que debe conectarse el módulo maestro. Para evitar que el cartel sea inaccesible por una mala configuración accidental de la red WiFI, se añadió el diseño un pulsador de RESET, el cual, al ser presionado por 5 segundos, reestablece los parámetros de configuración por defecto y reinicia el módulo maestro.
+Como se mencionó anteriormente, este módulo se encarga de procesar los datos enviados desde el cliente y controlar los módulos esclavos que componen el cartel. Este módulo maestro almacena los parámetros de configuración previamente establecidos desde la aplicación de PC. Uno de ellos es la red WiFi a la que debe conectarse. Para evitar que el cartel sea inaccesible por una mala configuración accidental de la red, se añadió el diseño un pulsador de RESET, el cual, al ser presionado durante 5 segundos, reestablece los parámetros de configuración por defecto y reinicia el módulo maestro.
 
-Por otro lado, resulta necesario comunicar al firmware del microcontrolador la cantidad de carteles que se forman el eslabón de esclavos. Para esto se utiliza un conjunto de jumpers que codifican la cantidad de carteles conectados, de manera que el usuario pueda agregar o quitar carteles sin necesidad de volver a cargar un firmware modificado. Esto se explica en mayor detalle en el manual de usuario.
+Por otro lado, resulta necesario comunicar al firmware del microcontrolador la cantidad de carteles que conforman el eslabón de esclavos. Para esto se utiliza un conjunto de jumpers que codifican la cantidad de carteles conectados, de manera que el usuario pueda agregar o quitar carteles sin necesidad de volver a cargar el firmware modificado. Ésto se explica en mayor detalle en el manual de usuario (ver sección \ref{sec:manual-usuario}).
 
 \subsubsection{Microcontrolador}
 El componente central en el módulo maestro es el microcontrolador ESP8266EX (figura \ref{fig:esp8266ex}), el cual se encuentra contenido en un módulo AI-Thinker ESP-12E (figura \ref{fig:foto-esp12e}), el cual está montado sobre un módulo NodeMCU que le provee de regulación de tensión y un conversor de serie TTL a USB. El ESP8266EX es un SoC (\emph{System on Chip}) de la empresa Espressif. El módulo NodeMCU es hardware libre, sin embargo, el ESP12E y el ESP8266EX no lo son.\cite{NodeMCU}
@@ -213,9 +213,9 @@ Es posible expandir el cartel con N esclavos. En la figura \ref{fig:MAX-MAX} se 
 		\label{fig:MAX-MAX}
 	\end{center}
 \end{figure}
-Es importante destacar la forma en la que se comunican el microcontrolador con el primer chip shifter, y a su vez, el protocolo que utilizan para comunicarse entre los distintos MAX7219.
+Es importante destacar la forma en la que se comunican el microcontrolador con el primer driver de LEDs, y a su vez, el protocolo que utilizan para comunicarse entre los distintos MAX7219.
 
-La idea general consiste en indicarle a cada chip shifter los leds que debe encender y apagar en cada columna. Para ello debe enviar palabras de dos bytes de manera serial. Es decir, primero envía la información de la columna 1, después la 2, y así siguiendo hasta la 8. El protocolo utilizado es SPI y corresponde a la trama previamente detallada (ver figura \ref{table:trama-spi}).
+La idea general consiste en indicarle a cada chip, los leds que debe encender y apagar en cada columna. Para ello debe enviar palabras de dos bytes de manera serial. Es decir, primero envía la información de la columna 1, después la 2, y así siguiendo hasta la 8. El protocolo utilizado es SPI y corresponde a la trama previamente detallada (ver figura \ref{table:trama-spi}).
 
 \begin{table}[ht]
 	\centering
