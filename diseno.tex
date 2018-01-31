@@ -518,6 +518,98 @@ Por último, almacena el nuevo texto en la clase Settings para persistir la nuev
 
 A lo largo de la sección \ref{sec:sw-implementacion} se detalla cada clase mencionada, mostrando cuáles son sus interfaces de software y la forma en que se interconectan entre ellas.
 
+\subsection{Aplicación de PC}
+
+La aplicación de PC es la que utilizará el usuario para manejar el contenido (texto) del cartel y su configuración. La aplicación tendrá una interfaz gráfica de usuario para simplificar su uso.
+
+\subsubsection{Requerimientos del software}\label{sec:sw-pc-req}
+A continuación se enumera los requerimientos funcionales de este aplicativo:
+
+\begin{itemize}
+	\item Debe presentar al usuario un diálogo de login, para que él pueda ingresar la contraseña. Se puede ver en la figura \ref{fig:skgui-login} un bosquejo de este diálogo.
+	\item Si la contraseña es incorrecta, se vuelve a mostrar el diálogo de login hasta que se ingrese la contraseña correcta o el usuario presione \enquote{Cancelar}.
+	\item Debe permitir al usuario modificar el texto del cartel.
+	\item Debe permitir al usuario modificar la configuración de red del cartel, es decir, los datos de la red Wi-Fi a la que se conecta al encenderse.
+	\item Debe permitir al usuario modificar la contraseña de acceso al cartel.
+	\item Mientras una comunicación con el cartel esté en curso, el usuario no debe poder realizar ninguna acción.
+	\item Se debe poder ejecutar multiples instancias de la aplicación. Esto es útil para casos en que se quiera administrar mas de un cartel.
+\end{itemize}
+
+A continuación se listan los requerimientos no funcionales:
+\begin{itemize}
+	\item La aplicación deberá poder ejecutarse en Windows 7 o versiones posteriores.
+	\item Al realizar operaciones de comunicación con el cartel, la aplicación no deberá dejar de responder a eventos de usuario.
+	\item La aplicación deberá responder a acciones del usuario en un tiempo razonable, no más de un segundo (mostrar un cartel que indica operación en curso califica como responder).
+\end{itemize}
+
+\subsubsection{Interfaz de usuario}
+Considerando los requisitos explícitados en la sección \ref{sec:sw-pc-req}, se armaron bosquejos de las distintas ventanas que conforman la interfaz de usuario del sistema.
+
+\subsubsection{Ventana de login}
+Esta ventana es la que aparece inmediatamente después de arrancar la ejecución del programa. Tiene un campo en que se ingresa el nombre de host del cartel (o directamente la IP) y un campo donde se ingresa la contraseña del cartel. Presionar \enquote{Conectar} debe iniciar la interacción de autenticación con el cartel y presionar \enquote{Cancelar} debe cerrar el programa. Se puede ver un bosquejo de esta ventana en la figura \ref{fig:skgui-login}.
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.8]{imagenes/skgui-login.pdf}
+	\caption{Bosquejo de la ventana de login.}
+	\label{fig:skgui-login}
+\end{figure}
+
+\subsubsection{Ventana principal}
+
+Esta ventana es con la cual usuario controla el cartel. Los elementos principales son:
+
+\begin{itemize}
+	\item Un campo de texto editable en el cual usuario ingrese el texto a mostrar.
+	\item Un casilla de verificación que habilite o deshabilite el parpadeo.
+	\item Un campo numérico editable para establecer la frecuencia de parpadeo. Este campo solo debe estar activo si estuviera tildada su casilla de verificación correspondiente.
+	\item Un casilla de verificación que habilite o deshabilite el deslizamiento.
+	\item Un campo numérico editable para establecer la velocidad de deslizamiento. Este campo solo debe estar activo si estuviera tildada su casilla de verificación correspondiente.
+	\item Un botón \enquote{Aplicar} que inicia la comunicación con el cartel, con el objeto de actualizar el texto del cartel con el texto que ingresó el usuario en el campo, junto a los parámetros de animación (parpadeo y deslizamiento).
+	\item Un botón \enquote{Restaurar} que inicia comunicación con el cartel con el objeto de traer los datos (texto y configuración) del cartel a la aplicación de PC, descartando todo cambio que el usuario haya hecho pero no aplicado.
+\end{itemize}
+
+Todos estos elementos se pueden ver en el bosquejo que muestra la figura \ref{fig:skgui-principal}.
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.8]{imagenes/skgui-principal.pdf}
+	\caption{Bosquejo de la ventana principal.}
+	\label{fig:skgui-principal}
+\end{figure}
+
+\subsubsection{Ventana de configuración}
+La ventana de configuración es la que utilizará el usuario para cambiar los parámetros de la red WiFi a la cual se deberá conectar el cartel la próxima vez que arranque o se reinicie. En ella se tiene un campo para ingresar el nombre de la red (SSID), un campo para ingresar la contraseña de la red, un botón \enquote{Modificar} y un botón \enquote{Cancelar}.
+
+El botón \enquote{Modificar} debe cerrar la ventana e iniciar la interacción con el cartel para actualizar la configuración, mientras que el botón \enquote{Cancelar} debe volver a la ventana principal sin realizar ningún cambio y descartar los datos ingresados.
+
+Esta ventana será alcanzable desde un menú ubicado en la ventana principal.
+
+Todos estos elementos se pueden ver en el bosquejo que muestra la figura \ref{fig:skgui-conf}.
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.8]{imagenes/skgui-conf.pdf}
+	\caption{Bosquejo de la ventana de configuración de red WiFi.}
+	\label{fig:skgui-conf}
+\end{figure}
+
+\subsubsection{Ventana de cambio de contraseña}
+Esta ventana es en la cual el usuario ingresa la contraseña nueva para que el cartel tome como correcta a partir de esta operación.
+
+Es importante notar que esta operación no se puede realizar si el usuario ni hubiese ingresado anteriormente la contraseña correcta. De hecho, el usuario no puede realizar ni esta ni ninguna otra operación, quedando estancado en la ventana de login, como se especificó en los requerimientos funcionales.
+
+Esta ventana será alcanzable desde un menú ubicado en la ventana principal.
+
+Se puede ver un bosquejo de la ventana de cambio de contraseña en la figura \ref{fig:skgui-passwd}
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.8]{imagenes/skgui-passwd.pdf}
+	\caption{Bosquejo de la ventana de cambio de contraseña.}
+	\label{fig:skgui-passwd}
+\end{figure}
+
 \subsection{Protocolo de comunicación} \label{sec:protocolo}
 
 \subsubsection{Codificación}
