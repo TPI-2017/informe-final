@@ -2,7 +2,7 @@
 
 \section{Hardware}\label{sec:hw}
 \subsection{Diagrama en bloques general}
-El sistema se compone de módulos que interactúan entre sí, intercambiando datos entre ellos. En primer lugar el maestro, es el encargado de recibir los datos que el cliente le proporciona. Es el que posee el microcontrolador que comanda todo el sistema (ver figura \ref{fig:dibujo-real}).
+El sistema se compone de módulos que interactúan entre sí, intercambiando datos entre ellos. En primer lugar el maestro, es el encargado de recibir los datos que el cliente le proporciona. Es quien  posee el microcontrolador que comanda todo el sistema (ver figura \ref{fig:dibujo-real}).
 
 Por otra parte los esclavos obtienen la información que les transmite el microcontrolador y actualizan la matriz de LEDs que tienen asociada. En la figura \ref{fig:diagrama-bloques-general} se puede observar un diagrama en bloques de todo el sistema.
 
@@ -13,7 +13,7 @@ Por otra parte los esclavos obtienen la información que les transmite el microc
 	\label{fig:diagrama-bloques-general}
 \end{figure}
 
-En la figura \ref{fig:diagrama-bloques-general}, leyendo de izquierda a derecha, se observa en primer lugar un cliente. Ésto se representa a través de una aplicación de PC, siendo ésta, una de las formas que el cliente tiene para interactuar con el sistema.
+En la figura \ref{fig:diagrama-bloques-general}, se observa en primer lugar al cliente. El mismo se representa a través de una aplicación de PC, siendo ésta, la forma en que el usuario puede interactuar con el sistema.
 
 Conectando su computadora a la misma red que se encuentra vinculado el cartel, el cliente puede, por medio de dicha aplicación, enviar los comandos para que el sistema satisfaga sus necesidades.
 
@@ -30,16 +30,31 @@ Finalmente, cada módulo esclavo enciende en su respectiva matriz de LEDs, la in
 Cabe destacar que la comunicación entre la aplicación de PC y el cartel es bidireccional, debido a que todas las operaciones que el cliente realice, necesitan de una respuesta.
 En algunos casos, dicha respuesta es solo para indicar éxito o error, mientras que en otros casos el usuario recibe parámetros de configuración y las credenciales de red a las que el sistema se encuentra actualmente conectado.
 
-\subsection{Fuente de alimentación}
-El cartel requiere una alimentación de 5V de corriente continua. Para esto se expone un conector hembra (de 5.5mm x 2.1mm), el cual se conecta a un transformador externo de 220V AC a 5V DC. El sistema no posee batería de ningún tipo.
-%TODO AMG - falta poner análisis de consumo. Todo lo que se hizo, incluso lo que después se descartó.
-
 \subsection{Módulo maestro}
-Como se mencionó anteriormente, este módulo se encarga de procesar los datos enviados desde el cliente y controlar los módulos esclavos que componen el cartel. Este módulo maestro almacena los parámetros de configuración previamente establecidos desde la aplicación de PC. Uno de ellos es la red WiFi a la que debe conectarse. Para evitar que el cartel sea inaccesible por una mala configuración accidental de la red, se añadió el diseño un pulsador de RESET, el cual, al ser presionado durante 5 segundos, reestablece los parámetros de configuración por defecto y reinicia el módulo maestro.
+Como se mencionó anteriormente, este módulo se encarga de procesar los datos enviados desde el cliente a fin de convertir dicha información en comandos que posteriormente son transmitidos hacia los diferentes esclavos que componen el cartel. 
+
+Para realizar esta operación, el módulo maestro requiere de un microcontrolador que sea capaz de conectarse a una red WiFi, a fin de poder obtener las peticiones que el usuario realice por medio de la aplicación de PC.
+
+El microcontrolador, entonces, debe recibir los requerimientos a través de la red y convertirlos en paquetes que puedan ser interpretados por los drivers de LEDs que se ubican en cada uno de los esclavos.
+
+Para el presente proyecto, se opta por el microcontrolador NodeMCU que posee funcionalidades para operar con redes WiFi y conexiones seguras. Además contiene un procesador con una frecuencia aproximada de 80Mhz que es suficiente para los requerimientos de este sistema. En el apartado \ref{sec:microcontrolador} se detallan las especificaciones y diagramas en bloque de este dispositivo electrónico.
+
+Para la elección de los drivers encargados de manejar las matrices de LEDs, se opta por el MAX7219 por ser un dispositivo mundialmente conocido en la industria del hardware, cuyas principales aplicaciones donde se utiliza es en 
+%TODO AMG -  Colocar donde se usan los MAX.
+Las especificaciones de este aparato electrónico se encuentran detalladas en el apartado \ref{sec:max7219}.
+
+El principal inconveniente, que se produce al momento en que interactúan el NodeMCU con los MAX7219 es que manejan diferentes niveles de tensiones lógicas. El primero trabaja a 3.3 V, mientras que los segundos a 5 V. Para ello, es necesario agregar en el módulo maestro un circuito de conversión de señal realizado a partir de transistores. Esto se explica más en detalle en la sección \ref{sec:transistores}.
+
+Tanto el microcontrolador como los drivers de LEDs elegidos para este sistema utilizan una alimentación de 5V continua. Por este motivo es necesario una interfaz de entrada hacia el módulo maestro de donde puedan obtener la tensión necesaria los distintos dispositivos electrónicos que conforman la totalidad del cartel. Esto se explica en detalle en la sección \ref{sec:alimentacion}.
+
+El microcontrolador almacena los parámetros de configuración previamente establecidos desde la aplicación de PC. Uno de ellos es la red WiFi a la que debe conectarse. Para evitar que el cartel sea inaccesible por una mala configuración accidental de la red, se añadió el diseño un pulsador de RESET, el cual, al ser presionado durante 5 segundos, reestablece los parámetros de configuración por defecto y reinicia el módulo maestro.
 
 Por otro lado, resulta necesario comunicar al firmware del microcontrolador la cantidad de carteles que conforman el eslabón de esclavos. Para esto se utiliza un conjunto de jumpers que codifican la cantidad de carteles conectados, de manera que el usuario pueda agregar o quitar carteles sin necesidad de volver a cargar el firmware modificado. Ésto se explica en mayor detalle en el manual de usuario (ver sección \ref{sec:manual-usuario}).
 
-\subsubsection{Microcontrolador}
+\subsubsection{Alimentación} \label{sec:alimentacion}
+El cartel requiere una alimentación de 5V de corriente continua. Para esto se expone un conector hembra (de 5.5mm x 2.1mm), el cual se conecta a un transformador externo de 220V AC a 5V DC. El sistema no posee batería de ningún tipo.
+
+\subsubsection{Microcontrolador} \label{sec:microcontrolador}
 El componente central en el módulo maestro es el microcontrolador ESP8266EX (figura \ref{fig:esp8266ex}), el cual se encuentra contenido en un módulo AI-Thinker ESP-12E (figura \ref{fig:foto-esp12e}), el cual está montado sobre un módulo NodeMCU que le provee de regulación de tensión y un conversor de serie TTL a USB. El ESP8266EX es un SoC (\emph{System on Chip}) de la empresa Espressif. El módulo NodeMCU es hardware libre, sin embargo, el ESP12E y el ESP8266EX no lo son.\cite{NodeMCU}
 
 Es importante tener en cuenta que el sistema no integra en su hardware directamente ni el ESP12E ni el ESP8266EX, sino que utiliza el NodeMCU, cuya asignación de pines se puede ver en la figura \ref{fig:nodemcu-pinout}.
@@ -90,6 +105,33 @@ Se puede ver un diagrama de bloques del ESP8266EX en la figura \ref{fig:diagrama
 \end{figure}
 
 Como se mencionó anteriormente, se necesita de flash externa para correr programas. El módulo ESP-12S se encarga de proveer al ESP8266EX 4 MiB de memoria flash.
+
+\subsubsection{Jumpers}
+
+\subsubsection{Botón de Reset}
+
+\subsubsection{Circuito de conversión de niveles} \label{sec:transistores}
+Como el microcontrolador transmite los datos con un valor alto de 3.3V, es necesario convertir estas señales para que este dentro de los rangos con los que trabaja el MAX7219. La solución por la cual se optó fue incorporar transistores configurados de manera que ante una entrada de 0V, produzcan 5V y ante una entrada de 3.3V, produzcan 0V (aproximado). Se conectan tres transistores NPN al circuito del módulo maestro, uno para cada señal (DATAIN, LOAD, CLK). Se puede observar en la figura \ref{fig:transistors} la conexión de cada transistor con sus respectivas resistencias. 
+
+Esta solución tiene como consecuencia el hecho de que la señal digital se invierte, para eliminar este problema, fue necesario modificar el firmware del cartel para invertir el valor lógico de sus salidas.
+
+Los transistores utilizados en el prototipo final son los 2N2369. %(http://www.pci-card.com/2n2369.pdf)
+La base es el pin 2, el colector el pin 1 y el emisor el pin 3 (ver figura \ref{fig:transistors}).
+
+\begin{figure}[ht!]
+	\centering
+	\begin{center}
+		\includegraphics[scale=2]{imagenes/hw/transistor.pdf}
+		\caption{Conexión de un transistor junto con los valores de las resistencias.}
+		\label{fig:transistors}
+	\end{center}
+\end{figure}
+
+\subsubsection{Comunicación con el primer esclavo}
+
+\subsubsection{Esquemático final}
+
+
 
 \subsection{Módulo esclavo}
 Un modulo esclavo posee un driver MAX7219, que es el componente principal junto con una interfaz que permite conectarse a otro módulo esclavo o en su defecto al master.
@@ -228,23 +270,6 @@ Para realizar este proceso, la figura \ref{fig:spi-timing-diagram} muestra un di
 		\includegraphics[width=\textwidth]{imagenes/hw/timingDiagram.pdf}
 		\caption{Diagrama de tiempo de las señales del MAX7219.}
 		\label{fig:spi-timing-diagram}
-	\end{center}
-\end{figure}
-
-\subsubsection{Problema de incompatibilidad de tensiones}
-Como el microcontrolador transmite los datos con un valor alto de 3.3V, es necesario convertir estas señales para que este dentros de los rangos del MAX7219. La solución por la cual se optó fue incorporar transistores configurados de manera que ante una entrada de 0V, produzcan 5V y ante una entrada de 3.3V, produzcan 0V (aproximado). Se conectan tres transistores NPN al circuito del módulo maestro, uno para cada señal (DATAIN, LOAD, CLK). Se puede observar en la figura \ref{fig:transistors} la conexión de cada transistor con sus respectivas resistencias. 
-
-Esta solución tiene como consecuencia el hecho de que la señal digital se invierte, para eliminar este problema, fue necesario modificar el firmware del cartel para invertir el valor lógico de sus salidas.
-
-Los transistores utilizados en el prototipo final son los 2N2369. %(http://www.pci-card.com/2n2369.pdf)
-La base es el pin 2, el colector el pin 1 y el emisor el pin 3 (ver figura \ref{fig:transistors}).
-
-\begin{figure}[ht!]
-	\centering
-	\begin{center}
-		\includegraphics[scale=2]{imagenes/hw/transistor.pdf}
-		\caption{Conexión de un transistor junto con los valores de las resistencias.}
-		\label{fig:transistors}
 	\end{center}
 \end{figure}
 
