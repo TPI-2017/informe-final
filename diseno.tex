@@ -61,19 +61,23 @@ En los siguientes apartados se describiran las partes que conforman el diseño d
 	\label{fig:esquematico-master-anotado}
 	% Ojo con el orden, tiene que coincidir con el orden en la imagen.
 	\begin{enumerate}
-		\item Microcontrolador ESP8266EX.
-		\item Ficha de alimentación.
-		\item Circuito de conversión de niveles lógicos.
-		\item Componentes de interacción directa con usuario.
-		\item Ficha de conexión a esclavo.
+		\item Ficha de alimentación (ver sección \ref{sec:alimentacion}).
+		\item Microcontrolador ESP8266EX (ver sección \ref{sec:microcontrolador}).
+		\item Componentes de interacción directa con usuario (ver sección \ref{sec:jumpers-rst}).
+		\item Circuito de conversión de niveles lógicos (ver sección \ref{sec:transistores})..
+		\item Ficha de conexión a esclavo (ver sección \ref{sec:ficha-esclavo}).
 	\end{enumerate}
 \end{figure}
 
 \subsubsection{Alimentación} \label{sec:alimentacion}
 El cartel requiere una alimentación de 5V de corriente continua. Para esto se expone un conector hembra (de 5.5mm x 2.1mm), el cual se conecta a un transformador externo de 220V AC a 5V DC. El sistema no posee batería de ningún tipo.
 
+Esta tensión permite alimentar tanto al microcontrolador ESP8266EX como a todos los drivers MAX7219 que posee el circuito, incluidas las matrices de LEDs que tiene cada uno asociada.
+
+En la sección \ref{sec:medicion-alimentacion} se agrega más información respecto del consumo que posee el  circuito completo y los diferentes mecanismos que se realizaron para obtener dichos parámetros.
+
 \subsubsection{Microcontrolador} \label{sec:microcontrolador}
-El componente central en el módulo maestro es el microcontrolador ESP8266EX (figura \ref{fig:esp8266ex}), el cual se encuentra contenido en un módulo AI-Thinker ESP-12E (figura \ref{fig:foto-esp12e}), el cual está montado sobre un módulo NodeMCU que le provee de regulación de tensión y un conversor de serie TTL a USB. El ESP8266EX es un SoC (\emph{System on Chip}) de la empresa Espressif. El módulo NodeMCU es hardware libre, sin embargo, el ESP12E y el ESP8266EX no lo son.\cite{NodeMCU}
+El componente central en el módulo maestro es el microcontrolador ESP8266EX, el cual se encuentra contenido en un módulo AI-Thinker ESP-12E (figura \ref{fig:foto-esp12e}), el cual está montado sobre un módulo NodeMCU que le provee de regulación de tensión y un conversor de serie TTL a USB. El ESP8266EX es un SoC (\emph{System on Chip}) de la empresa Espressif. El módulo NodeMCU es hardware libre, sin embargo, el ESP12E y el ESP8266EX no lo son.\cite{NodeMCU}
 
 Es importante tener en cuenta que el sistema no integra en su hardware directamente ni el ESP12E ni el ESP8266EX, sino que utiliza el NodeMCU, cuya asignación de pines se puede ver en la figura \ref{fig:nodemcu-pinout}.
 
@@ -87,19 +91,13 @@ Es importante tener en cuenta que el sistema no integra en su hardware directame
 
 \begin{figure}[ht!]
 	\begin{center}
-		\includegraphics[width=3cm]{imagenes/esp8266ex.jpg}
-		\caption{Foto del integrado ESP8266EX.}
-		\label{fig:esp8266ex}
-	\end{center}
-\end{figure}
-
-\begin{figure}[ht!]
-	\begin{center}
 		\includegraphics[width=0.95\textwidth]{imagenes/nodemcu-pinout.pdf}
 		\caption{Asignación de pines del NodeMCU.}
 		\label{fig:nodemcu-pinout}
 	\end{center}
 \end{figure}
+
+Utilizando la figura \ref{fig:esquematico-master-anotado} y la asociación de pines de la figura \ref{fig:nodemcu-pinout}, es posible aclarar que los pines GPIO12, GPIO13 y GPIO14 se utilizan para la conexión de los jumpers. Mientras que el pin GPIO2 para el botón de RESET. Por otra parte los pines GPIO0, GPIO4 y GPIO5 se utilizan para las señales CLK, LOAD y DATAIN necesarias para la comunicación entre el microcontrolador y los drivers MAX7219.
 
 El chip ESP8266EX combina un microcontrolador Tensillica Xtensa L106, un RISC de 32 bits corriendo a 80 Mhz, con funcionalidad WiFi. \cite{ESP8266Datasheet} El chip tiene memoria ROM con firmware no removible, y puede correr programas almacenados en flash externa. Para poder usar todas sus funcionalidades, se debe programar sobre firmware privativo desarrollado por Espressif, esto implica que el programa de usuario corre en simultáneo con el firmware (utilizando funciones disponibilizadas por el firmware) y el uso de la memoria de trabajo está sujeto a la versión del firmware. Según el datasheet del ESP8266EX, el usuario puede esperar tener disponible 50 KiB de RAM para alocar variables globales o utilizando la heap.
 
@@ -124,7 +122,7 @@ Se puede ver un diagrama de bloques del ESP8266EX en la figura \ref{fig:diagrama
 
 Como se mencionó anteriormente, se necesita de flash externa para correr programas. El módulo ESP-12S se encarga de proveer al ESP8266EX 4 MiB de memoria flash.
 
-\subsubsection{Jumpers y botón de Reset}
+\subsubsection{Jumpers y botón de Reset} \label{sec:jumpers-rst}
 Esta sección del circuito aglomera las componentes con las cuales el usuario (especificamente, el usuario encargado de mantener la operacion del cartel) va a interactuar directamente.
 
 El pulsador de Reset es un pulsador normalmente abierto, que conecta el pin GPIO2 del microcontrolador a la masa. El pin GPIO2 está configurado como entrada, con lo cual es necesario un circuito de pull-up para que su nodo circuital no tenga un valor lógico indefinido. Para esto se utiliza el pull-up interno del microcontrolador.
@@ -133,12 +131,17 @@ Los jumpers, de manera similar, conectan los pines GPIO13, GPIO12, GPIO14 a masa
 
 
 \subsubsection{Circuito de conversión de niveles} \label{sec:transistores}
-Como el microcontrolador transmite los datos con un valor alto de 3.3V, es necesario convertir estas señales para que este dentro de los rangos con los que trabaja el MAX7219. La solución por la cual se optó fue incorporar transistores configurados de manera que ante una entrada de 0V, produzcan 5V y ante una entrada de 3.3V, produzcan 0V (aproximado). Se conectan tres transistores NPN al circuito del módulo maestro, uno para cada señal (DATAIN, LOAD, CLK). Se puede observar en la figura \ref{fig:transistors} la conexión de cada transistor con sus respectivas resistencias. 
+Como el microcontrolador transmite los datos con un valor alto de 3.3V, es necesario convertir estas señales para que este dentro de los rangos con los que trabaja el MAX7219. La solución por la cual se optó fue incorporar transistores configurados de manera que ante una entrada de 0V, produzcan 5V y ante una entrada de 3.3V, produzcan 0V (aproximado). 
+
+Se conectan tres transistores NPN al circuito del módulo maestro, uno para cada señal: DATAIN, LOAD, CLK, que corresponde a los pines GPIO5, GPIO4 y GPIO0 del microcontrolador respectivamente. 
+Se puede observar en la figura \ref{fig:transistors} la conexión de cada transistor con sus respectivas resistencias. 
 
 Esta solución tiene como consecuencia el hecho de que la señal digital se invierte, para eliminar este problema, fue necesario modificar el firmware del cartel para invertir el valor lógico de sus salidas.
 
 Los transistores utilizados en el prototipo final son los 2N2369. %(http://www.pci-card.com/2n2369.pdf)
-La base es el pin 2, el colector el pin 1 y el emisor el pin 3 (ver figura \ref{fig:transistors}).
+El pin 2 corresponde a la base, donde se conecta las señales previamente enumeradas. Por otro lado el colector es el pin 1 donde se conecta VCC mientras que el emisor el pin 3 al que se le conecta GND (ver figura \ref{fig:transistors}).
+
+Finalmente la salida se conecta desde el emisor, y se encuentra invertida respecto a la entrada que se origina por la base.
 
 \begin{figure}[ht!]
 	\centering
@@ -149,20 +152,26 @@ La base es el pin 2, el colector el pin 1 y el emisor el pin 3 (ver figura \ref{
 	\end{center}
 \end{figure}
 
-\subsubsection{Comunicación con el primer esclavo}
-En esta porción del circuito se tiene la interfaz de conexión al primer esclavo. Que luego en el diseño del PCB terminará siendo una ficha.
+\subsubsection{Comunicación con el primer esclavo} \label{sec:ficha-esclavo}
+En esta porción del circuito se tiene la interfaz de conexión al primer esclavo. 
+Que luego en el diseño del PCB terminará siendo una ficha.
+
+El maestro expone todas las señales que necesita el primer esclavo para recibir los comandos que envía el microcontrolador.
+Dichas señales corresponden, en primer lugar, a los 5V y GND provenientes de la fuente.
+
+Adicionalmente, el primer esclavo recibe las señales de CLK, LATCH y DATAIN, ya convertidas a valores lógicos de 5V. Para más información revisar la sección \ref{sec:transistores}.
 
 \subsubsection{Esquemático final}
-Habiendo descrito por partes el esquemático del módulo maestro, se muestra en la figura \ref{fig:esquematico-master-anotado}.
+Habiendo descrito por partes el esquemático del módulo maestro, se muestra en la figura \ref{fig:esquematico-master} el circuito completo sin anotaciones.
 
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=\linewidth]{imagenes/esquematico-master.pdf}
 	\caption{Esquemático del módulo maestro.}
-	\label{fig:esquematico-master-anotado}
+	\label{fig:esquematico-master}
 \end{figure}
 
-
+\clearpage
 \subsection{Módulo esclavo}
 Un modulo esclavo posee un driver MAX7219, que es el componente principal junto con una interfaz que permite conectarse a otro módulo esclavo o en su defecto al master.
 
