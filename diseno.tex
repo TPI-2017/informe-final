@@ -2,7 +2,7 @@
 
 \section{Hardware}\label{sec:hw}
 \subsection{Diagrama en bloques general}
-El sistema se compone de módulos que interactúan entre sí, intercambiando datos entre ellos. En primer lugar el maestro, es el encargado de recibir los datos que el cliente le proporciona. Es el que posee el microcontrolador que comanda todo el sistema (ver figura \ref{fig:dibujo-real}).
+El sistema se compone de módulos que interactúan entre sí, intercambiando datos entre ellos. En primer lugar el maestro, es el encargado de recibir los datos que el cliente le proporciona. Es quien  posee el microcontrolador que comanda todo el sistema (ver figura \ref{fig:dibujo-real}).
 
 Por otra parte los esclavos obtienen la información que les transmite el microcontrolador y actualizan la matriz de LEDs que tienen asociada. En la figura \ref{fig:diagrama-bloques-general} se puede observar un diagrama en bloques de todo el sistema.
 
@@ -13,7 +13,7 @@ Por otra parte los esclavos obtienen la información que les transmite el microc
 	\label{fig:diagrama-bloques-general}
 \end{figure}
 
-En la figura \ref{fig:diagrama-bloques-general}, leyendo de izquierda a derecha, se observa en primer lugar un cliente. Ésto se representa a través de una aplicación de PC, siendo ésta, una de las formas que el cliente tiene para interactuar con el sistema.
+En la figura \ref{fig:diagrama-bloques-general}, se observa en primer lugar al cliente. El mismo se representa a través de una aplicación de PC, siendo ésta, la forma en que el usuario puede interactuar con el sistema.
 
 Conectando su computadora a la misma red que se encuentra vinculado el cartel, el cliente puede, por medio de dicha aplicación, enviar los comandos para que el sistema satisfaga sus necesidades.
 
@@ -30,16 +30,31 @@ Finalmente, cada módulo esclavo enciende en su respectiva matriz de LEDs, la in
 Cabe destacar que la comunicación entre la aplicación de PC y el cartel es bidireccional, debido a que todas las operaciones que el cliente realice, necesitan de una respuesta.
 En algunos casos, dicha respuesta es solo para indicar éxito o error, mientras que en otros casos el usuario recibe parámetros de configuración y las credenciales de red a las que el sistema se encuentra actualmente conectado.
 
-\subsection{Fuente de alimentación}
-El cartel requiere una alimentación de 5V de corriente continua. Para esto se expone un conector hembra (de 5.5mm x 2.1mm), el cual se conecta a un transformador externo de 220V AC a 5V DC. El sistema no posee batería de ningún tipo.
-%TODO AMG - falta poner análisis de consumo. Todo lo que se hizo, incluso lo que después se descartó.
-
 \subsection{Módulo maestro}
-Como se mencionó anteriormente, este módulo se encarga de procesar los datos enviados desde el cliente y controlar los módulos esclavos que componen el cartel. Este módulo maestro almacena los parámetros de configuración previamente establecidos desde la aplicación de PC. Uno de ellos es la red WiFi a la que debe conectarse. Para evitar que el cartel sea inaccesible por una mala configuración accidental de la red, se añadió el diseño un pulsador de RESET, el cual, al ser presionado durante 5 segundos, reestablece los parámetros de configuración por defecto y reinicia el módulo maestro.
+Como se mencionó anteriormente, este módulo se encarga de procesar los datos enviados desde el cliente a fin de convertir dicha información en comandos que posteriormente son transmitidos hacia los diferentes esclavos que componen el cartel. 
+
+Para realizar esta operación, el módulo maestro requiere de un microcontrolador que sea capaz de conectarse a una red WiFi, a fin de poder obtener las peticiones que el usuario realice por medio de la aplicación de PC.
+
+El microcontrolador, entonces, debe recibir los requerimientos a través de la red y convertirlos en paquetes que puedan ser interpretados por los drivers de LEDs que se ubican en cada uno de los esclavos.
+
+Para el presente proyecto, se opta por el microcontrolador NodeMCU que posee funcionalidades para operar con redes WiFi y conexiones seguras. Además contiene un procesador con una frecuencia aproximada de 80Mhz que es suficiente para los requerimientos de este sistema. En el apartado \ref{sec:microcontrolador} se detallan las especificaciones y diagramas en bloque de este dispositivo electrónico.
+
+Para la elección de los drivers encargados de manejar las matrices de LEDs, se opta por el MAX7219 por ser un dispositivo mundialmente conocido en la industria del hardware, cuyas principales aplicaciones donde se utiliza es en 
+%TODO AMG -  Colocar donde se usan los MAX.
+Las especificaciones de este aparato electrónico se encuentran detalladas en el apartado \ref{sec:max7219}.
+
+El principal inconveniente, que se produce al momento en que interactúan el NodeMCU con los MAX7219 es que manejan diferentes niveles de tensiones lógicas. El primero trabaja a 3.3 V, mientras que los segundos a 5 V. Para ello, es necesario agregar en el módulo maestro un circuito de conversión de señal realizado a partir de transistores. Esto se explica más en detalle en la sección \ref{sec:transistores}.
+
+Tanto el microcontrolador como los drivers de LEDs elegidos para este sistema utilizan una alimentación de 5V continua. Por este motivo es necesario una interfaz de entrada hacia el módulo maestro de donde puedan obtener la tensión necesaria los distintos dispositivos electrónicos que conforman la totalidad del cartel. Esto se explica en detalle en la sección \ref{sec:alimentacion}.
+
+El microcontrolador almacena los parámetros de configuración previamente establecidos desde la aplicación de PC. Uno de ellos es la red WiFi a la que debe conectarse. Para evitar que el cartel sea inaccesible por una mala configuración accidental de la red, se añadió el diseño un pulsador de RESET, el cual, al ser presionado durante 5 segundos, reestablece los parámetros de configuración por defecto y reinicia el módulo maestro.
 
 Por otro lado, resulta necesario comunicar al firmware del microcontrolador la cantidad de carteles que conforman el eslabón de esclavos. Para esto se utiliza un conjunto de jumpers que codifican la cantidad de carteles conectados, de manera que el usuario pueda agregar o quitar carteles sin necesidad de volver a cargar el firmware modificado. Ésto se explica en mayor detalle en el manual de usuario (ver sección \ref{sec:manual-usuario}).
 
-\subsubsection{Microcontrolador}
+\subsubsection{Alimentación} \label{sec:alimentacion}
+El cartel requiere una alimentación de 5V de corriente continua. Para esto se expone un conector hembra (de 5.5mm x 2.1mm), el cual se conecta a un transformador externo de 220V AC a 5V DC. El sistema no posee batería de ningún tipo.
+
+\subsubsection{Microcontrolador} \label{sec:microcontrolador}
 El componente central en el módulo maestro es el microcontrolador ESP8266EX (figura \ref{fig:esp8266ex}), el cual se encuentra contenido en un módulo AI-Thinker ESP-12E (figura \ref{fig:foto-esp12e}), el cual está montado sobre un módulo NodeMCU que le provee de regulación de tensión y un conversor de serie TTL a USB. El ESP8266EX es un SoC (\emph{System on Chip}) de la empresa Espressif. El módulo NodeMCU es hardware libre, sin embargo, el ESP12E y el ESP8266EX no lo son.\cite{NodeMCU}
 
 Es importante tener en cuenta que el sistema no integra en su hardware directamente ni el ESP12E ni el ESP8266EX, sino que utiliza el NodeMCU, cuya asignación de pines se puede ver en la figura \ref{fig:nodemcu-pinout}.
@@ -90,6 +105,33 @@ Se puede ver un diagrama de bloques del ESP8266EX en la figura \ref{fig:diagrama
 \end{figure}
 
 Como se mencionó anteriormente, se necesita de flash externa para correr programas. El módulo ESP-12S se encarga de proveer al ESP8266EX 4 MiB de memoria flash.
+
+\subsubsection{Jumpers}
+
+\subsubsection{Botón de Reset}
+
+\subsubsection{Circuito de conversión de niveles} \label{sec:transistores}
+Como el microcontrolador transmite los datos con un valor alto de 3.3V, es necesario convertir estas señales para que este dentro de los rangos con los que trabaja el MAX7219. La solución por la cual se optó fue incorporar transistores configurados de manera que ante una entrada de 0V, produzcan 5V y ante una entrada de 3.3V, produzcan 0V (aproximado). Se conectan tres transistores NPN al circuito del módulo maestro, uno para cada señal (DATAIN, LOAD, CLK). Se puede observar en la figura \ref{fig:transistors} la conexión de cada transistor con sus respectivas resistencias. 
+
+Esta solución tiene como consecuencia el hecho de que la señal digital se invierte, para eliminar este problema, fue necesario modificar el firmware del cartel para invertir el valor lógico de sus salidas.
+
+Los transistores utilizados en el prototipo final son los 2N2369. %(http://www.pci-card.com/2n2369.pdf)
+La base es el pin 2, el colector el pin 1 y el emisor el pin 3 (ver figura \ref{fig:transistors}).
+
+\begin{figure}[ht!]
+	\centering
+	\begin{center}
+		\includegraphics[scale=2]{imagenes/hw/transistor.pdf}
+		\caption{Conexión de un transistor junto con los valores de las resistencias.}
+		\label{fig:transistors}
+	\end{center}
+\end{figure}
+
+\subsubsection{Comunicación con el primer esclavo}
+
+\subsubsection{Esquemático final}
+
+
 
 \subsection{Módulo esclavo}
 Un modulo esclavo posee un driver MAX7219, que es el componente principal junto con una interfaz que permite conectarse a otro módulo esclavo o en su defecto al master.
@@ -230,151 +272,6 @@ Para realizar este proceso, la figura \ref{fig:spi-timing-diagram} muestra un di
 		\label{fig:spi-timing-diagram}
 	\end{center}
 \end{figure}
-
-\subsubsection{Problema de incompatibilidad de tensiones}
-Como el microcontrolador transmite los datos con un valor alto de 3.3V, es necesario convertir estas señales para que este dentros de los rangos del MAX7219. La solución por la cual se optó fue incorporar transistores configurados de manera que ante una entrada de 0V, produzcan 5V y ante una entrada de 3.3V, produzcan 0V (aproximado). Se conectan tres transistores NPN al circuito del módulo maestro, uno para cada señal (DATAIN, LOAD, CLK). Se puede observar en la figura \ref{fig:transistors} la conexión de cada transistor con sus respectivas resistencias. 
-
-Esta solución tiene como consecuencia el hecho de que la señal digital se invierte, para eliminar este problema, fue necesario modificar el firmware del cartel para invertir el valor lógico de sus salidas.
-
-Los transistores utilizados en el prototipo final son los 2N2369. %(http://www.pci-card.com/2n2369.pdf)
-La base es el pin 2, el colector el pin 1 y el emisor el pin 3 (ver figura \ref{fig:transistors}).
-
-\begin{figure}[ht!]
-	\centering
-	\begin{center}
-		\includegraphics[scale=2]{imagenes/hw/transistor.pdf}
-		\caption{Conexión de un transistor junto con los valores de las resistencias.}
-		\label{fig:transistors}
-	\end{center}
-\end{figure}
-
-% ========================  Fabricación  ========================
-
-
-
-\subsection{Fabricación del circuito PCB}
-En ésta sección se menciona como se procedió a la fabricación de los módulos de PCB mediante uno de los métodos mas económicos disponibles, la técnica de transferencia con planchado. Se utilizaron PCB doble cara, destinando una de sus caras para una superficie GND que unifique la conexión de todos los nodos de tierra de la placa.
-
-Este proceso consiste en cinco pasos esenciales, que serán detallados a continuación con detalles sobre como se debería proceder, las buenas practicas y sugerencias en cada paso.
-
-\subsubsection{Pasos preliminares}
-Antes de empezar es necesario contar con todos los materiales a utilizar. En el apéndice \ref{sec:materiales} se indica la lista de todos los componentes y materiales que se requieren en los procesos.
-
-En primer lugar, con el papel ilustración se imprime el dibujo del circuito (un ejemplo de éste, se encuentra en la figura \ref{fig:imp-pcb} del apéndice \ref{sec:materiales}), con una impresora laser. Se recomienda dejar un borde excedente para facilitar el proceso de planchado. Prestar mucha atención, que al imprimir el circuito mediante este método, la imagen del mismo se espeja al planchar.
-
-Antes de pasar al siguiente paso, es necesario quitar toda grasitud y suciedad de la plancha de cobre, con detergente (no con alcohol) y virulana fina, para evitar que impidan la correcta adhesión de la tinta durante el planchado.
-
-\subsubsection{Planchado}
-Apoye la plancha de cobre sobre una superficie firme no inflamable. Retire de la cercanía todo objeto que pueda obstruir sus movimientos durante el planchado. Posicione el papel lo más centrado posible boca abajo en la plancha de cobre. Asegurese de que el papel está apoyando bien sobre toda la plancha, y proceda a presionar con la plancha unos pocos minutos en la zona del dibujo previamente impreso. El papel no debe tener síntomas de quemaduras, si esto ocurre inmediatamente quitar la plancha ya que podría arruinar toda la transferencia de la tinta.
-
-Tras haber realizado esto durante unos 10 a 15 minutos (el tiempo puede variar según el calor de la plancha y la calidad del papel), retire la misma, desconecte su cable de alimentación y luego sumerja en un recipiente con agua fría la placa con la hoja que en este punto estará adherida a la misma. Deje reposar unos minutos hasta que se enfrien. Pasados unos 5 minutos, el calor ya se habrá disipado lo suficiente como para proseguir. Retire la placa y el papel del agua, apoyelos sobre un trapo seco sobre una superficie firme, y con las yemas de los dedos retirar el papel con mucho cuidado de no producir rayaduras y evitando que se salga la tinta, que ahora estará pegada al cobre.
-En la figura \ref{fig:sacado-papel} se observa como se va quitando el papel.
-
-\begin{figure}[ht!]
-	\centering
-	\includegraphics[width=0.6\linewidth]{imagenes/pcbeando/sacado-papel-1.png}
-	\caption{Proceso de quitar el papel.}
-	\label{fig:sacado-papel}
-\end{figure}
-
-\subsubsection{Reducción del Cobre}
-Una vez quitado todo el papel fotográfico debería quedar solo la tinta impregnada en el cobre (ver figura \ref{fig:pos-sacado-papel-1}). Si de alguna manera se salió la tinta, es posible corregir las imperfecciones con un marcador de esmalte, en la parte superior izquierda de la figura se puede notar que se requirio corregir el agujero del tornillo.
-
-\begin{figure}[ht!]
-	\centering
-	\includegraphics[width=0.47\linewidth]{imagenes/pcbeando/pos-sacado-pape-1.png}
-	\caption{Pos sadcado papel.}
-	\label{fig:pos-sacado-papel-1}
-\end{figure}
-
-{ \color{red} Contar que se opto por hacer GND toda una cara por lo tanto habia que pintar con esmalte la otra cara para que el cobre no lo comiera }
-
-En la figura \ref{fig:pos-sacado-papel-2} se puede ver el resultado luego de aplicar esmalte.
-
-\begin{figure}[ht!]
-	\centering
-	\includegraphics[width=0.47\linewidth]{imagenes/pcbeando/pos-sacado-papel-2.png}
-	\caption{Pos sadcado papel 2.}
-	\label{fig:pos-sacado-papel-2}
-\end{figure}
-
-Para reducir el cobre utilizar guantes de latex ya que el acido ferrico mancha. 
-
-
-{ \color{red} Contar el procedimiento del acido, de que no hay que mover mucho y dejar reposar al menos 15 min si el acido esta usado. En un ambiente abierto (y sobre todo sin vientoo (?..), sobre una superficie en la que si se derrama no pasa nada... cuando ya esta comido lavar con abundante agua para quietar el acido y dejar secar por al menos 10 minutos.
-Contar tambien que se utilizo un hilo enganchado para evitar tocar la placa directamente. }
-En la figura \ref{fig:acido} se muestra la placa cubierta de acido sostenido por un hilo azul que se utilizo como ayuda para sacarlo del recipiente.
-\begin{figure}[ht!]
-	\centering
-	\includegraphics[width=0.4\linewidth]{imagenes/pcbeando/acido.jpeg}
-	\caption{Acido}
-	\label{fig:acido}
-\end{figure}
-
-
-En la figura \ref{fig:pos-acido} se observa el resultado de ese paso.
-
-\begin{figure}[ht!]
-	\centering
-	\includegraphics[width=0.36\linewidth]{imagenes/pcbeando/pos-acido-2.jpeg}
-	\caption{Pos acido}
-	\label{fig:pos-acido}
-\end{figure}
-
-\subsubsection{Perforado de Placas}
-En este paso se requieren las mechas especificadas en el apéndice \ref{sec:materiales-para-hacer-cartel}. Es importante contar con mechas de las medidas ya que cada componente posee diferente tamaño de pines. La correcta elección de diámetro para cada uno contribuye a que el proceso de soldado sea menos trabajoso y disminuye la posibilidad de que la soltura de un componente entorpezca dicho paso provocando un mal funcionamiento del sistema.
-
-Antes de proseguir con el siguiente paso se realizaron los cortes pertinentes de forma de separar los módulos entre sí. Utilizando una sierra de arco, en primer lugar se marcó la línea de corte para facilitar el proceso.
-Luego con mucho cuidado se procedió con la misma. Seguido de esto, es recomendable que se lijen los bordes de los PCB para evitar futuros accidentes ya al cortarlo con una sierra queden imperfecciones filosas.
-
-En la figura \ref{fig:pos-corte} se muestran como deberían quedar los módulos lijados y separados entre sí.
-
-\begin{figure}[ht!]
-	\centering
-	\includegraphics[width=0.7\linewidth]{imagenes/pcbeando/pos-corte.jpeg}
-	\caption{Pos corte}
-	\label{fig:pos-corte}
-\end{figure}
-
-\subsubsection{Montaje}
-
-{ \color{red} Finalizando la fabricación, en primer lugar se monta los pines que seran el soporte a los componentes, por ejemplo el NodeMCU del master será conectado a dos tiras de pines de NxN pines para que el mantenimiento del modulo sea mas flexible.
-Se recomienda probar las conexiones de los componenetes antes de seguir con el montaje del siguiente para evitar fallos indeseados (en soft seria test unitario).}
-
-
-%TODO esto no tiene formato de lista ni espaciado, halp pls%
-
-\subsection{Manual de instalacion de hardware}
-
-%TODO deberia esto ir aca al final o seccion nueva? La fabricacion tambien on deberia ser seccion nueva?%
-
-Para compenzar con la instalacion del hardware, identifique cada uno de los modulos a instalar. El módulo maestro puede diferenciarse facilmente porque no posee una pantalla, además de que cuenta con una ficha de alimentación que los módulos esclavo no poseen. Los módulos esclavo en cambio cuentan con una matriz de LEDs.
-
-%Dibujo basico de modulos %
-
-
-Determine donde va a instalar el cartel. La altura ideal para su instalación es montado sobre la pared a una altura de alrededor de 1.80 metros. Esta altura garantiza su facil divisación por parte de personas de todas las estaturas sin resultar molesto de ver para ninguna en particular. El cartel deberá montarse sobre una pared preferiblemente despejada, en un area donde haya un tomacorrientes de 220 V a una distancia no mayor a 1 metro -debido al largo del cable de alimentación de la fuente incluída-, y lejos de cualquier fuente de luz directa cuyo reflejo pueda afectar la legibilidad del mensaje mostrado por el cartel. Esto también implica que para su óptima legibilidad, el cartel debe ser instalado en espacios interiores, siendo su potencia lumínica insuficiente para garantizar la correcta legibilidad de los mensajes bajo la luz solar directa.
-
-%Dibujo basico de pared con tomacorrientes cerca, linea punteada con cartel a la altura adecuada. Puede ser complicado, en cuyo caso mejor no lo hacemos %
-
-
-Apoye sobre una mesa los modulos, uno al lado de otro, simulando el orden en el que quedarán sobre la pared. Esto le permitirá identificar el ancho del cartel para saber si puede montarlo correctamente en el espacio disponible. Luego apoyando de a dos modulos sobre la pared, marque las posiciones donde el gabinete permite que pasen los tornillos para sujetarlos. Repita para todo para subsecuente de módulos hasta haber hecho las marcas para todos.
-
-
-%Dibujo basico de modulos sobre pared e indicacion sobre donde irian los tornillos %
-
-
-Una vez hechas las marcas haga los agujeros para poner los tarugos donde quedaran sujetos los tornillos. No utilice tornillos más finos de los indicados ya que estos pueden no soportar el peso del cartel.
-
-
-Apoye los modulos en la pared de manera que coincidan los agujeros de guia con los agujeros realizados, y luego inserte los tornillos en los mismos y ajustelos. El cartel tendria que quedar fijo y estatico en el lugar tras haber realizado esto.
-
-
-Conecte con los cables provistos el módulo maestro con la interfaz de entrada del primer modulo esclavo. Luego la interfaz de salida del primer modulo esclavo con la interfaz de entrada del segundo modulo esclavo. En caso de haber más módulos esclavo, repita este último paso hasta que todos estén conectados en cadena.
-
-Conecte la fuente de alimentacion en un tomacorrientes de 220V y en la ficha de alimentación del módulo maestro.
-
-El cartel ya se encuentra instalado y listo para su configuración y uso.
 
 \pagebreak
 \section{Software}\label{sec:sw}
