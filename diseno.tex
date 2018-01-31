@@ -37,19 +37,37 @@ Para realizar esta operación, el módulo maestro requiere de un microcontrolado
 
 El microcontrolador, entonces, debe recibir los requerimientos a través de la red y convertirlos en paquetes que puedan ser interpretados por los drivers de LEDs que se ubican en cada uno de los esclavos.
 
-Para el presente proyecto, se opta por el microcontrolador NodeMCU que posee funcionalidades para operar con redes WiFi y conexiones seguras. Además contiene un procesador con una frecuencia aproximada de 80Mhz que es suficiente para los requerimientos de este sistema. En el apartado \ref{sec:microcontrolador} se detallan las especificaciones y diagramas en bloque de este dispositivo electrónico.
+Para el presente proyecto, se opta por el microcontrolador ESP8266EX de Espressif que posee funcionalidades para operar con redes WiFi y conexiones seguras. Además tiene un procesador con una frecuencia aproximada de 80 Mhz de prestaciones suficientes para los requerimientos de este sistema. En el apartado \ref{sec:microcontrolador} se detallan las especificaciones y diagramas en bloque de este dispositivo electrónico.
 
 Para la elección de los drivers encargados de manejar las matrices de LEDs, se opta por el MAX7219 por ser un dispositivo mundialmente conocido en la industria del hardware, cuyas principales aplicaciones donde se utiliza es en 
+\ref{donde-se-usaba-el-max}
 %TODO AMG -  Colocar donde se usan los MAX.
-Las especificaciones de este aparato electrónico se encuentran detalladas en el apartado \ref{sec:max7219}.
+Las especificaciones de este circuito integrado se encuentran detalladas en el apartado \ref{sec:max7219}.
 
-El principal inconveniente, que se produce al momento en que interactúan el NodeMCU con los MAX7219 es que manejan diferentes niveles de tensiones lógicas. El primero trabaja a 3.3 V, mientras que los segundos a 5 V. Para ello, es necesario agregar en el módulo maestro un circuito de conversión de señal realizado a partir de transistores. Esto se explica más en detalle en la sección \ref{sec:transistores}.
+El principal inconveniente que se produce al momento en que interactúan el NodeMCU (ESP8266EX) con los MAX7219 es que manejan diferentes niveles de tensiones lógicas. El primero trabaja a 3.3 V, mientras que los segundos a 5 V. Para ello, es necesario agregar en el módulo maestro un circuito de conversión de señal realizado a partir de transistores. Esto se explica más en detalle en la sección \ref{sec:transistores}.
 
-Tanto el microcontrolador como los drivers de LEDs elegidos para este sistema utilizan una alimentación de 5V continua. Por este motivo es necesario una interfaz de entrada hacia el módulo maestro de donde puedan obtener la tensión necesaria los distintos dispositivos electrónicos que conforman la totalidad del cartel. Esto se explica en detalle en la sección \ref{sec:alimentacion}.
+Tanto el microcontrolador como los drivers de LEDs elegidos para este sistema utilizan una alimentación de 5 V continua. Por este motivo es necesario una interfaz de entrada hacia el módulo maestro de donde puedan obtener la tensión necesaria los distintos dispositivos electrónicos que conforman la totalidad del cartel. Esto se explica en detalle en la sección \ref{sec:alimentacion}.
 
-El microcontrolador almacena los parámetros de configuración previamente establecidos desde la aplicación de PC. Uno de ellos es la red WiFi a la que debe conectarse. Para evitar que el cartel sea inaccesible por una mala configuración accidental de la red, se añadió el diseño un pulsador de RESET, el cual, al ser presionado durante 5 segundos, reestablece los parámetros de configuración por defecto y reinicia el módulo maestro.
+El microcontrolador almacena los parámetros de configuración previamente establecidos desde la aplicación de PC. Uno de ellos es la red WiFi a la que debe conectarse. Para evitar que el cartel sea inaccesible por una mala configuración accidental de la red, se añadió al diseño un pulsador de RESET, el cual, al ser presionado durante 5 segundos, reestablece los parámetros de configuración por defecto y reinicia el módulo maestro, por lo tanto también el cartel.
 
 Por otro lado, resulta necesario comunicar al firmware del microcontrolador la cantidad de carteles que conforman el eslabón de esclavos. Para esto se utiliza un conjunto de jumpers que codifican la cantidad de carteles conectados, de manera que el usuario pueda agregar o quitar carteles sin necesidad de volver a cargar el firmware modificado. Ésto se explica en mayor detalle en el manual de usuario (ver sección \ref{sec:manual-usuario}).
+
+En los siguientes apartados se describiran las partes que conforman el diseño del circuito del módulo maestro, dividido de la manera que muestra la figura \ref{fig:esquematico-master-anotado}.
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=\linewidth]{imagenes/esquematico-master-anotado.pdf}
+	\caption{Esquemático del módulo maestro, dividido en subcircuitos.}
+	\label{fig:esquematico-master-anotado}
+	% Ojo con el orden, tiene que coincidir con el orden en la imagen.
+	\begin{enumerate}
+		\item Microcontrolador ESP8266EX.
+		\item Ficha de alimentación.
+		\item Circuito de conversión de niveles lógicos.
+		\item Componentes de interacción directa con usuario.
+		\item Ficha de conexión a esclavo.
+	\end{enumerate}
+\end{figure}
 
 \subsubsection{Alimentación} \label{sec:alimentacion}
 El cartel requiere una alimentación de 5V de corriente continua. Para esto se expone un conector hembra (de 5.5mm x 2.1mm), el cual se conecta a un transformador externo de 220V AC a 5V DC. El sistema no posee batería de ningún tipo.
@@ -106,9 +124,13 @@ Se puede ver un diagrama de bloques del ESP8266EX en la figura \ref{fig:diagrama
 
 Como se mencionó anteriormente, se necesita de flash externa para correr programas. El módulo ESP-12S se encarga de proveer al ESP8266EX 4 MiB de memoria flash.
 
-\subsubsection{Jumpers}
+\subsubsection{Jumpers y botón de Reset}
+Esta sección del circuito aglomera las componentes con las cuales el usuario (especificamente, el usuario encargado de mantener la operacion del cartel) va a interactuar directamente.
 
-\subsubsection{Botón de Reset}
+El pulsador de Reset es un pulsador normalmente abierto, que conecta el pin GPIO2 del microcontrolador a la masa. El pin GPIO2 está configurado como entrada, con lo cual es necesario un circuito de pull-up para que su nodo circuital no tenga un valor lógico indefinido. Para esto se utiliza el pull-up interno del microcontrolador.
+
+Los jumpers, de manera similar, conectan los pines GPIO13, GPIO12, GPIO14 a masa. También utilizan el pull-up interno del microcontrolador.
+
 
 \subsubsection{Circuito de conversión de niveles} \label{sec:transistores}
 Como el microcontrolador transmite los datos con un valor alto de 3.3V, es necesario convertir estas señales para que este dentro de los rangos con los que trabaja el MAX7219. La solución por la cual se optó fue incorporar transistores configurados de manera que ante una entrada de 0V, produzcan 5V y ante una entrada de 3.3V, produzcan 0V (aproximado). Se conectan tres transistores NPN al circuito del módulo maestro, uno para cada señal (DATAIN, LOAD, CLK). Se puede observar en la figura \ref{fig:transistors} la conexión de cada transistor con sus respectivas resistencias. 
@@ -128,9 +150,17 @@ La base es el pin 2, el colector el pin 1 y el emisor el pin 3 (ver figura \ref{
 \end{figure}
 
 \subsubsection{Comunicación con el primer esclavo}
+En esta porción del circuito se tiene la interfaz de conexión al primer esclavo. Que luego en el diseño del PCB terminará siendo una ficha.
 
 \subsubsection{Esquemático final}
+Habiendo descrito por partes el esquemático del módulo maestro, se muestra en la figura \ref{fig:esquematico-master-anotado}.
 
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=\linewidth]{imagenes/esquematico-master.pdf}
+	\caption{Esquemático del módulo maestro.}
+	\label{fig:esquematico-master-anotado}
+\end{figure}
 
 
 \subsection{Módulo esclavo}
