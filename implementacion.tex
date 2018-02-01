@@ -151,6 +151,34 @@ Un ejemplo de esta técnica de programación se puede ver en la figura \ref{fig:
 	\end{center}
 \end{figure}
 
+\subsubsection{Almacenamiento de los caracteres}
+
+Los caracteres que son recibidos en el microcontrolador son codificados en mapa de bits, en el que un bit representa el estado (encendido o apagado) de un LED en particular según la posición en el que esté, para poder representarlos correctamente en la matriz. En la figura \ref{fig:repAscii} se observa un ejemplo de como esta representada la letra \enquote{A} en el mapa de bits.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.48\textwidth]{imagenes/codificacionAscii.pdf}
+    \caption{Representación de los caracteres en el cartel.}
+    \label{fig:repAscii}
+\end{figure}
+
+Cada byte corresponde a una columna del carácter a mostrar y a su vez el LED inferior se codifica como el más significativo (MSB) y el superior se codifica como el menos significativo (LSB). De esta forma se envía al MAX7219 ocho bytes por cada carácter que se desea mostrar en la matriz.
+
+Por otro lado, respetando el orden en que se establecen los caracteres el estándar ISO/IEC 8859-1, se guardan en un archivo los ocho bytes de cada carácter.
+
+\subsubsection{Actualización de la matriz}
+
+El microcontrolador realiza el barrido de las columnas como se observa en la maquina de estados finitos de la figura \ref{fig:fsm-matriz}, esta actualización se realiza de izquierda a derecha lo suficientemente rápido para que el ojo humano no pueda percibir el entre el estado inicial y el final. 
+
+\begin{figure}[ht!]
+	\begin{center}
+		\centering
+		\includegraphics[width=0.9\textwidth]{imagenes/hw/estados-refresh.pdf}
+		\caption{Máquina de estados finitos de la actualización de los LEDs.}
+		\label{fig:fsm-matriz}
+	\end{center}
+\end{figure}
+
 \subsubsection{Archivo principal} \label{sec:archivo_principal}
 
 \lstinputlisting[label=pseudo:userInit, linerange=1-10, firstnumber=1] {codigo/pseudocodigo/microcontrolador.pseudo}
