@@ -270,8 +270,9 @@ El MAX7219, como se mencionó anteriormente, interpreta comandos de 16 bits. El 
 \end{table}
 
 \subsubsection{Matriz de LEDs} \label{sec:matriz-leds}
-La matriz posee 64 LEDs organizados en ocho filas y ocho columnas, con cátodo común en las columnas como se observa en la figura \ref{fig:modulo-led}. 
-%TODO AMG - Acá va lo de la descripción del funcionamiento físico de la matriz.
+La matriz está formada por 64 LEDs organizados en ocho filas y ocho columnas.
+
+Tener control independiente sobre cada LED sería prohibitivamente complicado. Por esto, cada LED se conecta de la siguiente manera: cada LED $L_{i j}$ (donde el subíndice $i$ representa la fila y $j$ la columna, $i=1, 2, ..., 8$, $j = 1,2, ..., 8$), tiene su ánodo conectado a un nodo circuital $C_j$ y su cátodo conectado a un nodo circuital $F_i$. Cada $C_j$ está conectado a DIGj y cada $F_i$ está conectado a SEGi. Este conexionado se puede ver en la figura \ref{fig:modulo-led}.
 
 \begin{figure}[ht!]
 	\centering
@@ -279,6 +280,8 @@ La matriz posee 64 LEDs organizados en ocho filas y ocho columnas, con cátodo c
 	\caption{Esquema de conexiones de la matriz de LEDs.}
 	\label{fig:modulo-led}
 \end{figure}
+
+La manera que se obtiene la ilusión de tener control independiente sobre cada led se logra explotando el efecto estroboscópico: el MAX7219 mantiene normalmente los nodos $C_j, j = 1, 2, ... ,8$ en alto. Para mostrar una imagen, pone primero pone $C_1$ en bajo y a la vez pone en alto en o en bajo los $S_i, i=1,2,...,8$ para que, por un período corto de tiempo, queden alumbrados los LEDs como correspondan. Luego se procede a hacer lo mismo con $C_2$, hasta llegar a $C_8$ y repetir indefinidamente el procedimiento. Esto se hace a una frequencia que resulta imperceptible al ojo humano y no se puede apreciar \emph{flicker}.
 
 Se analizaron las dimensiones más apropiadas para la utilidad del cartel y se llegó a una separación de 12mm entre LEDs la cual mantiene un dpi apropiado (consiguiendo verse las letras a una distancia aproximada de 10 metros). 
 Todas las medidas estimativas pueden observarse con mayor detalle en la figura \ref{fig:modulo-led-dimensiones}.
