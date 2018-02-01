@@ -39,9 +39,7 @@ El microcontrolador, entonces, debe recibir los requerimientos a través de la r
 
 Para el presente proyecto, se opta por el microcontrolador ESP8266EX de Espressif que posee funcionalidades para operar con redes WiFi y conexiones seguras. Además tiene un procesador con una frecuencia aproximada de 80 Mhz de prestaciones suficientes para los requerimientos de este sistema. En el apartado \ref{sec:microcontrolador} se detallan las especificaciones y diagramas en bloque de este dispositivo electrónico.
 
-Para la elección de los drivers encargados de manejar las matrices de LEDs, se opta por el MAX7219 por ser un dispositivo mundialmente conocido en la industria del hardware, cuyas principales aplicaciones donde se utiliza es en 
-\ref{donde-se-usaba-el-max}
-%TODO AMG -  Colocar donde se usan los MAX.
+Para la elección de los drivers encargados de manejar las matrices de LEDs, se opta por el MAX7219 por ser un dispositivo mundialmente conocido en la industria del hardware, cuyas principales aplicaciones donde se utiliza es para el control de dispositivos LEDs de 7 segmentos de hasta 8 dígitos, pantallas de gráficos de barras o incluso 64 LEDs individuales, dispuestos de forma matricial.
 Las especificaciones de este circuito integrado se encuentran detalladas en el apartado \ref{sec:max7219}.
 
 El principal inconveniente que se produce al momento en que interactúan el NodeMCU (ESP8266EX) con los MAX7219 es que manejan diferentes niveles de tensiones lógicas. El primero trabaja a 3.3 V, mientras que los segundos a 5 V. Para ello, es necesario agregar en el módulo maestro un circuito de conversión de señal realizado a partir de transistores. Esto se explica más en detalle en la sección \ref{sec:transistores}.
@@ -177,7 +175,37 @@ Habiendo descrito por partes el esquemático del módulo maestro, se muestra en 
 
 \clearpage
 \subsection{Módulo esclavo}
-Un modulo esclavo posee un driver MAX7219, que es el componente principal junto con una interfaz que permite conectarse a otro módulo esclavo o en su defecto al master.
+Un módulo esclavo posee un driver de LEDs conocido como MAX7219, que es el componente principal de este subsistema y se encarga de controlar la matriz de 8x8 LEDs que tiene asociada.
+
+Este módulo recibe los comandos que el microcontrolador del maestro le envía por medio de un protocolo de comunicación serie sincrónico. La interfaz de conexión comprende 5 señales. Estas son VCC y GND, sumados a las señales de CLK, LATCH y DATAIN para el correcto funcionamiento del protocolo de comunicación.
+
+Cabe destacar que físicamente, un esclavo posee dos interfaces de conexiones como las que se describieron en el párrafo anterior. Una se utiliza como puerto de entrada, mientras que la otra como de salida.
+
+La necesidad de colocar dos interfaces es porque el maestro con los esclavos se conectan en formato de serie como se observa en la figura \ref{fig:dibujo-real}.
+Un esclavo puede conectarse en su puerto de entrada con el maestro, en caso de sea el primero de la cadena o, en su defecto conectarse con otro esclavo anterior, del cual recibe las señales.
+A su vez, se interconecta, en su interfaz de salida con el módulo esclavo siguiente, permitiendo que la información proveniente del maestro fluya a lo largo de todo el sistema.
+
+Adicionalmente, el esclavo posee una interfaz de comunicación que permite conectar el MAX7219 con su respectiva matriz de LEDs. Para esto se exponen 8 pines correspondientes a las filas de la matriz y 8 para las columnas.
+
+\subsubsection{Esquemático general}
+El esquemático general del módulo esclavo se presenta en la figura \ref{fig:esquematico-esclavo}.
+Además se enumeran y describen los diferentes subcircuitos que lo componen en relación a lo descripto en la sección anterior.
+Dichos subcircuitos cumplen una función específica y aparecen enumerados al pie de la imagen.
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=\linewidth]{imagenes/esquematico-slave.pdf}
+	\caption{Esquemático del módulo esclavo, dividido en subcircuitos.}
+	\label{fig:esquematico-esclavo}
+\end{figure}
+
+\begin{enumerate}
+	\item Driver de LEDs MAX7219: Este dispositivo electrónico es el componente principal del módulo esclavo por lo que en la sección \ref{sec:max7219} se abordan, más en detalle, las características principales del mismo.
+	\item Interfaz de entrada: se comparten las señales de VCC, GND, CLK, DATAIN y LATCH del anterior módulo en la cadena, pudiendo corresponderse tanto al maestro como a otro esclavo.
+	\item Interfaz de salida: se comparten las señales de VCC, GND, CLK, DATAOUT y LATCH del próximo módulo esclavo en la cadena.
+	\item Interfaz de conexión con las filas de la matriz: En la sección \ref{sec:matriz-leds} se hace un especial énfasis en la comunicación entre la matriz de 8x8 LEDs con el MAX7219.
+	\item Interfaz de conexión con las columnas de la matriz: Ver sección \ref{sec:matriz-leds}.
+\end{enumerate}
 
 \subsubsection{MAX7219}\label{sec:max7219}
 El MAX7219 es un controlador compacto, de entrada y salida en serie de cátodo común que conectan, indirectamente, microcontroladores a LEDs numéricos de siete segmentos de hasta ocho dígitos, pantallas de gráfico de barras o, en este caso, 64 LED individuales dispuestos de forma matricial. Se incluye en el chip, un decodificador BCD, circuitos de multiplexación, controladores de segmentos y dígitos, y una RAM estática de 8x8 que almacena cada número, o en este caso, mapas de bits. Solo se necesita una resistencia externa para configurar la corriente para todos los LEDs.
@@ -232,48 +260,53 @@ Pin               & Nombre          & Función    \\ \hline
 \end{tabular}
 \end{table}
 
-\begin{figure}[htp!]
-\centering
-\begin{center}
-	\includegraphics[width=0.8\textwidth]{imagenes/hw/conexion-MAX-matriz.pdf}
-	\caption{Conexión entre MAX7219 y su módulo de LEDs.}
-	\label{fig:MAX-matriz}
-\end{center}
-\end{figure}
+\subsubsection{Matriz de LEDs} \label{sec:matriz-leds}
+La matriz posee 64 LEDs organizados en ocho filas y ocho columnas, con cátodo común en las columnas como se observa en la figura \ref{fig:modulo-led}. 
+%TODO AMG - Acá va lo de la descripción del funcionamiento físico de la matriz.
 
-\begin{figure}[htp!]
-\centering
-\begin{center}
-	\includegraphics[width=0.7\textwidth]{imagenes/hw/conexion-MAX-matriz.JPG}
-	\caption{Fotografía de conexión entre MAX7219 y su módulo de LEDs.}
-	\label{fig:MAX-matriz-real}
-\end{center}
-\end{figure}
-
-
-\subsection{Matriz de LEDs}
-La matriz posee 64 LEDs organizados en ocho filas y ocho columnas, con cátodo común en las columnas como se observa en la figura \ref{fig:modulo-led}. Se analizaron las dimensiones más apropiadas para la utilidad del cartel y se llegó a una separación de 12mm entre LEDs la cual mantiene un dpi apropiado (consiguiendo verse las letras a 10 metros), las demás medidas de pueden observar en la figura \ref{fig:modulo-led-dimensiones}.
-
-Cada uno de los MAX7219 está conectado a una matriz, sus conexiones se pueden observar en el diagrama \ref{fig:MAX-matriz}. Adicionalmente, en la figura \ref{fig:MAX-matriz-real} se observa el prototipo que complementa el esquema de conexión de la figura previamente mencionada.
-
-A la hora de efectuar las conexiones, se debe prestar principal atención a la orientación de la matriz. En la figura \ref{fig:MAX-matriz-real} se indica claramente cuáles son las filas (y su orden) y cuáles son las columnas. Con dicha información el proceso de conexionado se simplifica.
-
-\begin{figure}[!htp]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=0.7\linewidth]{imagenes/hw/modulo-led.pdf}
 	\caption{Esquema de conexiones de la matriz de LEDs.}
 	\label{fig:modulo-led}
 \end{figure}
-\begin{figure}[!htp]
+
+Se analizaron las dimensiones más apropiadas para la utilidad del cartel y se llegó a una separación de 12mm entre LEDs la cual mantiene un dpi apropiado (consiguiendo verse las letras a una distancia aproximada de 10 metros). 
+Todas las medidas estimativas pueden observarse con mayor detalle en la figura \ref{fig:modulo-led-dimensiones}.
+
+\begin{figure}[ht!]
 	\centering
-	\includegraphics[width=\linewidth]{imagenes/hw/modulo-led-dimensiones.pdf}
+	\includegraphics[width=0.8\linewidth]{imagenes/hw/modulo-led-dimensiones.pdf}
 	\caption{Dimensiones de la matriz de LEDs.}
 	\label{fig:modulo-led-dimensiones}
+\end{figure}
+
+Cada uno de los MAX7219 está conectado a una matriz, sus conexiones se pueden observar en el diagrama \ref{fig:MAX-matriz}. Adicionalmente, en la figura \ref{fig:MAX-matriz-real} se observa el prototipo que complementa el esquema de conexión de la figura previamente mencionada.
+
+A la hora de efectuar las conexiones, se debe prestar principal atención a la orientación de la matriz. En la figura \ref{fig:MAX-matriz-real} se indica claramente cuáles son las filas (y su orden) y cuáles son las columnas. Con dicha información el proceso de conexionado se simplifica.
+
+\begin{figure}[ht!]
+	\centering
+	\begin{center}
+		\includegraphics[width=0.8\textwidth]{imagenes/hw/conexion-MAX-matriz.pdf}
+		\caption{Conexión entre MAX7219 y su módulo de LEDs.}
+		\label{fig:MAX-matriz}
+	\end{center}
+\end{figure}
+
+\begin{figure}[ht!]
+	\centering
+	\begin{center}
+		\includegraphics[width=0.6\textwidth]{imagenes/hw/conexion-MAX-matriz.JPG}
+		\caption{Fotografía de conexión entre MAX7219 y su módulo de LEDs.}
+		\label{fig:MAX-matriz-real}
+	\end{center}
 \end{figure}
 
 
 \subsection{Comunicación entre los módulos}
 Para la comunicación maestro-esclavo y esclavo-esclavo se utiliza un protocolo serie de un bit sincrónico. Cada módulo esclavo tiene en su MAX7219 una entrada de serie junto a un clock, de manera que se toma el valor del bit en el flanco ascendente del reloj. A su vez, cada MAX7219 tiene un registro de desplazamiento de 16 bits, que en cada flanco ascendente del clock inserta en orden FIFO al registro un bit (DIN) y, en el flanco descendente del reloj, coloca en su salida el valor del bit más viejo en el registro de desplazamiento (DOUT). Por último, el MAX7219 tiene una entrada llamada LATCH que al pasar a alto, provoca que el MAX7219 \enquote{tome} la palabra de 16 bits, interpretándola como se describió en la sección \ref{sec:max7219}.
+%TODO AMG - No se habla nada de la interpretación de la palabra de 16 bits.
 
 De esta manera es posible dirigir una palabra arbitraria a cualquier esclavo, y es particularmente eficiente en el caso en que se debe mandar una palabra a cada MAX7219 y se desea que todas la interpreten a la vez. Es cuestión de simplemente transmitir los datos dirigidos a cada esclavo, uno tras otro, hasta llenar todos los registros de desplazamiento y levantar LATCH. Alternativamente, si se quisiera mandar un sólo comando a un esclavo en particular, basta con insertar \enquote{burbujas} (comandos que no realizan ninguna operación) en la secuencia de bits.
 
@@ -290,7 +323,7 @@ Es posible expandir el cartel con $N$ esclavos. En la figura \ref{fig:MAX-MAX} s
 
 El procedimiento que se realiza para cargar los mapas de bits en cada esclavo consiste en transmitir a cada MAX7219 los LEDs que debe encender y apagar en cada columna. Para ello debe enviar palabras de 16 bits por serie. Es decir, primero envía la información de la columna 1, después la 2, y así hasta la 8.
 
-\begin{table}[ht]
+\begin{table}[ht!]
 	\centering
 	\caption{Formato de la palabra de comando del MAX7219.}
 	\label{table:trama-spi}
@@ -315,6 +348,7 @@ Para realizar este proceso, la figura \ref{fig:spi-timing-diagram} muestra un di
 		\label{fig:spi-timing-diagram}
 	\end{center}
 \end{figure}
+
 
 \pagebreak
 \section{Software}\label{sec:sw}
