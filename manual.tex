@@ -1,33 +1,27 @@
 \section{Manual de usuario} \label{sec:manual-usuario}
 
-\subsection{Configuración hardware}
+\subsection{Primer uso}
+Para el primer uso, es necesario tener disponible una red WiFi con los siguientes parámetros. Esto se puede conseguir utilizando un celular o una notebook, configurandola como punto de acceso, como hacer esto no se cubrirá en esta guia.
 
-El cartel posee elementos de hardware configurables, los mismos se detallan a continuación:
+\begin{description}
+	\item[Nombre de red (SSID): ] TP12017G7
+	\item[Contraseña de red: abcd1234]
+\end{description}
 
-\begin{table}[ht!]
-	\centering
-	\caption{Detalle de cada componente configurable.}
-	\label{my-label}
-	\begin{tabular}{lcp{.65\textwidth}}
-		\multicolumn{1}{c}{Elemento}	& Identificación & \multicolumn{1}{c}{Descrición} \\ \hline
-		Switch de Power         		& 1              & Encender o apaga el cartel, el cartel no recibe energía eléctrica si esta apagado. \\ \hline
-		Switch de Formateo      		& 2              & Formatea la memoria interna, y se carga los datos de fabrica, para este propósito es necesario que se mantenga en ese estado por al menos 3 segundos. \\ \hline
-		Jumpers de capacidad 			& 3              & En total son tres. Antes de encender de debe seleccionar la cantidad de módulos esclavos que serán utilizados. \\ \hline
-	\end{tabular}
-\end{table}
+El microcontrolador cuando se prende por primera vez, tendrá un mensaje predeterminado y se conectará a la siguiente red predefinida:
 
-En la figura es posible observar los elementos anteriormente mencionados identificados por su número correspondiente.
-% TODO: Sacar fotol esta dado 
+La contraseña de acceso por defecto será \enquote{1234}. Ésta deberá ser modificada rápidamente en el primer uso, para evitar que un atacante lo haga antes. Este procedimiento se explica en la sección \ref{sec:guia-password}.
 
-\subsubsection{Escalabilidad}
-La escalabilidad, es decir, el tamaño del cartel lo determina la cantidad de módulos esclavos conectados entre sí. Este valor se establece activando los jumpers en una configuración determinada. La figura \ref{fig:manual-jumpers} explica como deben establecerse para este propósito.
+Como siguiente paso, se debe cambiar la red a la que se conecta el cartel a una red WiFi fija, a la que siempre se conectará el cartel al encenderse. Este procedimiento se explica en la sección \ref{sec:guia-wifi}.
 
-\begin{figure}[ht!]
-	\centering
-	\includegraphics[width=0.6\linewidth]{imagenes/manual/jumper.pdf}
-	\caption{Configuración de los jumpers para cada cantidad esclavos conectados.}
-	\label{fig:manual-jumpers}
-\end{figure}
+%TODO completar las siguientes personas
 
-\subsection{Configuración software}
-Del lado del software, al ingresar al panel existe una opción que esta en la parte superior izquierda en la que es posible cambiar la contraseña de acceso y la IP.
+\subsection{Conexión al cartel}\label{sec:guia-conexion}
+
+\subsection{Cambio de contraseña de acceso}\label{sec:guia-password}
+
+\subsection{Cambio de mensaje al cartel}\label{sec:guia-texto}
+
+\subsection{Cambio de red WiFi}\label{sec:guia-wifi}
+
+\subsection{Reestablecimiento de configuración}\label{sec:guia-reset}
