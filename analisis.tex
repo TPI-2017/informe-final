@@ -67,16 +67,40 @@
 	\begin{figure}[ht!]
 		\begin{center}
 			\centering
-			\includegraphics[width=\linewidth]{imagenes/dibujo-fisico.pdf}
+			\includegraphics[width=1.1\linewidth]{imagenes/dibujo-fisico.pdf}
 			\caption{Dibujo ilustrativo del hardware del sistema.}
 			\label{fig:dibujo-real}
 		\end{center}
 	\end{figure}
 
-
+	
 \section{Cronograma de actividades}
-%TODO AMG - Se debe agregar una breve descripción de las actividades y la foto del cronograma.
+El cronograma comienza el 4 de Septiembre del 2017 analizando las prestaciones que posee la CIAA y el uso que se le puede dar en el proyecto. En la etapa de Elección de Componentes se decide dejar de lado la CIAA y sustituirlo por el micro controlador NodeMCU ya el mismo cubre todos los requerimientos para administrar el sistema.
+En ésta etapa además, se prevee el funcionamiento de los distintos componentes como ser el MAX7219.
 
+En la etapa de Especificación de conexiones, se empezaron a detallar la interface entre módulos y conexiones al exterior, junto con la comunicación entre el microcontrolador y los demás periféricos. Dejando así las funcionalidades básicas que el sistema tendrá.
+
+Luego se pasó a la siguiente etapa que es de Diseño en el software KiCad\footnote{KiCad es un entorno de software usado para el diseño de circuitos eléctricos.}.
+En primer lugar se diseñó el esquemático y luego el \emph{footprint}, cabe destacar que el diseño no fue estrictamente lineal, sino que sufrió idas y vueltas entre ambos.
+
+Siguiendo con el cronograma y finalizado la etapa anterior, en la semana 10 se comenzó con la fabricación del los PCBs dicha etapa se detalla en la sección \ref{sec:fab-PCB}. Las siguientes etapas están muy relacionadas con la fabricación, en el cual se testea todo el sistema.
+
+Paralelamente, del lado del software....
+
+% TODO - NAHUEL - Especificar detalles minumos de la etapa de soft.
+
+El proceso de redacción del informe se formalizo en la semana 9 pero durante todo el cronograma se fue agregando paulatinamente información al respecto a medida que se analizaban los componentes y el diseño.
+
+La figura \ref{fig:cronograma} se observa en detalle el tiempo empleado encada etapa.
+
+\begin{figure}[ht!]
+	\begin{center}
+		\centering
+		\includegraphics[scale=1.4]{tablas/cronograma.pdf}
+		\caption{Coronograma final del proyecto.}
+		\label{fig:cronograma}
+	\end{center}
+\end{figure}
 
 \section{Componentes de hardware}
 A la hora de construir el cartel, se debe armar tanto un módulo maestro y uno o más módulos esclavos, siendo éstos últimos los encargados de mostrar los mensajes en el cartel.
