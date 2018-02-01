@@ -173,6 +173,16 @@ Habiendo descrito por partes el esquemático del módulo maestro, se muestra en 
 	\label{fig:esquematico-master}
 \end{figure}
 
+\subsubsection{Diseño de PCB}
+
+%TODO escribir sobre PCB. Mencionar que no esta escala, etc
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=\linewidth]{imagenes/pcb-master.pdf}
+	\caption{PCB del módulo maestro.}
+	\label{fig:pcb-master}
+\end{figure}
+
 \clearpage
 \subsection{Módulo esclavo}
 Un módulo esclavo posee un driver de LEDs conocido como MAX7219, que es el componente principal de este subsistema y se encarga de controlar la matriz de 8x8 LEDs que tiene asociada.
@@ -360,6 +370,14 @@ Para realizar este proceso, la figura \ref{fig:spi-timing-diagram} muestra un di
 	\end{center}
 \end{figure}
 
+\subsubsection{Diseño de PCB}
+%TODO escribir sobre PCB. Mencionar que no esta escala, etc
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=\linewidth]{imagenes/pcb-slave.pdf}
+	\caption{PCB del módulo esclavo.}
+	\label{fig:pcb-slave}
+\end{figure}
 
 \pagebreak
 \section{Software}\label{sec:sw}
