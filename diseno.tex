@@ -595,6 +595,29 @@ Se puede ver un bosquejo de la ventana de cambio de contraseña en la figura \re
 	\label{fig:skgui-passwd}
 \end{figure}
 
+\subsubsection{Arquitectura del software}
+Al tratarse de una aplicación con interfaz gráfica de usuario, resulta útil tomar un paradigma de programación basada en eventos. Esto combina bien con la programación orientada a objetos. Un patrón de arquitectura de software muy conocido es el patrón Model-View-Controller (MVC).
+
+El patrón MVC \cite{MVC} tiene como objetivo principal el de desacoplar el manejo de datos de la interfaz de usuario, de manera que se logre mejor eficiencia en el resuso del código y el desarrollo en simultáneo entre mas de una persona. Es un patrón que expresa el núcleo de la arquitectura, dejando abierta la posibilidad de cambio y adaptación del patrón a cada problema particular. Es muy utilizado en aplicaciones con interfaz gráfica de usuario.
+
+\begin{figure} [h!]
+	\centering
+	\includegraphics[scale=0.8]{imagenes/mvc.pdf}
+	\caption{Arquitectura de software Model-View-Controller.}
+	\label{fig:mvc}
+\end{figure}
+
+En el patrón MVC, se separan los objetos de forma que caigan en una de tres categorias:
+\begin{description}
+	\item[Modelo: ] Encapsula los datos. En este caso, esos datos pueden ser el texto del cartel junto a sus parámetros de animacion, o la configuración de red del cartel. De haber modificaciones, actualiza la vista para reflejar estos cambios.
+	\item[Vista: ] Representa a la interfaz gráfica que el usuario ve.
+	\item[Controlador: ] Hace de mediador entre el modelo y la vista. Toma los eventos de interfaz de usuario y actua sobre ellos, manipulando el modelo si fuera necesario.
+\end{description}
+
+Se puede ver en la figura \ref{fig:mvc} un gráfico resumiendo el rol del Modelo, Vista y Controlador.
+
+
+\FloatBarrier
 \subsection{Protocolo de comunicación} \label{sec:protocolo}
 
 \subsubsection{Codificación}
