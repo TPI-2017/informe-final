@@ -177,12 +177,12 @@ Habiendo descrito por partes el esquemático del módulo maestro, se muestra en 
 \subsection{Módulo esclavo}
 Un módulo esclavo posee un driver de LEDs conocido como MAX7219, que es el componente principal de este subsistema y se encarga de controlar la matriz de 8x8 LEDs que tiene asociada.
 
-Este módulo recibe los comandos que el microcontrolador del maestro le envía por medio de un protocolo de comunicación serie sincrónico. La interfaz de conexión comprende 5 señales. Estas son VCC y GND, sumados a las señales de CLK, LATCH y DATAIN para el correcto funcionamiento del protocolo de comunicación.
+Este módulo recibe los comandos que el microcontrolador del maestro le envía por medio de un protocolo de comunicación serie sincrónico. La interfaz de conexión comprende 3 señales. Estas son CLK, LATCH y DATAIN, además de la conexión de la alimentación y masa para el correcto funcionamiento del protocolo de comunicación.
 
-Cabe destacar que físicamente, un esclavo posee dos interfaces de conexiones como las que se describieron en el párrafo anterior. Una se utiliza como puerto de entrada, mientras que la otra como de salida.
+Cabe destacar que, físicamente, un esclavo posee dos interfaces de conexión como las que se describió en el párrafo anterior. Una se utiliza como puerto de entrada, mientras que la otra como de salida.
 
-La necesidad de colocar dos interfaces es porque el maestro con los esclavos se conectan en formato de serie como se observa en la figura \ref{fig:dibujo-real}.
-Un esclavo puede conectarse en su puerto de entrada con el maestro, en caso de sea el primero de la cadena o, en su defecto conectarse con otro esclavo anterior, del cual recibe las señales.
+La necesidad de colocar dos interfaces es porque el maestro con los esclavos se conectan en cadena como se observa en la figura \ref{fig:dibujo-real}.
+Un esclavo puede conectarse en su puerto de entrada con el maestro, en caso de sea el primero de la cadena o, en su defecto conectarse con un esclavo anterior, del cual recibe las señales propagadas desde el maestro.
 A su vez, se interconecta, en su interfaz de salida con el módulo esclavo siguiente, permitiendo que la información proveniente del maestro fluya a lo largo de todo el sistema.
 
 Adicionalmente, el esclavo posee una interfaz de comunicación que permite conectar el MAX7219 con su respectiva matriz de LEDs. Para esto se exponen 8 pines correspondientes a las filas de la matriz y 8 para las columnas.
@@ -221,7 +221,7 @@ Las características principales que posee el chip integrado se enumeran a conti
 	\item Selección de dígitos Decode / No-Decode.
 	\item Apagado de baja potencia de 150 microA (datos retenidos).
 	\item Control de brillo digital y analógico.
-	\item Pantalla borrada al encenderse.
+	\item Pantalla borrada al encenderse (todos los LEDs apagados).
 	\item Unidad de visualización LED de cátodo común.
 	\item SPI, QSPI, interfaz serie Microwire paquetes DIP y SO de 24 pines.
 \end{itemize}
@@ -258,6 +258,15 @@ Pin               & Nombre          & Función    \\ \hline
 19                & V+              & Fuente positiva de corriente, conectar a 5 V. \\
 24                & DOUT            & Salida de datos en serie. Los datos en DIN son válidos en DOUT 16.5 ciclos de reloj más tarde. \\ \hline
 \end{tabular}
+\end{table}
+
+El MAX7219, como se mencionó anteriormente, interpreta comandos de 16 bits. El byte mas significativo de esta palabra de 16 bits codifica el registro que se modificará con el comando. Hay 16 registros con lo cual cuatro bits de este byte se utilizan para direccionar a ellos. Se puede ver en la tabla \ref{tab:max-cmdaddr} parte del formato de un comando, específicamente la dedicada al direccionamiento del registro. Se puede ver también en mejor detalle el formato del contenido de cada comando (el byte menos significativo) en el datasheet del MAX7219 \cite{MAX7219}.
+\begin{table}[htbp]
+	\centering
+	\caption{Mapa de direccionamiento de registros del MAX7219.}
+	\vspace{0.2cm}
+	\includegraphics[scale=1]{imagenes/max-cmdaddr.pdf}
+	\label{tab:max-cmdaddr}
 \end{table}
 
 \subsubsection{Matriz de LEDs} \label{sec:matriz-leds}
@@ -306,7 +315,6 @@ A la hora de efectuar las conexiones, se debe prestar principal atención a la o
 
 \subsection{Comunicación entre los módulos}
 Para la comunicación maestro-esclavo y esclavo-esclavo se utiliza un protocolo serie de un bit sincrónico. Cada módulo esclavo tiene en su MAX7219 una entrada de serie junto a un clock, de manera que se toma el valor del bit en el flanco ascendente del reloj. A su vez, cada MAX7219 tiene un registro de desplazamiento de 16 bits, que en cada flanco ascendente del clock inserta en orden FIFO al registro un bit (DIN) y, en el flanco descendente del reloj, coloca en su salida el valor del bit más viejo en el registro de desplazamiento (DOUT). Por último, el MAX7219 tiene una entrada llamada LATCH que al pasar a alto, provoca que el MAX7219 \enquote{tome} la palabra de 16 bits, interpretándola como se describió en la sección \ref{sec:max7219}.
-%TODO AMG - No se habla nada de la interpretación de la palabra de 16 bits.
 
 De esta manera es posible dirigir una palabra arbitraria a cualquier esclavo, y es particularmente eficiente en el caso en que se debe mandar una palabra a cada MAX7219 y se desea que todas la interpreten a la vez. Es cuestión de simplemente transmitir los datos dirigidos a cada esclavo, uno tras otro, hasta llenar todos los registros de desplazamiento y levantar LATCH. Alternativamente, si se quisiera mandar un sólo comando a un esclavo en particular, basta con insertar \enquote{burbujas} (comandos que no realizan ninguna operación) en la secuencia de bits.
 
