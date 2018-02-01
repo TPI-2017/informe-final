@@ -173,16 +173,26 @@ Habiendo descrito por partes el esquemático del módulo maestro, se muestra en 
 	\label{fig:esquematico-master}
 \end{figure}
 
+\subsubsection{Diseño de PCB}
+
+%TODO escribir sobre PCB. Mencionar que no esta escala, etc
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=\linewidth]{imagenes/pcb-master.pdf}
+	\caption{PCB del módulo maestro.}
+	\label{fig:pcb-master}
+\end{figure}
+
 \clearpage
 \subsection{Módulo esclavo}
 Un módulo esclavo posee un driver de LEDs conocido como MAX7219, que es el componente principal de este subsistema y se encarga de controlar la matriz de 8x8 LEDs que tiene asociada.
 
-Este módulo recibe los comandos que el microcontrolador del maestro le envía por medio de un protocolo de comunicación serie sincrónico. La interfaz de conexión comprende 5 señales. Estas son VCC y GND, sumados a las señales de CLK, LATCH y DATAIN para el correcto funcionamiento del protocolo de comunicación.
+Este módulo recibe los comandos que el microcontrolador del maestro le envía por medio de un protocolo de comunicación serie sincrónico. La interfaz de conexión comprende 3 señales. Estas son CLK, LATCH y DATAIN, además de la conexión de la alimentación y masa para el correcto funcionamiento del protocolo de comunicación.
 
-Cabe destacar que físicamente, un esclavo posee dos interfaces de conexiones como las que se describieron en el párrafo anterior. Una se utiliza como puerto de entrada, mientras que la otra como de salida.
+Cabe destacar que, físicamente, un esclavo posee dos interfaces de conexión como las que se describió en el párrafo anterior. Una se utiliza como puerto de entrada, mientras que la otra como de salida.
 
-La necesidad de colocar dos interfaces es porque el maestro con los esclavos se conectan en formato de serie como se observa en la figura \ref{fig:dibujo-real}.
-Un esclavo puede conectarse en su puerto de entrada con el maestro, en caso de sea el primero de la cadena o, en su defecto conectarse con otro esclavo anterior, del cual recibe las señales.
+La necesidad de colocar dos interfaces es porque el maestro con los esclavos se conectan en cadena como se observa en la figura \ref{fig:dibujo-real}.
+Un esclavo puede conectarse en su puerto de entrada con el maestro, en caso de sea el primero de la cadena o, en su defecto conectarse con un esclavo anterior, del cual recibe las señales propagadas desde el maestro.
 A su vez, se interconecta, en su interfaz de salida con el módulo esclavo siguiente, permitiendo que la información proveniente del maestro fluya a lo largo de todo el sistema.
 
 Adicionalmente, el esclavo posee una interfaz de comunicación que permite conectar el MAX7219 con su respectiva matriz de LEDs. Para esto se exponen 8 pines correspondientes a las filas de la matriz y 8 para las columnas.
@@ -221,7 +231,7 @@ Las características principales que posee el chip integrado se enumeran a conti
 	\item Selección de dígitos Decode / No-Decode.
 	\item Apagado de baja potencia de 150 microA (datos retenidos).
 	\item Control de brillo digital y analógico.
-	\item Pantalla borrada al encenderse.
+	\item Pantalla borrada al encenderse (todos los LEDs apagados).
 	\item Unidad de visualización LED de cátodo común.
 	\item SPI, QSPI, interfaz serie Microwire paquetes DIP y SO de 24 pines.
 \end{itemize}
@@ -260,9 +270,19 @@ Pin               & Nombre          & Función    \\ \hline
 \end{tabular}
 \end{table}
 
+El MAX7219, como se mencionó anteriormente, interpreta comandos de 16 bits. El byte mas significativo de esta palabra de 16 bits codifica el registro que se modificará con el comando. Hay 16 registros con lo cual cuatro bits de este byte se utilizan para direccionar a ellos. Se puede ver en la tabla \ref{tab:max-cmdaddr} parte del formato de un comando, específicamente la dedicada al direccionamiento del registro. Se puede ver también en mejor detalle el formato del contenido de cada comando (el byte menos significativo) en el datasheet del MAX7219 \cite{MAX7219}.
+\begin{table}[htbp]
+	\centering
+	\caption{Mapa de direccionamiento de registros del MAX7219.}
+	\vspace{0.2cm}
+	\includegraphics[scale=1]{imagenes/max-cmdaddr.pdf}
+	\label{tab:max-cmdaddr}
+\end{table}
+
 \subsubsection{Matriz de LEDs} \label{sec:matriz-leds}
-La matriz posee 64 LEDs organizados en ocho filas y ocho columnas, con cátodo común en las columnas como se observa en la figura \ref{fig:modulo-led}. 
-%TODO AMG - Acá va lo de la descripción del funcionamiento físico de la matriz.
+La matriz está formada por 64 LEDs organizados en ocho filas y ocho columnas.
+
+Tener control independiente sobre cada LED sería prohibitivamente complicado. Por esto, cada LED se conecta de la siguiente manera: cada LED $L_{i j}$ (donde el subíndice $i$ representa la fila y $j$ la columna, $i=1, 2, ..., 8$, $j = 1,2, ..., 8$), tiene su ánodo conectado a un nodo circuital $C_j$ y su cátodo conectado a un nodo circuital $F_i$. Cada $C_j$ está conectado a DIGj y cada $F_i$ está conectado a SEGi. Este conexionado se puede ver en la figura \ref{fig:modulo-led}.
 
 \begin{figure}[ht!]
 	\centering
@@ -270,6 +290,8 @@ La matriz posee 64 LEDs organizados en ocho filas y ocho columnas, con cátodo c
 	\caption{Esquema de conexiones de la matriz de LEDs.}
 	\label{fig:modulo-led}
 \end{figure}
+
+La manera que se obtiene la ilusión de tener control independiente sobre cada led se logra explotando el efecto estroboscópico: el MAX7219 mantiene normalmente los nodos $C_j, j = 1, 2, ... ,8$ en alto. Para mostrar una imagen, pone primero pone $C_1$ en bajo y a la vez pone en alto en o en bajo los $S_i, i=1,2,...,8$ para que, por un período corto de tiempo, queden alumbrados los LEDs como correspondan. Luego se procede a hacer lo mismo con $C_2$, hasta llegar a $C_8$ y repetir indefinidamente el procedimiento. Esto se hace a una frequencia que resulta imperceptible al ojo humano y no se puede apreciar \emph{flicker}.
 
 Se analizaron las dimensiones más apropiadas para la utilidad del cartel y se llegó a una separación de 12mm entre LEDs la cual mantiene un dpi apropiado (consiguiendo verse las letras a una distancia aproximada de 10 metros). 
 Todas las medidas estimativas pueden observarse con mayor detalle en la figura \ref{fig:modulo-led-dimensiones}.
@@ -306,7 +328,6 @@ A la hora de efectuar las conexiones, se debe prestar principal atención a la o
 
 \subsection{Comunicación entre los módulos}
 Para la comunicación maestro-esclavo y esclavo-esclavo se utiliza un protocolo serie de un bit sincrónico. Cada módulo esclavo tiene en su MAX7219 una entrada de serie junto a un clock, de manera que se toma el valor del bit en el flanco ascendente del reloj. A su vez, cada MAX7219 tiene un registro de desplazamiento de 16 bits, que en cada flanco ascendente del clock inserta en orden FIFO al registro un bit (DIN) y, en el flanco descendente del reloj, coloca en su salida el valor del bit más viejo en el registro de desplazamiento (DOUT). Por último, el MAX7219 tiene una entrada llamada LATCH que al pasar a alto, provoca que el MAX7219 \enquote{tome} la palabra de 16 bits, interpretándola como se describió en la sección \ref{sec:max7219}.
-%TODO AMG - No se habla nada de la interpretación de la palabra de 16 bits.
 
 De esta manera es posible dirigir una palabra arbitraria a cualquier esclavo, y es particularmente eficiente en el caso en que se debe mandar una palabra a cada MAX7219 y se desea que todas la interpreten a la vez. Es cuestión de simplemente transmitir los datos dirigidos a cada esclavo, uno tras otro, hasta llenar todos los registros de desplazamiento y levantar LATCH. Alternativamente, si se quisiera mandar un sólo comando a un esclavo en particular, basta con insertar \enquote{burbujas} (comandos que no realizan ninguna operación) en la secuencia de bits.
 
@@ -349,6 +370,14 @@ Para realizar este proceso, la figura \ref{fig:spi-timing-diagram} muestra un di
 	\end{center}
 \end{figure}
 
+\subsubsection{Diseño de PCB}
+%TODO escribir sobre PCB. Mencionar que no esta escala, etc
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=\linewidth]{imagenes/pcb-slave.pdf}
+	\caption{PCB del módulo esclavo.}
+	\label{fig:pcb-slave}
+\end{figure}
 
 \pagebreak
 \section{Software}\label{sec:sw}
@@ -584,6 +613,29 @@ Se puede ver un bosquejo de la ventana de cambio de contraseña en la figura \re
 	\label{fig:skgui-passwd}
 \end{figure}
 
+\subsubsection{Arquitectura del software}
+Al tratarse de una aplicación con interfaz gráfica de usuario, resulta útil tomar un paradigma de programación basada en eventos. Esto combina bien con la programación orientada a objetos. Un patrón de arquitectura de software muy conocido es el patrón Model-View-Controller (MVC).
+
+El patrón MVC \cite{MVC} tiene como objetivo principal el de desacoplar el manejo de datos de la interfaz de usuario, de manera que se logre mejor eficiencia en el resuso del código y el desarrollo en simultáneo entre mas de una persona. Es un patrón que expresa el núcleo de la arquitectura, dejando abierta la posibilidad de cambio y adaptación del patrón a cada problema particular. Es muy utilizado en aplicaciones con interfaz gráfica de usuario.
+
+\begin{figure} [h!]
+	\centering
+	\includegraphics[scale=0.8]{imagenes/mvc.pdf}
+	\caption{Arquitectura de software Model-View-Controller.}
+	\label{fig:mvc}
+\end{figure}
+
+En el patrón MVC, se separan los objetos de forma que caigan en una de tres categorias:
+\begin{description}
+	\item[Modelo: ] Encapsula los datos. En este caso, esos datos pueden ser el texto del cartel junto a sus parámetros de animacion, o la configuración de red del cartel. De haber modificaciones, actualiza la vista para reflejar estos cambios.
+	\item[Vista: ] Representa a la interfaz gráfica que el usuario ve.
+	\item[Controlador: ] Hace de mediador entre el modelo y la vista. Toma los eventos de interfaz de usuario y actua sobre ellos, manipulando el modelo si fuera necesario.
+\end{description}
+
+Se puede ver en la figura \ref{fig:mvc} un gráfico resumiendo el rol del Modelo, Vista y Controlador.
+
+
+\FloatBarrier
 \subsection{Protocolo de comunicación} \label{sec:protocolo}
 
 \subsubsection{Codificación}
