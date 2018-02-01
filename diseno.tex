@@ -113,11 +113,9 @@ Se puede ver un diagrama de bloques del ESP8266EX en la figura \ref{fig:diagrama
 
 \begin{figure}[htp!]
 	\centering
-	\begin{center}
 	\includegraphics[width=\linewidth]{imagenes/diagrama-bloques-esp8266.pdf}
 	\caption{Diagrama de bloques del Espressif ESP8266EX.}
 	\label{fig:diagrama-bloques-esp8266ex}
-	\end{center}
 \end{figure}
 
 Como se mencionó anteriormente, se necesita de flash externa para correr programas. El módulo ESP-12S se encarga de proveer al ESP8266EX 4 MiB de memoria flash.
@@ -125,10 +123,16 @@ Como se mencionó anteriormente, se necesita de flash externa para correr progra
 \subsubsection{Jumpers y botón de Reset} \label{sec:jumpers-rst}
 Esta sección del circuito aglomera las componentes con las cuales el usuario (especificamente, el usuario encargado de mantener la operacion del cartel) va a interactuar directamente.
 
-El pulsador de Reset es un pulsador normalmente abierto, que conecta el pin GPIO2 del microcontrolador a la masa. El pin GPIO2 está configurado como entrada, con lo cual es necesario un circuito de pull-up para que su nodo circuital no tenga un valor lógico indefinido. Para esto se utiliza el pull-up interno del microcontrolador.
+El pulsador de Reset es un pulsador normalmente abierto, que conecta el pin GPIO2 del microcontrolador a la masa. El pin GPIO2 está configurado como entrada, con lo cual es necesario un circuito de pull-up para que su nodo circuital no tenga un valor lógico indefinido. Para esto se utiliza el pull-up interno del microcontrolador, equivalente al de la figura \ref{fig:pull-up}.
 
 Los jumpers, de manera similar, conectan los pines GPIO13, GPIO12, GPIO14 a masa. También utilizan el pull-up interno del microcontrolador.
 
+\begin{figure}[htp!]
+	\centering
+	\includegraphics[height=5cm]{imagenes/pullup_resistor.png}
+	\caption{Circuito de pull-up genérico, donde el elemento S representa tanto un pulsador como un jumper.}
+	\label{fig:pull-up}
+\end{figure}
 
 \subsubsection{Circuito de conversión de niveles} \label{sec:transistores}
 Como el microcontrolador transmite los datos con un valor alto de 3.3V, es necesario convertir estas señales para que este dentro de los rangos con los que trabaja el MAX7219. La solución por la cual se optó fue incorporar transistores configurados de manera que ante una entrada de 0V, produzcan 5V y ante una entrada de 3.3V, produzcan 0V (aproximado). 
