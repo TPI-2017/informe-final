@@ -2,9 +2,9 @@
 
 \section{Hardware}\label{sec:hw}
 \subsection{Diagrama en bloques general}
-El sistema se compone de módulos que interactúan entre sí, intercambiando datos entre ellos. En primer lugar el maestro, es el encargado de recibir los datos que el cliente le proporciona. Es quien  posee el microcontrolador que comanda todo el sistema (ver figura \ref{fig:dibujo-real}).
+El sistema se compone de módulos que interactúan entre sí, intercambiando datos entre ellos. En primer lugar el maestro, es el encargado de recibir los datos que el cliente le proporciona. Es quien contiene el microcontrolador que comanda todo el sistema (ver figura \ref{fig:dibujo-real}).
 
-Por otra parte los esclavos obtienen la información que les transmite el microcontrolador y actualizan la matriz de LEDs que tienen asociada. En la figura \ref{fig:diagrama-bloques-general} se puede observar un diagrama en bloques de todo el sistema.
+Por otra parte los esclavos obtienen la información que les transmite el microcontrolador desde el maestro y actualizan la matriz de LEDs que tienen asociada. En la figura \ref{fig:diagrama-bloques-general} se puede observar un diagrama en bloques general de todo el sistema.
 
 \begin{figure}[!ht]
 	\centering
@@ -13,19 +13,19 @@ Por otra parte los esclavos obtienen la información que les transmite el microc
 	\label{fig:diagrama-bloques-general}
 \end{figure}
 
-En la figura \ref{fig:diagrama-bloques-general}, se observa en primer lugar al cliente. El mismo se representa a través de una aplicación de PC, siendo ésta, la forma en que el usuario puede interactuar con el sistema.
+En la figura \ref{fig:diagrama-bloques-general}, se observa en primer lugar la PC, a partir de ahora \enquote{cliente}. Esta es la componente que interactúa directamente con el usuario.
 
 Conectando su computadora a la misma red que se encuentra vinculado el cartel, el cliente puede, por medio de dicha aplicación, enviar los comandos para que el sistema satisfaga sus necesidades.
 
-Por medio del protocolo de comunicación WiFi, los datos llegan hacia el microcontrolador que se encuentra en el módulo maestro. Cabe destacar que el protocolo de red que encapsula las distintas acciones que el usuario puede realizar ha sido diseñado completamente para este proyecto y se explica en mayor detalle en el apéndice \ref{sec:protocolo}.
-Dicho protocolo se implementa tanto del lado de la aplicación de PC, como del microcontrolador que controla el cartel.
+Por medio del protocolo de comunicación WiFi y la pila de protocolos TCP/IP, los datos llegan hacia el microcontrolador que se encuentra en el módulo maestro. Cabe destacar que el protocolo de red que encapsula las distintas acciones que el usuario puede realizar se trata de un protocolo binario personalizado que ha sido diseñado específicamente para este proyecto y se explica en mayor detalle en el apéndice \ref{sec:protocolo}.
+Dicho protocolo se implementa tanto del lado de la aplicación de PC, como del microcontrolador que controla el cartel. La información se transmite cifrada.
 
-Tras recibir y decifrar los datos, el microcontrolador procesa la información y la transmite vía protocolo serie, sincrónico hacia el primer driver MAX7219 que controla la primera matriz de LEDs.
+Tras recibir y decifrar los datos, el microcontrolador procesa la información y la transmite vía protocolo serie sincrónico hacia el primer driver MAX7219 que controla la primera matriz de LEDs.
 
-Resulta necesario aclarar que cada módulo esclavo posee un MAX7219 y la información que le proporciona el microcontrolador se transmite sólo al primerero de ellos. Luego la misma se desplaza entre los diferentes MAX7219 utilizando determinados pines de dicho módulo.
-De esta forma, el microcontrolador solo mantiene una conexión física directa con el primer driver.
+Resulta necesario aclarar que cada módulo esclavo posee un MAX7219 y la información que le proporciona el microcontrolador se transmite sólo al primero de ellos. Luego esta información se desplaza entre los diferentes MAX7219 utilizando determinados pines de dicho módulo.
+De esta forma, el microcontrolador solo mantiene una conexión física directa con el primer esclavo, con lo cual la señal digital se regenera en cada eslabón.
 
-Finalmente, cada módulo esclavo enciende en su respectiva matriz de LEDs, la información suministrada por el maestro, de forma de mostrar el mensaje que el cliente había enviado inicialmente por medio de la aplicación de PC.
+Finalmente, cada módulo esclavo proyecta en su respectiva matriz de LEDs la información suministrada por el maestro, de manera que se muestra el mensaje que el cliente ha enviado inicialmente por medio de la aplicación de PC.
 
 Cabe destacar que la comunicación entre la aplicación de PC y el cartel es bidireccional, debido a que todas las operaciones que el cliente realice, necesitan de una respuesta.
 En algunos casos, dicha respuesta es solo para indicar éxito o error, mientras que en otros casos el usuario recibe parámetros de configuración y las credenciales de red a las que el sistema se encuentra actualmente conectado.
