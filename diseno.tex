@@ -31,11 +31,11 @@ Cabe destacar que la comunicación entre la aplicación de PC y el cartel es bid
 En algunos casos, dicha respuesta es solo para indicar éxito o error, mientras que en otros casos el usuario recibe parámetros de configuración y las credenciales de red a las que el sistema se encuentra actualmente conectado.
 
 \subsection{Módulo maestro}
-Como se mencionó anteriormente, este módulo se encarga de procesar los datos enviados desde el cliente a fin de convertir dicha información en comandos que posteriormente son transmitidos hacia los diferentes esclavos que componen el cartel. 
+Como se mencionó anteriormente, este módulo se encarga de procesar los datos enviados desde el cliente a fin de convertir dicha información en comandos que posteriormente son transmitidos hacia los diferentes esclavos que componen el cartel.
 
 Para realizar esta operación, el módulo maestro requiere de un microcontrolador que sea capaz de conectarse a una red WiFi, a fin de poder obtener las peticiones que el usuario realice por medio de la aplicación de PC.
 
-El microcontrolador, entonces, debe recibir los requerimientos a través de la red y convertirlos en paquetes que puedan ser interpretados por los drivers de LEDs que se ubican en cada uno de los esclavos.
+El microcontrolador, entonces, debe recibir los pedidos a través de la red y convertirlos en paquetes que puedan ser interpretados por los drivers de LEDs que se ubican en cada uno de los esclavos.
 
 Para el presente proyecto, se opta por el microcontrolador ESP8266EX de Espressif que posee funcionalidades para operar con redes WiFi y conexiones seguras. Además tiene un procesador con una frecuencia aproximada de 80 Mhz de prestaciones suficientes para los requerimientos de este sistema. En el apartado \ref{sec:microcontrolador} se detallan las especificaciones y diagramas en bloque de este dispositivo electrónico.
 
