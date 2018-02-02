@@ -175,7 +175,21 @@ Habiendo descrito por partes el esquemático del módulo maestro, se muestra en 
 
 \subsubsection{Diseño de PCB}
 
-%TODO escribir sobre PCB. Mencionar que no esta escala, etc
+El módulo maestro emite el mensaje hacia los módulos esclavo, sin encargarse especificamente de su visualización.
+
+El ESP8266EX es el componente más importante de este módulo, ya que se encarga tanto de comunicarse con la computadora del usuario para la configuración del mensaje como de emitir el mensaje a los módulos esclavo.
+
+El PCB contará con las pistas necesarias para cerrar el circuito electrónico que unirá los componentes de este módulo.
+
+Los tres transistores NPN actuarán en corte y saturación con el fin de convertir las señales de datos del NodeMCU, pasando las mismas de 3.3 V (salida del NodeMCU, valor que pese a funcionar en la práctica estaba fuera de los márgenes aceptados en las entradas del MAX7219 según su hoja de datos) a 5V (valor válido y seguro de funcionamiento). Las resistencias adaptarán los valores de tensión y corriente del circuito de forma pasiva.
+
+Los jumpers permitirán indicar en la configuración del sistema la cantidad de módulos esclavo a utilizar, representando en función del sistema númerico basado en base 2 presentado anteriormente.
+
+El jack con bornera permitirá alimentar al circuito mediante un cable de alimentación con una ficha genérica o bien a través de un método alternativo que se conecte en la bornera provista.
+
+La tecla rocker switch controlará que se provea la alimentación al circuito, permitiendo encender o apagar el cartel manualmente. Dos tiras de 15 pines hembra serán empleadas para poder conectar el NodeMCU al PCB sin necesidad de soldarlo, facilitando su reutilización en caso de ser necesaria. Finalmente una tira de 5 pines macho permitirá conectar el módulo a un módulo esclavo para la transmisión de las señales de datos y alimentación.
+
+Se puede ver en la figura \ref{fig:pcb-master} el diseño final de la PCB del maestro.
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=\linewidth]{imagenes/pcb-master.pdf}
@@ -373,7 +387,20 @@ Para realizar este proceso, la figura \ref{fig:spi-timing-diagram} muestra un di
 \end{figure}
 
 \subsubsection{Diseño de PCB}
-%TODO escribir sobre PCB. Mencionar que no esta escala, etc
+Los componentes implicados en el sistema del módulo esclavo cumplen una función relativamente pasiva. El mensaje programado en el master se transmitirá al esclavo de la manera especificada en la sección \ref{sec:sec:max7219}.
+
+Los LEDs cumplirán la función de visualizar el espacio correspondiente a un caracter del mensaje transmitido. El PCB contendrá las pistas que cerrarán el circuito electrónico del módulo.
+
+El MAX7219 leerá las señales de datos del mensaje e indicará a cada fila y columna qué LEDs deben estar encendidos en cada instante, teniendo en cuenta el retardo necesario para que los subsiguientes módulos puedan visualizar la parte que les corresponda del mensaje de tal manera que en conjunto éste pueda ser leído uniformemente y con un desplazamiento homogeneo en toda la cadena de módulos esclavo. El MAX7219 también se encargara de, dejando pasar el retardo necesario, pasar el mensaje al siguiente módulo para el procesamiento de la parte que corresponda más adelante.
+
+Los capacitores y la resistencia cumplen funciones pasivas.
+
+Los conectores hembra de 8 pines permitirán la conexión con las filas y las columnas de la matriz respectivamente.
+
+Los conectores macho de 5 pines permitirán la interconexión con otros esclavos o bien con el maestro para la transmisión de las 3 señales de datos y las 2 de alimentación.
+
+Se puede ver en la figura \ref{fig:pcb-slave} el diseño final de la PCB del esclavo.
+
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=\linewidth]{imagenes/pcb-slave.pdf}

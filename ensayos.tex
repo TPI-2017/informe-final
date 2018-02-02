@@ -5,9 +5,19 @@
 % ==============================================================
 \clearpage
 \part{Ensayos y mediciones}\label{part:ensayos}
-Con el prototipo de PCB se probó las prestaciones que el sistema brinda, el cual no se obtuvo ningún problema a la hora de mostrar los caracteres especificados por el usuario. A su vez, la forma en que se conecta el sistema a GND evita mas interferencias que hay en el ambiente.
+El módulo maestro emite el mensaje hacia los módulos esclavo, sin encargarse especificamente de su visualización.
 
-Por otra parte, se midió la potencia que gasta el sistema ronda los XX, lo cual para abastecer de energía es suficiente con una fuente de tensión de 5V. 
+El ESP8266EX es el componente más importante de este módulo, ya que se encarga tanto de comunicarse con la computadora del usuario para la configuración del mensaje como de emitir el mensaje a los módulos esclavo.
+
+El PCB contará con las pistas necesarias para cerrar el circuito electrónico que unirá los componentes de este módulo.
+
+Los tres transistores NPN actuarán en corte y saturación con el fin de convertir las señales de datos del NodeMCU, pasando las mismas de 3.3 V (salida del NodeMCU, valor que pese a funcionar en la práctica estaba fuera de los márgenes aceptados en las entradas del MAX7219 según su hoja de datos) a 5V (valor válido y seguro de funcionamiento). Las resistencias adaptarán los valores de tensión y corriente del circuito de forma pasiva.
+
+Los jumpers permitirán indicar en la configuración del sistema la cantidad de módulos esclavo a utilizar, representando en función del sistema númerico basado en base 2 presentado anteriormente.
+
+El jack con bornera permitirá alimentar al circuito mediante un cable de alimentación con una ficha genérica o bien a través de un método alternativo que se conecte en la bornera provista.
+
+La tecla rocker switch controlará que se provea la alimentación al circuito, permitiendo encender o apagar el cartel manualmente. Dos tiras de 15 pines hembra serán empleadas para poder conectar el NodeMCU al PCB sin necesidad de soldarlo, facilitando su reutilización en caso de ser necesaria. Finalmente una tira de 5 pines macho permitirá conectar el módulo a un módulo esclavo para la transmisión de las señales de datos y alimentación.
 
 \section{Conclusiones}
 
@@ -15,6 +25,10 @@ Pudo comprobarse a través de este proyecto la viabilidad tanto en términos de 
 La totalidad del protocolo de comunicación pudo ser implementada de acuerdo a lo pautado en los objetivos iniciales, y en tiempo y forma respecto al cronograma propuesto. El desarrollo del hardware se vio demorado por falta de disposición de recursos, ya que algunos componentes no se encuentran disponibles en todas las tiendas de electrónica (Node MCU y MAX7219). Aún así pudo implementarse un prototipo del circuito maestro y dos prototipos de los circuitos esclavos, con las debidas interfaces para las conexiones externas e internas, tanto de datos como de alimentación, y cumpliendo los patrones de diseño recomendados por el personal técnico de la Facultad.
 
 En términos de consumo, se comprobó que la potencia consumida por el circuito coincidía con la calculada mediante los datos indicados en la hoja de datos del MAX7219. Dicho consumo es relativamente bajo, por lo que no se lo considera un impedimento relevante a la hora de conseguir nuevas fuentes de alimentación para el sistema. 
+
+En cuanto a posibles cambios futuros para el cartel se podría sugerir la implementación de una API Web que permita que tanto sitios web como apps puedan obtener el mensaje mostrado en el cartel en ese momento. De esta manera el alcance del mensaje podría ser mayor comúnicandose desde un mismo lugar.
+
+Otro buen cambio sería un jumper adicional en el módulo esclavo, que separe la alimentación de la tensión del circuito de la entrada de tensión de la interfaz. De esta manera, el consumo del circuito podría ser medido más facilmente, ayudando a detectar problemas.
 
 Aunque no estaba planificado en el proyecto inicial el equipo también adaptó un cargador móvil en desuso para alimentar el circuito.
 

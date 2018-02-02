@@ -1,96 +1,43 @@
-Manual de instalacion de hardware
+Manual de instalación de hardware
 
-Para compenzar con la instalacion del hardware, identifique cada uno de los modulos a instalar. El módulo maestro puede diferenciarse facilmente porque no posee una pantalla, además de que cuenta con una ficha de alimentación que los módulos esclavo no poseen. Los módulos esclavo en cambio cuentan con una matriz de LEDs.
+Para comenzar con la instalacion del hardware, identifique cada uno de los módulos a instalar. El módulo maestro puede diferenciarse fácilmente porque no posee una pantalla, además de que cuenta con una ficha de alimentación que los módulos esclavo no poseen. Los módulos esclavo en cambio cuentan con una matriz de LEDs.
 
 %Dibujo basico de modulos %
 
 
-Determine donde va a instalar el cartel. La altura ideal para su instalación es montado sobre la pared a una altura de alrededor de 1.80 metros. Esta altura garantiza su facil divisación por parte de personas de todas las estaturas sin resultar molesto de ver para ninguna en particular. El cartel deberá montarse sobre una pared preferiblemente despejada, en un area donde haya un tomacorrientes de 220 V a una distancia no mayor a 1 metro -debido al largo del cable de alimentación de la fuente incluída-, y lejos de cualquier fuente de luz directa cuyo reflejo pueda afectar la legibilidad del mensaje mostrado por el cartel. Esto también implica que para su óptima legibilidad, el cartel debe ser instalado en espacios interiores, siendo su potencia lumínica insuficiente para garantizar la correcta legibilidad de los mensajes bajo la luz solar directa.
-
+%Determine donde va a instalar el cartel. La altura ideal para su instalación es montado sobre la pared a una altura de alrededor de 1.80 metros. Esta altura se garantiza su fácil divisación por parte de personas de todas las estaturas sin resultar molesto de ver para ninguna en particular. El cartel deberá montarse sobre una pared preferiblemente despejada, en un area donde haya un tomacorrientes de 220 V a una distancia no mayor a 1 metro -- debido al largo del cable de alimentación de la fuente incluída --, y lejos de cualquier fuente de luz directa cuyo reflejo pueda afectar la legibilidad del mensaje mostrado por el cartel. Esto también implica que para su óptima legibilidad, el cartel debe ser instalado en espacios interiores, siendo su potencia lumínica insuficiente para garantizar la correcta legibilidad de los mensajes bajo la luz solar directa.
 %Dibujo basico de pared con tomacorrientes cerca, linea punteada con cartel a la altura adecuada. Puede ser complicado, en cuyo caso mejor no lo hacemos %
 
-
-Apoye sobre una mesa los modulos, uno al lado de otro, simulando el orden en el que quedarán sobre la pared. Esto le permitirá identificar el ancho del cartel para saber si puede montarlo correctamente en el espacio disponible. Luego apoyando de a dos modulos sobre la pared, marque las posiciones donde el gabinete permite que pasen los tornillos para sujetarlos. Repita para todo para subsecuente de módulos hasta haber hecho las marcas para todos.
-
+Apoye sobre una superficie plana, como una mesa o el suelo, los módulos, uno al lado de otro, simulando el orden en el que quedarán sobre la pared. Luego proceda a conectar 
 
 %Dibujo basico de modulos sobre pared e indicacion sobre donde irian los tornillos %
+% Una vez hechas las marcas haga los agujeros para poner los tarugos donde quedaran sujetos los tornillos. No utilice tornillos más finos de los indicados ya que estos pueden no soportar el peso del cartel.
 
+% Apoye los modulos en la pared de manera que coincidan los agujeros de guia con los agujeros realizados, y luego inserte los tornillos en los mismos y ajustelos. El cartel tendria que quedar fijo y estatico en el lugar tras haber realizado esto.
+% Conecte con los cables provistos el módulo maestro con la interfaz de entrada del primer modulo esclavo. Luego la interfaz de salida del primer modulo esclavo con la interfaz de entrada del segundo modulo esclavo. En caso de haber más módulos esclavo, repita este último paso hasta que todos estén conectados en cadena.
 
- Una vez hechas las marcas haga los agujeros para poner los tarugos donde quedaran sujetos los tornillos. No utilice tornillos más finos de los indicados ya que estos pueden no soportar el peso del cartel.
-
-
- Apoye los modulos en la pared de manera que coincidan los agujeros de guia con los agujeros realizados, y luego inserte los tornillos en los mismos y ajustelos. El cartel tendria que quedar fijo y estatico en el lugar tras haber realizado esto.
-
-
-Conecte con los cables provistos el módulo maestro con la interfaz de entrada del primer modulo esclavo. Luego la interfaz de salida del primer modulo esclavo con la interfaz de entrada del segundo modulo esclavo. En caso de haber más módulos esclavo, repita este último paso hasta que todos estén conectados en cadena.
-
- Conecte la fuente de alimentacion en un tomacorrientes de 220V y en la ficha de alimentación del módulo maestro.
+Conecte la fuente de alimentacion en un tomacorrientes de 220V y en la ficha de alimentación del módulo maestro.
 
  El cartel ya se encuentra instalado y listo para su configuración y uso.
 
-______________________________________________________________________________________________
 
 Tipos de cables involucrados:
 
 Se implementaron adicionalmente conjuntos de cables con la siguiente disposición:
+\begin{itemize}
+	\item[Cables de interfaz:] Conjuntos de 5 cables paralelos con pines hembra en ambos extremos. Estos cables permiten conectar el módulo maestro con un esclavo o bien los módulos esclavos que forman parte de una misma implementación del cartel.
 
-- Cables de interfaz: Conjuntos de 5 cables paralelos con pines hembra en ambos extremos. Estos cables permiten conectar el módulo maestro con un esclavo o bien los módulos esclavos que forman parte de una misma implementación del cartel.
+	\item[Cable de alimentación:] Se modificó la ficha de un cargador de celular en desuso para utilizarlo como fuente de alimentación con entrada de 220V 50Hz y salida continua de 5V apta para alimentar el sistema.
 
-- Cable de alimentación: Se modificó la ficha de un cargador de celular en desuso para utilizarlo como fuente de alimentación con entrada de 220V 50Hz y salida continua de 5V apta para alimentar el sistema.
-
-- Cables de conexión a la matriz: Conjuntos de 8 cables paralelos. Cumplen la función de transmitir las señales desde cada MAX7219 hasta su respectiva matriz de LEDs. Uno de los utilizados fue comprado ya completo, mientras que otro fue armado por uno de los miembros del equipo a partir de cables individuales.
-
+	\item[Cables de conexión a la matriz:] Conjuntos de 8 cables paralelos. Cumplen la función de transmitir las señales desde cada MAX7219 hasta su respectiva matriz de LEDs. Uno de los utilizados fue comprado ya completo, mientras que otro fue armado por uno de los miembros del equipo a partir de cables individuales.
+\end{itemize}
 
 _______________________________________________________________________________________________
 
-Los componentes implicados en el sistema del modulo esclavo cumplen una funcion relativamente pasiva. El mensaje programado en el master se transmitira al esclavo en el protocolo especificado en la sección anterior. Los LEDs cumplirán la función de visualizar el espacio correspondiente a un caracter del mensaje transmitido. El PCB contendrá las pistas que cerrarán el circuito electrónico del módulo. El MAX7219 leerá las señales de datos del mensaje e indicará a cada fila y columna qué LEDs deben estar encendidos en cada instante, teniendo en cuenta el retardo necesario para que los subsiguientes módulos puedan visualizar la parte que les corresponda del mensaje de tal manera que en conjunto éste pueda ser leído uniformemente y con un desplazamiento homogeneo en toda la cadena de módulos esclavo. El MAX7219 también se encargara de, dejando pasar el retardo necesario, pasar el mensaje al siguiente módulo para el procesamiento de la parte que corresponda más adelante. Los capacitores y la resistencia cumplen funciones pasivas. Los conectores hembra de 8 pines permitirán la conexión con las filas y las columnas de la matriz respectivamente. Los conectores macho de 5 pines permitirán la interconexión con otros esclavos o bien con el maestro para la transmisión de las 3 señales de datos y las 2 de alimentación. Finalmente se contará con 2 tiras de 12 pines hembra que permitirán conectar el MAX7219 sin soldarlo a la placa. 
-
-El módulo maestro emite el mensaje hacia los módulos esclavo, sin encargarse especificamente de su visualización. El NodeMCU ESP8266 es el componente más importante de este módulo, ya que se encarga tanto de comunicarse con la computadora del usuario para la configuración del mensaje como de emitir el mensaje a los módulos esclavo. El PCB contará con las pistas necesarias para cerrar el circuito electrónico que unirá los componentes de este módulo. Los tres transistores NPN actuarán en corte y saturación con el fin de convertir las señales de datos del NodeMCU, pasando las mismas de 3.3 V (salida del NodeMCU, valor que pese a funcionar en la práctica estaba fuera de los márgenes aceptados en las entradas del MAX7219 según su hoja de datos) a 5V (valor válido y seguro de funcionamiento). Las resistencias adaptarán lso valores de tensión y corriente del circuito de forma pasiva. Los jumpers permitirán indicar en la configuración del sistema la cantidad de módulos esclavo a utilizar, representando en función del sistema númerico basado en base 2 presentado anteriormente. El jack con bornera permitirá alimentar al circuito mediante un cable de alimentación con una ficha genérica o bien a través de un método alternativo que se conecte en la bornera provista. La tecla rocker switch controlará que se provea la alimentación al circuito, permitiendo encender o apagar el cartel manualmente. Dos tiras de 15 pines hembra serán empleadas para poder conectar el NodeMCU al PCB sin necesidad de soldarlo, facilitando su reutilización en caso de ser necesaria. Finalmente una tira de 5 pines macho permitirá conectar el módulo a un módulo esclavo para la transmisión de las señales de datos y alimentación.
-
-
-Como parte del proceso de fabricación también se utilizaron numerosas herramientas e insumos varios. Para imprimir las pistas a la PCB se utilizó papel fotográfico de 60 gramos. Se requirió una plancha para pasar dicha impresión a la PCB. Luego durante el proceso de corrosión del cobre de la placa se utilizó Cloruro férrico y un pequeño contenedor plástico. Para manipular los elementos en esta etapa se utilizaron guantes de látex. Para quitar la tinta de la placa se utilizó una virulana fina y un poco de detergente y agua. También se utilizaron gafas de seguridad en el proceso de agujereado de la placa, realizado con una agujereadora y mechas de 0,75 mm, 1 mm y 1,25 mm de diametro. Para el proceso de soldado se utilizaron las gafas de seguridad nuevamente, y se requirió el uso de soldadores eléctricos, estaño, pinzas, alicates y desoldadores. Finalmente para las pruebas de los circuitos se utilizaron multímetros digitales.
+% Donde va esto?
+Como parte del proceso de fabricación también se utilizaron numerosas herramientas e insumos varios. Para imprimir las pistas a la PCB se utilizó papel fotográfico de 60 gramos. Se requirió una plancha para pasar dicha impresión a la PCB. Luego durante el proceso de corrosión del cobre de la placa se utilizó cloruro férrico y un pequeño contenedor plástico. Para manipular los elementos en esta etapa se utilizaron guantes de látex. Para quitar la tinta de la placa se utilizó una virulana fina y un poco de detergente y agua. También se utilizaron gafas de seguridad en el proceso de agujereado de la placa, realizado con una agujereadora y mechas de 0,75 mm, 1 mm y 1,25 mm de diametro. Para el proceso de soldado se utilizaron las gafas de seguridad nuevamente, y se requirió el uso de soldadores eléctricos, estaño, pinzas, alicates y desoldadores. Finalmente para las pruebas de los circuitos se utilizaron multímetros digitales.
 
 _____________________________________________________________
-
-Requerimientos hardware:
-
-- El cartel debe tener un consumo energético bajo capaz de ser cubierto por una fuente de alimentación pequeña (<= 1000 mW)
-
-- El sistema tiene que poder ser replicado. Los componentes que lo conforman tienen que ser comercializables y obtenibles en negocios de electrónica.
-
-- El cartel debe tener el tamaño suficiente para poder ser leído desde una distancia de aproximadamente 20 metros.
-
-- El cartel debe poder permanecer trabajando constantemente sin alcanzar una temperatura elevada que ponga en peligro la instalación.
-
-- La luminosidad de los LEDs debe ser suficientemente alta como para poder distinguirse pese a estar en ambientes iluminados artificialmente.
-
-- El sistema del cartel debe ser modularizable. Esto quiere decir que pueda ser dividido en partes definidas que cumplan distintas funciones.
-
-- Las dimensiones de los circuitos del cartel deben ser de un tamaño tal que no ocupen espacio adicional además del necesario para mostrar las matrices de LEDs del cartel.
-
-- La longitud del cartel poder extenderse agregando módulos adicionales.
-
-_____________________________________________________________
-
-
-Tras haber realizado los prototipos de los circuitos sobre protoboards, antes de comenzar con la implementación del mismo en PCB se realizaron pruebas sobre los módulos para determinar su consumo y así estimar la cantidad de módulos máximos a encadenar. Como estimación inicial se tuvo en consideración la ecuación presentada en la hoja de datos del MAX7219, adjunta en el anexo de este documento. Dicha ecuación tiene en consideración las variables que pueden llegar a producir más incertidumbre en el valor de potencia de consumo del circuito, como la tensión de operación de los LEDs. A través de esta ecuación entonces se pudo estimar con bastante precisión la corriente estimada del circuito de cada módulo esclavo. Dichó cálculo arrojó un valor de alrededor de 1,5 mA. Multiplicando este valor por 5V que alimentan el circuito y redondeando generosamente podemos asumir que cada esclavo tendrá un consumo de unos 8 mW. El circuito maestro tiene un consumo relativamente fijo, que pudo obtenerse midiendo la corriente entre la fuente de alimentación y el pin de alimentación del módulo. El valor brindado era de 8 mA cuando no se tenía conectado ningún esclavo, y aproximadamente 10 mA cuando se contaba con un esclavo, valor aceptablemente aproximado al que habíamos alcanzado previamente. Con el fin de reducir el riesgo para los multímetros utilizados, durante la implementación de otro protocolo de módulo esclavo se decidió conectar un resistor pequeño en la entrada de la alimentación. Midiendo la tensión sobre ese resistor y dividiendolo por su resistencia sabríamos la corriente que circula por el circuito esclavo. Se utilizó inicialmente un resistor de 680 ohms, en el que la corriente observada difería ampliamente de la estimada y medida por otros medios, pero las luces de la matriz se veian mucho más tenues, indicio de que la magnitud de la corriente podía estar viéndose perjudicada por un valor muy alto de resistencia. Procedimos a utilizar una resistencia mucho mas pequeña, de 10 ohms. Esta vez los valores coincidieron con los previamente obtenidos. 
-
-Después de hacer las placas pero antes de soldar los componentes, se posicionó cada uno en los respectivos huecos de la placa en los que iría soldado con el estaño. Después se procedió a medir continuidad con el multímetro entre los pines de los componentes y la capa de GND, mientras se movía suavemente los pines de los componentes. De esta forma podíamos saber antes del proceso de soldadura que en determinados casos, los componentes estaban en contacto con GND sin que así el esquemático lo indicara. La solución fue corroer el cobre hasta removerlo en un diámetro de aproximadamente un milímetro adicional al ya existente. Luego se volvía a colocar el componente y buscar continuidad con GND alterando la posicion de los terminales. Este procedimiento fue realizado para todos los componentes. En los casos en que la terminal de un componente debiera estar en contacto con GND, lo que se buscaba cumplir era justamente lo opuesto, es decir, que con solo apoyar el terminal en el agujero este sea tan estrecho que permita que la pata del componente esté en contacto con la placa de cobre de la capa de GND. En algunos casos esto no bastaba, por lo que fue necesario realizar pequeñas soldaduras del lado de la capa GND. Esto garantiza la correcta conectividad de los componentes en la placa pese al obstáculo de la capa GND.
-
-Al finalizar la implementación de los circuitos sobre los PCB finales, se procedió a realizar una pequeña prueba tras verificar que las señales más peligrosas para el circuito estaban controladas. La prueba constaba de realizar las conexiones entre los prototipos y el modulo esclavo  que finalizamos, y luego probar si el comportamiento era el esperado. Como se estaba probando el maestro prototipo, no el final, el error debería estar en el módulo esclavo. Se procedió a desconectar la alimentación y testear las entradas de datos (V+, GND, Data, Load, y Clock). Tras probar continuidad entre los puntos de entrada y salida del circuito de dichas señales -cambiando de posición las puntas si se trababa de conexiones con puentes- algo muy progresivo- se descubrió que la soldadura de Clock había quedado mal realizada, evitando que su hilo se mantenga sobre su cabeza. Otro problema encontrado pero que no habríamos podido predescir era que los MAX7219, pese a entrar en conjuntos de tiras de pines hembra, en realidad sus puertos no alcanzan el contacto de dichos pines. Se intentó agregar extensiones de metal a cada pin del MAX7219 pero esta tarea resultó excesivamente complicada.
-Finalmente la solución constó de soldar el MAX7219 directamente a la placa PCB. De esa manera pese a no poder reutilizarse tan facilmente, estamos casi seguro de que se mueve mucho menos y ya no existirá el riesgo de que una tira de pines arruine el circuito.
-
-
-Se mantuvo el sistema funcionando durante varios minutos sin que el mismo se caliente significativamente, por lo que el cartel final no requerirá métodos de refrigeración activos.
-
-_______________________________
 
 
 Se determinó como característica de diseño de la placa utilizar una capa para las pistas de las conexiones y otra capa, la que generalmente suele estar vacía, que unificará las conexiones a GND en toda la placa. De esta manera se reduce la cantidad de puentes necesarios para realizar todas las conexiones del esquemático. Esta característica de diseño también contribuye a que las señales de datos se trasladen con menos ruido. De todas formas el beneficio en cuanto a tiempo de realización del circuito se vio bastante complicado.
-
-_______________________________
-
-En cuanto a posibles cambios futuros para el cartel se podría sugerir la implementación de una API Web que permita que tanto sitios web como apps puedan obtener el mensaje mostrado en el cartel en ese momento. De esta manera el alcance del mensaje podría ser mayor comúnicandose desde un mismo lugar.
-Otro buen cambio sería un jumper adicional en el módulo esclavo, que separe la alimentación de la tensión del circuito de la entrada de tensión de la interfaz. De esta manera, el consumo del circuito podría ser medido más facilmente, ayudando a detectar problemas.
-
-
