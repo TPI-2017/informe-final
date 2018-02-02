@@ -187,13 +187,15 @@ Habiendo descrito por partes el esquemático del módulo maestro, se muestra en 
 \subsection{Módulo esclavo}
 Un módulo esclavo posee un driver de LEDs conocido como MAX7219, que es el componente principal de este subsistema y se encarga de controlar la matriz de 8x8 LEDs que tiene asociada.
 
-Este módulo recibe los comandos que el microcontrolador del maestro le envía por medio de un protocolo de comunicación serie sincrónico. La interfaz de conexión comprende 3 señales. Estas son CLK, LATCH y DATAIN, además de la conexión de la alimentación y masa para el correcto funcionamiento del protocolo de comunicación.
+Este módulo recibe los comandos que el microcontrolador del maestro le envía por medio de un protocolo de comunicación serie sincrónico. La interfaz de conexión comprende 3 señales. Estas son CLK, LATCH y DATAIN, además de la conexión de la alimentación y masa.
 
 Cabe destacar que, físicamente, un esclavo posee dos interfaces de conexión como las que se describió en el párrafo anterior. Una se utiliza como puerto de entrada, mientras que la otra como de salida.
 
-La necesidad de colocar dos interfaces es porque el maestro con los esclavos se conectan en cadena como se observa en la figura \ref{fig:dibujo-real}.
-Un esclavo puede conectarse en su puerto de entrada con el maestro, en caso de sea el primero de la cadena o, en su defecto conectarse con un esclavo anterior, del cual recibe las señales propagadas desde el maestro.
-A su vez, se interconecta, en su interfaz de salida con el módulo esclavo siguiente, permitiendo que la información proveniente del maestro fluya a lo largo de todo el sistema.
+La necesidad de colocar dos interfaces surge del hecho que el maestro se conecta con un primer esclavo, y éste se conecta en cadena con otros esclavos como observa en la figura \ref{fig:dibujo-real}.
+
+Un esclavo puede conectarse a través de su puerto de entrada con el módulo maestro, en caso de ser el primero de la cadena. En su defecto, un esclavo puede conectarse con un esclavo anterior, del cual recibe las señales propagadas desde el maestro.
+
+A su vez, se interconecta, a través de su interfaz de salida con el módulo esclavo siguiente, permitiendo que la información proveniente del maestro fluya a lo largo de todo el sistema.
 
 Adicionalmente, el esclavo posee una interfaz de comunicación que permite conectar el MAX7219 con su respectiva matriz de LEDs. Para esto se exponen 8 pines correspondientes a las filas de la matriz y 8 para las columnas.
 
@@ -211,8 +213,8 @@ Dichos subcircuitos cumplen una función específica y aparecen enumerados al pi
 
 \begin{enumerate}
 	\item Driver de LEDs MAX7219: Este dispositivo electrónico es el componente principal del módulo esclavo por lo que en la sección \ref{sec:max7219} se abordan, más en detalle, las características principales del mismo.
-	\item Interfaz de entrada: se comparten las señales de VCC, GND, CLK, DATAIN y LATCH del anterior módulo en la cadena, pudiendo corresponderse tanto al maestro como a otro esclavo.
-	\item Interfaz de salida: se comparten las señales de VCC, GND, CLK, DATAOUT y LATCH del próximo módulo esclavo en la cadena.
+	\item Interfaz de entrada: se comparten las líneas VCC, GND, CLK, DATAIN y LATCH del anterior módulo en la cadena, pudiendo corresponderse tanto al maestro como a otro esclavo.
+	\item Interfaz de salida: se comparten las líneas de VCC, GND, CLK, DATAOUT y LATCH del próximo módulo esclavo en la cadena.
 	\item Interfaz de conexión con las filas de la matriz: En la sección \ref{sec:matriz-leds} se hace un especial énfasis en la comunicación entre la matriz de 8x8 LEDs con el MAX7219.
 	\item Interfaz de conexión con las columnas de la matriz: Ver sección \ref{sec:matriz-leds}.
 \end{enumerate}
