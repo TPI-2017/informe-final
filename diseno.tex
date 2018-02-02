@@ -6,7 +6,7 @@ El sistema se compone de módulos que interactúan entre sí, intercambiando dat
 
 Por otra parte los esclavos obtienen la información que les transmite el microcontrolador desde el maestro y actualizan la matriz de LEDs que tienen asociada. En la figura \ref{fig:diagrama-bloques-general} se puede observar un diagrama en bloques general de todo el sistema.
 
-\begin{figure}[!ht]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[scale=1]{imagenes/esquema-general.pdf}
 	\caption{Esquema general entre todos los componentes del sistema.}
@@ -183,7 +183,7 @@ El PCB contará con las pistas necesarias para cerrar el circuito electrónico q
 
 Los tres transistores NPN actuarán en corte y saturación con el fin de convertir las señales de datos del NodeMCU, pasando las mismas de 3.3 V (salida del NodeMCU, valor que pese a funcionar en la práctica estaba fuera de los márgenes aceptados en las entradas del MAX7219 según su hoja de datos) a 5V (valor válido y seguro de funcionamiento). Las resistencias adaptarán los valores de tensión y corriente del circuito de forma pasiva.
 
-Los jumpers permitirán indicar en la configuración del sistema la cantidad de módulos esclavo a utilizar, representando en función del sistema númerico basado en base 2 presentado anteriormente.
+Los jumpers permitirán indicar en la configuración del sistema la cantidad de módulos esclavo a utilizar, representando en función del sistema numérico basado en base 2 presentado anteriormente.
 
 El jack con bornera permitirá alimentar al circuito mediante un cable de alimentación con una ficha genérica o bien a través de un método alternativo que se conecte en la bornera provista.
 
@@ -254,7 +254,7 @@ Las características principales que posee el chip integrado se enumeran a conti
 
 La disposición de los pines del MAX7219 se puede observar en la figura \ref{fig:MAX-pines} y la descripción de cada uno en la tabla \ref{table:MAX-pines}.
 
-Es necesario prestar atención en el conexionado con respecto a los pines de tierra (GND) ya que ambos deben estar conectados para el driver pueda funcionar correctamente, ambas estan al lado izquierdo de la figura \ref{fig:MAX-pines} (Pin 4 y 9).
+Es necesario prestar atención en el conexionado con respecto a los pines de tierra (GND) ya que ambos deben estar conectados para el driver pueda funcionar correctamente, ambas están al lado izquierdo de la figura \ref{fig:MAX-pines} (Pin 4 y 9).
 
 Por otro lado, el MAX7219 tiene un pin denominado DOUT (pin 24) se utiliza para encadenar varios MAX7219 y de esta forma pasar la información al que esta directamente conectado, éste pin nunca tiene alta impedancia.
 
@@ -287,7 +287,7 @@ Pin               & Nombre          & Función    \\ \hline
 \end{table}
 
 El MAX7219, como se mencionó anteriormente, interpreta comandos de 16 bits. El byte mas significativo de esta palabra de 16 bits codifica el registro que se modificará con el comando. Hay 16 registros con lo cual cuatro bits de este byte se utilizan para direccionar a ellos. Se puede ver en la tabla \ref{tab:max-cmdaddr} parte del formato de un comando, específicamente la dedicada al direccionamiento del registro. Se puede ver también en mejor detalle el formato del contenido de cada comando (el byte menos significativo) en el datasheet del MAX7219 \cite{MAX7219}.
-\begin{table}[htbp]
+\begin{table}[ht]
 	\centering
 	\caption{Mapa de direccionamiento de registros del MAX7219.}
 	\vspace{0.2cm}
@@ -307,7 +307,7 @@ Tener control independiente sobre cada LED sería prohibitivamente complicado. P
 	\label{fig:modulo-led}
 \end{figure}
 
-La manera que se obtiene la ilusión de tener control independiente sobre cada led se logra explotando el efecto estroboscópico: el MAX7219 mantiene normalmente los nodos $C_j, j = 1, 2, ... ,8$ en alto. Para mostrar una imagen, pone primero pone $C_1$ en bajo y a la vez pone en alto en o en bajo los $S_i, i=1,2,...,8$ para que, por un período corto de tiempo, queden alumbrados los LEDs como correspondan. Luego se procede a hacer lo mismo con $C_2$, hasta llegar a $C_8$ y repetir indefinidamente el procedimiento. Esto se hace a una frequencia que resulta imperceptible al ojo humano y no se puede apreciar \emph{flicker}.
+La manera que se obtiene la ilusión de tener control independiente sobre cada led se logra explotando el efecto estroboscópico: el MAX7219 mantiene normalmente los nodos $C_j, j = 1, 2, ... ,8$ en alto. Para mostrar una imagen, pone primero pone $C_1$ en bajo y a la vez pone en alto en o en bajo los $S_i, i=1,2,...,8$ para que, por un período corto de tiempo, queden alumbrados los LEDs como correspondan. Luego se procede a hacer lo mismo con $C_2$, hasta llegar a $C_8$ y repetir indefinidamente el procedimiento. Esto se hace a una frecuencia que resulta imperceptible al ojo humano y no se puede apreciar \emph{flicker}.
 
 Se analizaron las dimensiones más apropiadas para la utilidad del cartel y se llegó a una separación de 12mm entre LEDs la cual mantiene un dpi apropiado (consiguiendo verse las letras a una distancia aproximada de 10 metros). 
 Todas las medidas estimativas pueden observarse con mayor detalle en la figura \ref{fig:modulo-led-dimensiones}.
@@ -387,7 +387,7 @@ Para realizar este proceso, la figura \ref{fig:spi-timing-diagram} muestra un di
 \end{figure}
 
 \subsubsection{Diseño de PCB}
-Los componentes implicados en el sistema del módulo esclavo cumplen una función relativamente pasiva. El mensaje programado en el master se transmitirá al esclavo de la manera especificada en la sección \ref{sec:sec:max7219}.
+Los componentes implicados en el sistema del módulo esclavo cumplen una función relativamente pasiva. El mensaje programado en el master se transmitirá al esclavo de la manera especificada en la sección \ref{sec:max7219}.
 
 Los LEDs cumplirán la función de visualizar el espacio correspondiente a un caracter del mensaje transmitido. El PCB contendrá las pistas que cerrarán el circuito electrónico del módulo.
 
@@ -529,7 +529,7 @@ La misma es la encargada de recibir la cadena de bytes vía TCP y enviarla hacia
 En otras palabras MessageHandler toma la secuencia de bytes que le pasa la clase Server e interpreta esos datos utilizando el protocolo que se detalla en la sección \ref{sec:protocolo}.
 Este protocolo ofrece soporte para interpretar cada acción que el cliente realiza ya que posee métodos para codificar y decodificar dichas peticiones.
 
-MessageHandler decodifica los pedidos y los envía a la clase Settings o LedSign según pertenezcan a la cateogría de get o set respectivamente.
+MessageHandler decodifica los pedidos y los envía a la clase Settings o LedSign según pertenezcan a la categoría de get o set respectivamente.
 La clase Settings, ha sido enunciada previamente en esta sección, la misma se encarga de todos los pedidos que no requieran configurar la matriz de LEDs.
 Mientras que LedSign obtiene los valores de configuración del tipo set y procesa los datos a fin de convertirlos en comandos que puedan ser interpretados por los dispositivos MAX7219, encargados de encender las luces del cartel.
 
@@ -654,11 +654,11 @@ El patrón MVC \cite{MVC} tiene como objetivo principal el de desacoplar el mane
 	\label{fig:mvc}
 \end{figure}
 
-En el patrón MVC, se separan los objetos de forma que caigan en una de tres categorias:
+En el patrón MVC, se separan los objetos de forma que caigan en una de tres categorías:
 \begin{description}
-	\item[Modelo: ] Encapsula los datos. En este caso, esos datos pueden ser el texto del cartel junto a sus parámetros de animacion, o la configuración de red del cartel. De haber modificaciones, actualiza la vista para reflejar estos cambios.
+	\item[Modelo: ] Encapsula los datos. En este caso, esos datos pueden ser el texto del cartel junto a sus parámetros de animación, o la configuración de red del cartel. De haber modificaciones, actualiza la vista para reflejar estos cambios.
 	\item[Vista: ] Representa a la interfaz gráfica que el usuario ve.
-	\item[Controlador: ] Hace de mediador entre el modelo y la vista. Toma los eventos de interfaz de usuario y actua sobre ellos, manipulando el modelo si fuera necesario.
+	\item[Controlador: ] Hace de mediador entre el modelo y la vista. Toma los eventos de interfaz de usuario y actúa sobre ellos, manipulando el modelo si fuera necesario.
 \end{description}
 
 Se puede ver en la figura \ref{fig:mvc} un gráfico resumiendo el rol del Modelo, Vista y Controlador.
@@ -710,8 +710,8 @@ Por su parte, el servidor, recibe el paquete, analiza todos los campos del heade
 El campo type de la respuesta puede obtener los siguientes valores.
 
 \begin{itemize}
-	\item GetTextResponse: envia hacia el usuario la información del contenido y los parámetros de configuración del cartel.
-	\item GetWiFiConfigResponse: envia hacia el usuario la información respecto de la red WiFi a la que actualmente se encuentra conectado el servidor.
+	\item GetTextResponse: envía hacia el usuario la información del contenido y los parámetros de configuración del cartel.
+	\item GetWiFiConfigResponse: envía hacia el usuario la información respecto de la red WiFi a la que actualmente se encuentra conectado el servidor.
 	\item GenericResponse: es un tipo de paquete que se envía de vuelta, cuando alguno de los datos proporcionados por el cliente no son válido.
 \end{itemize}
 
@@ -735,7 +735,7 @@ A lo largo de esta sección se detallan las distintas estructuras del campo cont
 
 \subsubsection{SetPassword}
 
-El paquete de este tipo permie cambiar la contraseña del sistema.
+El paquete de este tipo permite cambiar la contraseña del sistema.
 En content se encuentra la nueva contraseña, tiene un máximo de 40 caracteres sin incluir al caracter nulo.
 La respuesta que se recibe es del tipo GenericResponse.
 
@@ -763,7 +763,7 @@ El campo content debe respetar la estructura que se observa en la figura \ref{fi
 	\label{fig:paquete-anim}
 \end{figure}
 
-BRATE y SRATE son la frequencia de parpadeo en Hz y la velocidad de deslizamiento en píxeles por segundo.
+BRATE y SRATE son la frecuencia de parpadeo en Hz y la velocidad de deslizamiento en píxeles por segundo.
 Se asume que si BRATE es cero, no se debe parpadear el contenido.
 De la misma forma, si SRATE es cero, no se debe deslizar el contenido.
 El tipo de dato ufp844 es un número en punto fijo sin signo con 4 bits de parte entera y 4 bits de parte fraccionaria.
@@ -813,9 +813,9 @@ El protocolo TLS está diseñado para permitir a aplicaciones con arquitectura d
 Los objetivos del protocolo TLS son los siguientes:
 \begin{description}
 	\item [Seguridad criptográfica:] TLS se utiliza para establecer una conexión segura entre dos partes.
-	\item [Interoperabilidad:] Dos o más programadores independientes deberían poder desarrollar aplicaciones utilizando TLS que puedan intercambiar parámetros criptográficos sin tener conocimiento del código de la otra aplicacion.
+	\item [Interoperabilidad:] Dos o más programadores independientes deberían poder desarrollar aplicaciones utilizando TLS que puedan intercambiar parámetros criptográficos sin tener conocimiento del código de la otra aplicación.
 	\item [Extensibilidad:] TLS busca proveer un marco al cual se le pueden incorporar nuevos algoritmos de cifrado. Esto tiene como resultado el hecho de que al agregar un nuevo algoritmo no es necesario crear un nuevo protocolo y, por lo tanto, una nueva implementación.
-	\item [Eficiencia relativa:] Las operaciones criptográficas tienden a ser intensivas en cómputo, especialmente las operaciones que trabajan sobre las claves públicas. Para esto el procolo TLS especifica un mecanismo de cacheo de sesiones para reducir el número de conexiones que se debe establecer desde cero. Por otro lado, se tomaron medidas para reducir el uso de ancho de banda en la red.
+	\item [Eficiencia relativa:] Las operaciones criptográficas tienden a ser intensivas en cómputo, especialmente las operaciones que trabajan sobre las claves públicas. Para esto el protocolo TLS especifica un mecanismo de cacheo de sesiones para reducir el número de conexiones que se debe establecer desde cero. Por otro lado, se tomaron medidas para reducir el uso de ancho de banda en la red.
 \end{description}
 
 \subsection{Criptografía asimétrica}
