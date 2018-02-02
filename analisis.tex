@@ -78,7 +78,7 @@
 
 En el apartado anterior del informe, se menciona la necesidad de realizar una buena planificación de las tareas a fin de obtener un panorama general respecto a la duración total del proyecto entero.
 
-Para que el proceso de planificación arroje resultados más preciso, se recomienda dividir el sistema entero en tareas concretas e independientes y realizar una estimación de cada una de ellas de manera individual.
+Para que el proceso de planificación arroje resultados más precisos, se recomienda dividir el sistema entero en tareas concretas e independientes y realizar una estimación de cada una de ellas de manera individual.
 
 Un cronograma de actividades acertado, que englobe a todas las tareas requeridas para el proyecto, permite identificar la dependencia entre ellas y por consiguiente, la mejor forma para paralelizar las mismas de manera que se minimice el tiempo total de desarrollo, maximizando, a su vez, la productividad general de cada uno de los miembros del proyecto.
 
@@ -92,7 +92,7 @@ El diagrama de Gantt es una eficaz herramienta para la gestión de proyectos, qu
 En él se muestra las etapas de las que se compone el programa diseñado y las actividades planificadas para desarrollarlo. Para ello, se señala el principio y final de cada una de estas fases por medio de diagramas de barras. De esta forma, se puede visualizar  fácilmente  el calendario global del proyecto.
 
 \subsubsection{Pasos para elaborar un diagrama de Gantt}
-Este método favorece la planificación global de proyectos. Para confeccionarlo,  se deben seguir una serie de pasos necesarios, que facilitan la elaboración de este tipo de cronogramas. Los pasos se listan a continuación.
+Este método favorece la planificación global de proyectos. Para confeccionarlo, se deben seguir una serie de pasos necesarios, que facilitan la elaboración de este tipo de cronogramas. Los pasos se listan a continuación.
 
 \begin{itemize}
 	\item Reflejar las etapas del proyecto.
@@ -110,14 +110,14 @@ Este tipo de diagramas permite visualizar el cronograma global del proyecto.
 
 Por otra parte establece una serie de plazos realistas, que se ven reflejados en dicho esquema.
 De hecho, el planteamiento de un diagrama de Gantt debe hacerse en base a fines totalmente alcanzables.
-En este sentido, resulta muy útil para conseguir establer objetivos realistas.
+En este sentido, resulta muy útil para conseguir establecer objetivos realistas.
 
 La elaboración del cronograma exige descomponer el proceso en diversas partes que se estructuran en pequeñas unidades. De esta forma, se establecen las fases y se detallan las acciones necesarias para llevar a cabo el sistema final. El proyecto se descompone y organiza en pequeñas metas de corta duración.
 
 El diagrama de Gantt es una eficaz herramienta de comunicación, que permite transmitir a todos los integrantes implicados en el proyecto, la totalidad de las etapas que conforman el sistema.
 
 \subsubsection{Desventajas del modelo}
-En proyectos  complejos y dinámicos puede resultar demasiado difícil su elaboración. La reorganización del cronograma puede convertirse en una tarea complicada y costosa, especialmente cuando no se dispone de las herramientas adecuadas.
+En proyectos complejos y dinámicos puede resultar demasiado difícil su elaboración. La reorganización del cronograma puede convertirse en una tarea complicada y costosa, especialmente cuando no se dispone de las herramientas adecuadas.
 
 Además, precisa de una evaluación y revisión continua debido a que los proyectos se vuelven dinámicos y cambiantes. Determinados imprevistos pueden modificar el cronograma entero, por lo que es necesario actualizarlo periódicamente, para que cumpla con su fin.
 
@@ -127,7 +127,7 @@ Para la confección del cronograma de tareas, se sigue la filosofía de diseño 
 
 En primer lugar, se deben exponer todos los requerimientos funcionales y no funcionales del proyecto entero.
 En esta primera fase, se listan las funcionalidades del sistema, y sus reestricciones en cuanto a tamaño, consumo, precio.
-Esta tarea, correspondió con la primera semana del proyecto.
+Esta tarea, tomó lugar durante la primera semana del proyecto.
 
 Tras haber confeccionado una lista detallada de los requerimientos que el sistema debe satisfacer, se procede a determinar los componentes necesarios para la implementación del sistema.
 Entre los dispositivos más importantes para este proyecto, se encuentra el microcontrolador a utilizar y los drivers de LEDs.
@@ -135,27 +135,27 @@ Para el primero se asignó dos semanas de estudio de las diferentes alternativas
 
 En paralelo con la elección de los componentes, se decide realizar el modelo de la solución general del sistema del lado del software, al cual se le asignó dos semanas. Esta etapa incluye tanto la investigación de las tecnologías de desarrollo compatibles con los distintos microcontroladores de la industria, así como también, la elección del lenguaje de programación, frameworks, confeccionado de UMLs y diagramas de estados.
 
-Tras elegir los componentes de hardware que se utilizarán en el desarrollo del sistema, se procede a armar el conexionado inicial del cartel. Analizando las interfaces de comunicación entre los distintos dispositivos electrónicos, en conjunto con los valores de tensión a los que trabajan.
-En particular, se hace un especial hincapie en la interconexión entre el microcontrolador y los drivers de LEDs.
-Para esta tarea se asignó una semana de investigación y otra más para el desarrollo del prototipo del cartel sobre protoboard. Esto abarca el prototipado de un esclavo y de un maestro.
+Tras elegir los componentes de hardware que se utilizarán en el desarrollo del sistema, se procede a armar el conexionado inicial del cartel , analizando las interfaces de comunicación entre los distintos dispositivos electrónicos, en conjunto con los valores de tensión a los que trabajan.
+En particular, se hace un especial hincapié en la interconexión entre el microcontrolador y los drivers de LEDs.
+Para esta tarea se asignó una semana de investigación y otra más para el desarrollo del prototipo del cartel sobre una protoboard. Esto abarca el prototipado de un esclavo y de un maestro.
 
 En paralelo con esta última tarea, se procede a realizar el diseño del protocolo de comunicación de red entre la aplicación de PC y el firmware del microcontrolador. Para este punto, es necesario tener en claro todas las funciones que puede realizar el sistema ya que las mismas van a convertirse en comandos que se intercambiarán entre los dos módulos de software mencionados. Para el diseño e implementación de esta tarea, se asignaron tres semanas de desarrollo.
 
-En conjunto con la codificación del protocolo de comunicación de red, se procedió a realizar el diseño del esquemático y posteriormente el \emph{footprint}. Para la realización de esta tarea, se estimó tres semanas de desarrollo puesto que incluye tanto el diseño del maestro como del esclavo.
+En conjunto con la codificación del protocolo de comunicación de red, se procedió a realizar el diseño del esquemático y posteriormente el diseño de la PCB. Para la realización de esta tarea, se estimó tres semanas de trabajo puesto que incluye tanto el diseño del maestro como del esclavo.
 
-Al finalizar el proceso de implementación del protocolo, se decidió a realizar en paralelo el desarrollo de la aplicación de PC y del firmware del microcontrolador. Para cada tareá se asignó dos y tres semanas respectivamente.
+Al finalizar el proceso de implementación del protocolo, se decidió a realizar en paralelo el desarrollo de la aplicación de PC y del firmware del microcontrolador. Para cada tarea se asignó dos y tres semanas respectivamente.
 
-Luego de completada esta última fase se procede a la codificación de las conexiones TLS entre los dos módulos de software lo que se planificó en un lapso de dos semanas.
+Luego de completada esta última fase, se procede a la utilización del protocolo de red TLS, para brindar cifrado, autenticación e integridad a las conexiones de red que se establecen entre la aplicación de PC y el firmware del microcontrolador.
 
-Tras concluir con las dos aplicaciones de software, se destinaron dos semanas a la prueba en conjunto de estos dos productos.
+Tras concluir con las dos aplicaciones de software, se destinaron dos semanas a la prueba en conjunto de estas dos componentes.
 
-Por otra parte, siguiendo con el cronograma y finalizada la etapa anterior, la semana 9 a la 11, se destinó a la fabricación del los PCBs dicha etapa se detalla en la sección \ref{sec:fab-PCB}. Cabe recordar que esta tarea incluye la confección del maestro y de dos esclavos.
+Por otra parte, siguiendo con el cronograma y finalizada la etapa anterior, la semana 9 a la 11, se destinó a la fabricación del los PCBs. Dicha etapa se detalla en la sección \ref{sec:fab-PCB}. Cabe recordar que esta tarea incluye la confección del maestro y de dos esclavos.
 
-A continuación, se estimó dos semanas adicionales para el proceso de soldado de los componentes hacia la plaqueta y el testo de conductividad eléctrica entre los módulos de hardware.
+Luego, se estimaron dos semanas adicionales para el proceso de soldado de los componentes sobre la plaqueta y el testeo de conductividad eléctrica entre los módulos de hardware.
 
-Finalmente, tras haber realizado la prueba general del software, se utilzia la última semana de producción para las pruebas generales donde se evalúa la interacción de los programas con el cartel propiamente dicho.
+Finalmente, tras haber realizado la prueba general del software, se destina la última semana de producción para las pruebas generales donde se evalúa la interacción de los programas con el cartel propiamente dicho.
 
-La figura \ref{fig:cronograma} se observa en detalle el tiempo empleado encada etapa.
+La figura \ref{fig:cronograma} se observa en detalle el tiempo empleado en cada etapa.
 
 \begin{figure}[ht!]
 	\begin{center}
