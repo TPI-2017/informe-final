@@ -275,3 +275,30 @@ $ ./Panel
 \end{lstlisting}
 
 Con esto concluye la puesta en marcha del software del sistema.
+
+\subsection{Preparado del hardware}
+%TODO poner todo sobre la conexión de los cables, el enchufar etc _en imperativo_
+
+\subsubsection{Configuración de jumpers}
+
+La cantidad de letras o la cantidad de módulos esclavos debe ser conocido por el microcontrolador al momento de iniciar la ejecución de su programa. Este valor se establece cortocircuitando los jumpers en una configuración predefinida. La figura \ref{fig:manual-jumpers} explica como deben configurarse.
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=0.6\linewidth]{imagenes/manual/jumper.pdf}
+	\caption{Configuración de los jumpers para cada cantidad esclavos conectados.}
+	\label{fig:manual-jumpers}
+\end{figure}
+
+%\begin{table}[ht!]
+%	\centering
+%	\caption{Detalle de cada componente configurable.}
+%	\label{my-label}
+%	\begin{tabular}{lcp{.65\textwidth}}
+%		\multicolumn{1}{c}{Elemento}	& Identificación & \multicolumn{1}{c}{Descrición} \\ \hline
+%		Switch de Power         		& 1              & Encender o apaga el cartel, el cartel no recibe energía eléctrica si esta apagado. \\ \hline
+%		Switch de Formateo      		& 2              & Formatea la memoria interna, y se carga los datos de fabrica, para este propósito es necesario que se mantenga en ese estado por al menos 3 segundos. \\ \hline
+%		Jumpers de cantidad de letras		& 3              & En total son tres. Antes de encender de debe seleccionar la cantidad de módulos esclavos que serán utilizados. \\ \hline
+%	\end{tabular}
+%\end{table}
+%
