@@ -72,7 +72,7 @@ El cartel requiere una alimentación de 5V de corriente continua. Para esto se e
 
 Esta tensión permite alimentar tanto al microcontrolador ESP8266EX como a todos los drivers MAX7219 que posee el circuito, incluidas las matrices de LEDs que tiene cada uno asociada.
 
-En la sección \ref{sec:medicion-alimentacion} se agrega más información respecto del consumo que posee el  circuito completo y los diferentes mecanismos que se realizaron para obtener dichos parámetros.
+En la sección \ref{part:ensayos} se agrega más información respecto del consumo que posee el  circuito completo y los diferentes mecanismos que se realizaron para obtener dichos parámetros.
 
 \subsubsection{Microcontrolador} \label{sec:microcontrolador}
 El componente central en el módulo maestro es el microcontrolador ESP8266EX, el cual se encuentra contenido en un módulo AI-Thinker ESP-12E (figura \ref{fig:foto-esp12e}), el cual está montado sobre un módulo NodeMCU que le provee de regulación de tensión y un conversor de serie TTL a USB. El ESP8266EX es un SoC (\emph{System on Chip}) de la empresa Espressif. El módulo NodeMCU es hardware libre, sin embargo, el ESP12E y el ESP8266EX no lo son.\cite{NodeMCU}
@@ -81,7 +81,7 @@ Es importante tener en cuenta que el sistema no integra en su hardware directame
 
 \begin{figure}[ht!]
 	\begin{center}
-		\includegraphics[width=8cm]{imagenes/esp12e-foto.jpg}
+		\includegraphics[width=0.4\textwidth]{imagenes/esp12e-foto.jpg}
 		\caption{Foto del módulo ESP12E sin su cubrimiento.}
 		\label{fig:foto-esp12e}
 	\end{center}
@@ -89,7 +89,7 @@ Es importante tener en cuenta que el sistema no integra en su hardware directame
 
 \begin{figure}[ht!]
 	\begin{center}
-		\includegraphics[width=0.95\textwidth]{imagenes/nodemcu-pinout.pdf}
+		\includegraphics[width=0.85\textwidth]{imagenes/nodemcu-pinout.pdf}
 		\caption{Asignación de pines del NodeMCU.}
 		\label{fig:nodemcu-pinout}
 	\end{center}
@@ -154,6 +154,7 @@ Finalmente la salida se conecta desde el emisor, y se encuentra invertida respec
 	\end{center}
 \end{figure}
 
+\pagebreak
 \subsubsection{Comunicación con el primer esclavo} \label{sec:ficha-esclavo}
 En esta porción del circuito se tiene la interfaz de conexión al primer esclavo. 
 Que luego en el diseño del PCB terminará siendo una ficha.
@@ -192,7 +193,7 @@ La tecla rocker switch controlará que se provea la alimentación al circuito, p
 Se puede ver en la figura \ref{fig:pcb-master} el diseño final de la PCB del maestro.
 \begin{figure}[ht!]
 	\centering
-	\includegraphics[width=\linewidth]{imagenes/pcb-master.pdf}
+	\includegraphics[width=0.7\linewidth]{imagenes/pcb-master.pdf}
 	\caption{PCB del módulo maestro.}
 	\label{fig:pcb-master}
 \end{figure}
@@ -258,6 +259,9 @@ Es necesario prestar atención en el conexionado con respecto a los pines de tie
 
 Por otro lado, el MAX7219 tiene un pin denominado DOUT (pin 24) se utiliza para encadenar varios MAX7219 y de esta forma pasar la información al que esta directamente conectado, éste pin nunca tiene alta impedancia.
 
+Los otros pines más reelevantes de este driver son los que utiliza el microcontrolador para transmitir los comandos requeridos. Estos son el pin DIN (pin 1)
+donde ingresan los datos al MAX7219. Adicionalmente se encuentra el LOAD (pin 12) requerido para indicarle a este dispositivo, que los últimos 16 bits recibidos deben ser cargados. Finalmente se encuentra la señal de CLCK (pin 13) que se utiliza para la transmisión sincrónica entre el maestro (microcontrolador) y los esclavos (drivers de LEDs).
+
 \begin{figure}[htp!]
 	\centering
 	\begin{center}
@@ -287,7 +291,7 @@ Pin               & Nombre          & Función    \\ \hline
 \end{table}
 
 El MAX7219, como se mencionó anteriormente, interpreta comandos de 16 bits. El byte mas significativo de esta palabra de 16 bits codifica el registro que se modificará con el comando. Hay 16 registros con lo cual cuatro bits de este byte se utilizan para direccionar a ellos. Se puede ver en la tabla \ref{tab:max-cmdaddr} parte del formato de un comando, específicamente la dedicada al direccionamiento del registro. Se puede ver también en mejor detalle el formato del contenido de cada comando (el byte menos significativo) en el datasheet del MAX7219 \cite{MAX7219}.
-\begin{table}[ht]
+\begin{table}[ht!]
 	\centering
 	\caption{Mapa de direccionamiento de registros del MAX7219.}
 	\vspace{0.2cm}
@@ -335,14 +339,14 @@ A la hora de efectuar las conexiones, se debe prestar principal atención a la o
 \begin{figure}[ht!]
 	\centering
 	\begin{center}
-		\includegraphics[width=0.6\textwidth]{imagenes/hw/conexion-MAX-matriz.JPG}
+		\includegraphics[width=0.8\textwidth]{imagenes/hw/conexion-MAX-matriz.JPG}
 		\caption{Fotografía de conexión entre MAX7219 y su módulo de LEDs.}
 		\label{fig:MAX-matriz-real}
 	\end{center}
 \end{figure}
 
 
-\subsection{Comunicación entre los módulos}
+\subsection{Comunicación entre los módulos} \label{sec:comunicacion-modulos}
 Para la comunicación maestro-esclavo y esclavo-esclavo se utiliza un protocolo serie de un bit sincrónico. Cada módulo esclavo tiene en su MAX7219 una entrada de serie junto a un clock, de manera que se toma el valor del bit en el flanco ascendente del reloj. A su vez, cada MAX7219 tiene un registro de desplazamiento de 16 bits, que en cada flanco ascendente del clock inserta en orden FIFO al registro un bit (DIN) y, en el flanco descendente del reloj, coloca en su salida el valor del bit más viejo en el registro de desplazamiento (DOUT). Por último, el MAX7219 tiene una entrada llamada LATCH que al pasar a alto, provoca que el MAX7219 \enquote{tome} la palabra de 16 bits, interpretándola como se describió en la sección \ref{sec:max7219}.
 
 De esta manera es posible dirigir una palabra arbitraria a cualquier esclavo, y es particularmente eficiente en el caso en que se debe mandar una palabra a cada MAX7219 y se desea que todas la interpreten a la vez. Es cuestión de simplemente transmitir los datos dirigidos a cada esclavo, uno tras otro, hasta llenar todos los registros de desplazamiento y levantar LATCH. Alternativamente, si se quisiera mandar un sólo comando a un esclavo en particular, basta con insertar \enquote{burbujas} (comandos que no realizan ninguna operación) en la secuencia de bits.
@@ -373,7 +377,8 @@ El procedimiento que se realiza para cargar los mapas de bits en cada esclavo co
 	\end{adjustbox}
 \end{table}
 
-Para realizar este proceso, la figura \ref{fig:spi-timing-diagram} muestra un diagrama a lo largo del tiempo de la forma de enviar cada bit. En ella se puede observar que el primer paso consiste en bajar la señal de LOAD y esperar un instante de tiempo (aproximadamente un microsegundo). Luego se genera una señal de CLK de onda cuadrada y de frecuencia de a lo sumo 1Mhz con ciclo de trabajo de $50 \%$. No es necesario que CLK sea una señal periódica, es suficiente que se respeten los tiempos de setup y hold, llevando CLK a alto luego de haber transcurrido $t_{DS}$ con el dato ya en DIN y mantenerlo por $t_{DH}$.
+Para realizar este proceso, la figura \ref{fig:spi-timing-diagram} muestra un diagrama a lo largo del tiempo de la forma de enviar cada bit. En ella se puede observar que el primer paso consiste en bajar la señal de LOAD y esperar un instante de tiempo (aproximadamente un microsegundo).
+Luego se genera una señal de CLK de onda cuadrada y de frecuencia de a lo sumo 1Mhz con ciclo de trabajo de $50 \%$. No es necesario que CLK sea una señal periódica, es suficiente que se respeten los tiempos de setup y hold, llevando CLK a alto luego de haber transcurrido $t_{DS}$ con el dato ya en DIN y mantenerlo por $t_{DH}$.
 
 % Cuando finaliza el envío de los 16 bits, se debe subir la señal de LATCH. En ese momento, el MAX7219 almacena, en sus registros internos, el comando recibido. Todos los comandos son de dos bytes, sin embargo, se puede enviar más de esa cantidad. Esta funcionalidad se utiliza para enviar instrucciones a los demás MAX7219 que están conectados en serie. Lo que ocurre es que la información se recibe en el flanco ascendente de CLK y se envía, hacia el siguiente chip, por el pin DATAOUT en el flanco descendente. De esta forma, en una iteración se pueden configurar una columna de cada módulo de 8x8 LEDs.
 
@@ -403,7 +408,7 @@ Se puede ver en la figura \ref{fig:pcb-slave} el diseño final de la PCB del esc
 
 \begin{figure}[ht!]
 	\centering
-	\includegraphics[width=\linewidth]{imagenes/pcb-slave.pdf}
+ 	\includegraphics[width=\linewidth]{imagenes/pcb-slave.pdf}
 	\caption{PCB del módulo esclavo.}
 	\label{fig:pcb-slave}
 \end{figure}
@@ -635,7 +640,7 @@ Esta ventana será alcanzable desde un menú ubicado en la ventana principal.
 
 Se puede ver un bosquejo de la ventana de cambio de contraseña en la figura \ref{fig:skgui-passwd}
 
-\begin{figure}
+\begin{figure} [h!]
 	\centering
 	\includegraphics[scale=0.8]{imagenes/skgui-passwd.pdf}
 	\caption{Bosquejo de la ventana de cambio de contraseña.}
@@ -665,7 +670,7 @@ Se puede ver en la figura \ref{fig:mvc} un gráfico resumiendo el rol del Modelo
 
 
 \FloatBarrier
-\subsection{Protocolo de comunicación} \label{sec:protocolo}
+\subsection{Protocolo de comunicación de red} \label{sec:protocolo}
 
 \subsubsection{Codificación}
 

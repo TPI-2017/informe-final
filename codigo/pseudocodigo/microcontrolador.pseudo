@@ -60,24 +60,20 @@ void MessageHandler::handle(const Message &msg)
 			Settings::setPassword(msg.newPassword());
 			Settings::storeSettings();
 			Server::send(OK);
-			break;
 
 		case Message::Type::GetText:
 			os_printf("GetText request\n");
 			Server::send(Message::createGetTextResponse(Settings::blinkRate(), Settings::slideRate(), Settings::text());
-			break;
 
 		case Message::Type::SetText:
 			os_printf("SetText request\n");
 			Settings::setText(msg.text(), msg.blinkRate(), msg.slideRate());
 			Settings::storeSettings();
 			Server::send(OK);
-			break;
 
 		case Message::Type::GetWiFiConfig:
 			os_printf("GetWifiConfig request\n");
 			Server::send(Message::createGetWiFiConfigResponse(Settings::ssid(), Settings::wifiPassword(), Settings::ip(), Settings::subnetMask());
-			break;
 
 		case Message::Type::SetWiFiConfig:
 			os_printf("SetWifiConfig request\n");
@@ -87,7 +83,6 @@ void MessageHandler::handle(const Message &msg)
 			Settings::setSubnetMask(msg.wifiSubnet());
 			Settings::storeSettings();
 			Server::send(OK);
-			break;
 			
 	}
 }
