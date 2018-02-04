@@ -118,6 +118,7 @@ Conecte la fuente de alimentacion en un tomacorrientes de 220V y en la ficha de 
 
 El cartel ya se encuentra instalado y listo para su configuración y uso.
 
+\newpage
 \section{Programa del microcontrolador} \label{sec:sw-implementacion}
 
 \subsubsection{Plataformas de desarrollo}\label{sec:sdk}
@@ -149,13 +150,12 @@ Los caracteres que son recibidos en el microcontrolador son codificados en mapa 
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.48\textwidth]{imagenes/codificacionAscii.pdf}
+    \includegraphics[width=0.44\textwidth]{imagenes/codificacionAscii.pdf}
     \caption{Representación de los caracteres en el cartel.}
     \label{fig:repAscii}
 \end{figure}
 
 Cada byte corresponde a una columna del carácter a mostrar y a su vez el LED inferior se codifica como el más significativo (MSB) y el superior se codifica como el menos significativo (LSB). De esta forma se envía al MAX7219 ocho bytes por cada carácter que se desea mostrar en la matriz.
-
 Por otro lado, respetando el orden en que se establecen los caracteres el estándar ISO/IEC 8859-1, se guardan en un archivo los ocho bytes de cada carácter.
 
 \subsubsection{Actualización de la matriz}
@@ -292,7 +292,7 @@ La clase MessageHandler implementa el protocolo de comunicación entre el servid
 Esta clase contiene un sólo método denominado \code{handle()} que atiende el mensaje que le envía el usuario y genera una respuesta para el cliente.
 En el fragmento \ref{pseudo:messageHandlerHandle} se muestra un pseudocódigo del método a fin de brindar mayor claridad en la comprensión de la función.
 
-\lstinputlisting[label=pseudo:messageHandlerHandle,linerange=36-93, firstnumber=36] {codigo/pseudocodigo/microcontrolador.pseudo}
+\lstinputlisting[label=pseudo:messageHandlerHandle,linerange=36-88, firstnumber=36, tabsize=2] {codigo/pseudocodigo/microcontrolador.pseudo}
 
 
 
@@ -310,10 +310,10 @@ En la figura \ref{uml:ledSign} se muestra un UML con los métodos públicos que 
 	\label{uml:ledSign}
 \end{figure}
 
-\lstinputlisting[linerange=95-109, firstnumber=95] {codigo/pseudocodigo/microcontrolador.pseudo}
+\lstinputlisting[linerange=90-104, firstnumber=90] {codigo/pseudocodigo/microcontrolador.pseudo}
 
-En primer lugar, el método \code{init()} se encarga de configurar los pines LATCH, CLK y DATA que se utilizan para la comunicación entre el microcontrolador y el MAX7219.
-Para mayor información respecto de los pines, se sugiere visitar la sección \ref{sec:hw} %TODO AMG - poner la sección donde se explica los pines esos.
+En primer lugar, el método \code{init()} se encarga de configurar los pines LATCH, CLK y DATA que se utilizan para la comunicación sincrónica entre el microcontrolador y el MAX7219.
+Para mayor información respecto de los pines, se sugiere visitar la sección \ref{sec:comunicacion-modulos}
 
 Adicionalmente se configura como salida los pines que se utilizan para los jumpers, se les habilita su pull up interno y se lee su valor a la salida.
 De esta forma, se indica cuántos módulos de 8x8 LEDs componen el cartel.
@@ -326,7 +326,7 @@ Para más información respecto de la configuración de los registros consultar 
 
 Finalmente se limpia el cartel, apagando todas las luces de cada módulo.
 
-\lstinputlisting[linerange=111-111, firstnumber=111] {codigo/pseudocodigo/microcontrolador.pseudo}
+\lstinputlisting[linerange=106-106, firstnumber=106] {codigo/pseudocodigo/microcontrolador.pseudo}
 
 El método \code{messageChanged()} se invoca cuando el mensaje o algún parámetro de configuración (tiempo de parpadeo o velocidad de desplazamiento) es modificado.
 

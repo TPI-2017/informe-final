@@ -72,7 +72,7 @@ El cartel requiere una alimentación de 5V de corriente continua. Para esto se e
 
 Esta tensión permite alimentar tanto al microcontrolador ESP8266EX como a todos los drivers MAX7219 que posee el circuito, incluidas las matrices de LEDs que tiene cada uno asociada.
 
-En la sección \ref{sec:medicion-alimentacion} se agrega más información respecto del consumo que posee el  circuito completo y los diferentes mecanismos que se realizaron para obtener dichos parámetros.
+En la sección \ref{part:ensayos} se agrega más información respecto del consumo que posee el  circuito completo y los diferentes mecanismos que se realizaron para obtener dichos parámetros.
 
 \subsubsection{Microcontrolador} \label{sec:microcontrolador}
 El componente central en el módulo maestro es el microcontrolador ESP8266EX, el cual se encuentra contenido en un módulo AI-Thinker ESP-12E (figura \ref{fig:foto-esp12e}), el cual está montado sobre un módulo NodeMCU que le provee de regulación de tensión y un conversor de serie TTL a USB. El ESP8266EX es un SoC (\emph{System on Chip}) de la empresa Espressif. El módulo NodeMCU es hardware libre, sin embargo, el ESP12E y el ESP8266EX no lo son.\cite{NodeMCU}
@@ -154,6 +154,7 @@ Finalmente la salida se conecta desde el emisor, y se encuentra invertida respec
 	\end{center}
 \end{figure}
 
+\pagebreak
 \subsubsection{Comunicación con el primer esclavo} \label{sec:ficha-esclavo}
 En esta porción del circuito se tiene la interfaz de conexión al primer esclavo. 
 Que luego en el diseño del PCB terminará siendo una ficha.
@@ -338,14 +339,14 @@ A la hora de efectuar las conexiones, se debe prestar principal atención a la o
 \begin{figure}[ht!]
 	\centering
 	\begin{center}
-		\includegraphics[width=0.6\textwidth]{imagenes/hw/conexion-MAX-matriz.JPG}
+		\includegraphics[width=0.8\textwidth]{imagenes/hw/conexion-MAX-matriz.JPG}
 		\caption{Fotografía de conexión entre MAX7219 y su módulo de LEDs.}
 		\label{fig:MAX-matriz-real}
 	\end{center}
 \end{figure}
 
 
-\subsection{Comunicación entre los módulos}
+\subsection{Comunicación entre los módulos} \label{sec:comunicacion-modulos}
 Para la comunicación maestro-esclavo y esclavo-esclavo se utiliza un protocolo serie de un bit sincrónico. Cada módulo esclavo tiene en su MAX7219 una entrada de serie junto a un clock, de manera que se toma el valor del bit en el flanco ascendente del reloj. A su vez, cada MAX7219 tiene un registro de desplazamiento de 16 bits, que en cada flanco ascendente del clock inserta en orden FIFO al registro un bit (DIN) y, en el flanco descendente del reloj, coloca en su salida el valor del bit más viejo en el registro de desplazamiento (DOUT). Por último, el MAX7219 tiene una entrada llamada LATCH que al pasar a alto, provoca que el MAX7219 \enquote{tome} la palabra de 16 bits, interpretándola como se describió en la sección \ref{sec:max7219}.
 
 De esta manera es posible dirigir una palabra arbitraria a cualquier esclavo, y es particularmente eficiente en el caso en que se debe mandar una palabra a cada MAX7219 y se desea que todas la interpreten a la vez. Es cuestión de simplemente transmitir los datos dirigidos a cada esclavo, uno tras otro, hasta llenar todos los registros de desplazamiento y levantar LATCH. Alternativamente, si se quisiera mandar un sólo comando a un esclavo en particular, basta con insertar \enquote{burbujas} (comandos que no realizan ninguna operación) en la secuencia de bits.
@@ -639,7 +640,7 @@ Esta ventana será alcanzable desde un menú ubicado en la ventana principal.
 
 Se puede ver un bosquejo de la ventana de cambio de contraseña en la figura \ref{fig:skgui-passwd}
 
-\begin{figure}
+\begin{figure} [h!]
 	\centering
 	\includegraphics[scale=0.8]{imagenes/skgui-passwd.pdf}
 	\caption{Bosquejo de la ventana de cambio de contraseña.}
@@ -669,7 +670,7 @@ Se puede ver en la figura \ref{fig:mvc} un gráfico resumiendo el rol del Modelo
 
 
 \FloatBarrier
-\subsection{Protocolo de comunicación} \label{sec:protocolo}
+\subsection{Protocolo de comunicación de red} \label{sec:protocolo}
 
 \subsubsection{Codificación}
 
