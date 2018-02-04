@@ -284,21 +284,46 @@ En la Tabla \ref{table:uso-instalacion} resume los diferentes elementos del sist
 	\centering
 	\caption{Detalle de los componentes en su uso e instalación.}
 	\label{table:uso-instalacion}
-	\begin{tabular}{lcp{.5\textwidth}}
-		\multicolumn{1}{c}{Elemento}	& Identificación & \multicolumn{1}{c}{Descripción} \\ \hline
-		Switch de Power         		& 1              & Encender o apaga el cartel, el cartel no recibe energía eléctrica si esta apagado. \\ \hline
-		Switch de Formateo      		& 2              & Formatea la memoria interna, y se carga los datos de fabrica, para este propósito es necesario que se mantenga en ese estado por al menos 3 segundos. \\ \hline
-		Jumpers de cantidad de letras	& 3              & En total son tres. Antes de encender se debe seleccionar la cantidad de módulos esclavos que serán utilizados. \\ \hline
-		Cables de interfaz 				& 4				 & Son cinco cables en que conecta: GND, VCC, DATAIN, CLK y LOAD, entre módulo maestro-esclavo o esclavo-esclavo.
+	\begin{tabular}{lcp{.45\textwidth}}
+		\multicolumn{1}{c}{Elemento}	& Figura & \multicolumn{1}{c}{Descripción} \\ \hline
+		Switch de Power         		& \ref{fig:guia-master} (rectángulo rojo)	& Encender o apaga el cartel, el cartel no recibe energía eléctrica si esta apagado. \\ \hline
+		Switch de Formateo      		& \ref{fig:guia-master} (rectángulo azul)	& Formatea la memoria interna, y se carga los datos de fabrica, para este propósito es necesario que se mantenga en ese estado por al menos 3 segundos. \\ \hline
+		Jumpers de cantidad de letras	& \ref{fig:guia-master} (rectángulo verde)	& En total son tres. Antes de encender se debe seleccionar la cantidad de módulos esclavos que serán utilizados. \\ \hline
+		Cables de interfaz 				& \ref{fig:interfaz-master-slave}			& Son cinco cables en que conecta: GND, VCC, DATAIN, CLK y LOAD, entre módulo maestro-esclavo o esclavo-esclavo.
 	\end{tabular}
 \end{table}
 
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=\linewidth]{imagenes/guia/interfaz.jpeg}
+	\caption{Interfaz de entre maestro-esclavo.}
+	\label{fig:interfaz-master-slave}
+\end{figure}
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=0.8\linewidth]{imagenes/guia/master-rec.jpg}
+	\caption{Módulo master del prototilo final.}
+	\label{fig:guia-master}
+\end{figure}
+
 En primer lugar comprobar que todos los componentes del PCB estén debidamente conectados. Acción siguiente, conectar los módulos que se van a utilizar con los cables de interfaz prestando atención en el sentido en que son conectados.
-Y además, conectar por cada esclavo su matriz de LEDs correspondiente usando de guía la figura \ref{fig:matriz-esclavo}.
+Para facilitar esta tarea \ref{fig:interfaz-master-slave} se puede observar que en el módulo master se tiene los cables: blanco (GND), rojo (DATAOUT), amarillo (VCC), gris (CLK) y verde (LOAD). Y en el módulo esclavo se invierte el sentido de derecha a izquierda.
+
+Y además, conectar por cada esclavo su matriz de LEDs correspondiente sabiendo que la regleta de ocho pines de la matriz que está a la izquierda son las filas de la matriz y la regleta de ocho pines de la derecha son las columnas.
 
 Luego de que decidiera la cantidad de esclavos que se tendrá en funcionamiento, configurar los jumpers que se encuentran en el maestro a través de lo detallado en la sección \ref{sec:config-jumpers}.
 
 Y por último, enchufar el cable de alimentación a un toma corriente cercano. Si no se observa el mensaje por default, pulse el de switch de formateo para revisar el reinicio del sistema.
+
+Cabe destacar que el prototipo final posee una tira de dos pines que son el ingreso de la fuente de energía. En el circulo amarillo de la imagen \ref{fig:guia-master} se puede apreciar los mismos, siendo el pin superior el VCC y el inferior GND. Actualmente se utiliza un jack de alimentación ya que se analizó en incorporar un gabinete para fijarlo a la pared, la ficha jack junto con el transformador de 5V se muestra en la figura \ref{fig:guia-trafo}.
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=0.8\linewidth]{imagenes/guia/trafo.jpeg}
+	\caption{Transformador con ficha jack para la alimentación del sistema.}
+	\label{fig:guia-trafo}
+\end{figure}
 
 \subsubsection{Configuración de jumpers}\label{sec:config-jumpers}
 
