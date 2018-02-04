@@ -17,7 +17,6 @@
 	\item El hardware del cartel debe poder escalar la cantidad de módulos de LEDs.
 	\item El hardware del cartel debe permitir indicar la cantidad de módulos de LEDs conectados, de manera tal que el programa del microcontrolador sepa con cuántos de ellos está operando en todo momento.
 	\item El sistema que controla el cartel debe estar preparado para escalar en caso de que se agreguen más módulos de LEDs.
-	%TODO AMG - Requerimientos de hardware??
 	\item El cartel debe tener un consumo energético bajo capaz de ser cubierto por una fuente de alimentación pequeña ($\le 1000\ \mbox{mW}$)
 	\item El sistema tiene que poder ser replicado. Los componentes que lo conforman tienen que ser comercializables y obtenibles en negocios de electrónica.
 	\item El cartel debe tener el tamaño suficiente para poder ser leído desde una distancia de aproximadamente 20 metros.
@@ -32,8 +31,12 @@
 \begin{itemize}
 	\item El tiempo de respuesta del cartel no debe exceder los cinco segundos.
 	\item El sistema entero no debe consumir mas de 30 Watts bajo operación normal.
-%	\item El sistema deberá ser capaz de aceptar sólo conexiones por TLS \cite{TLS} de forma que las conexiones y el intercambio de paquetes sea cifrado y seguro.
-	%TODO AMG - Si podemos meter algunos requerimientos no funcionales más, joya!
+	\item El sistema debe ser capaz de operar adecuadamente solamente con un usuario a la vez.
+	\item Los permisos de acceso al sistema podrán ser cambiados solamente por la persona autorizada a manejar el cartel.
+	\item El nuevo sistema debe desarrollarse aplicando patrones y recomendaciones de programación que incrementen la seguridad de datos ((ver \cite{Patrones}).
+	\item El sistema debe contar con manuales de usuario estructurados adecuadamente, de forma que permitan explicar la instalación tanto del software como del hardware del cartel.
+	\item La aplicación de PC debe proporcionar mensajes de error que sean informativos y orientados a usuario final.
+	\item La aplicación de PC debe poseer interfaces gráficas de forma que ayuden al usuario a identificar los distintos comandos que puede realizar sobre el sistema.
 \end{itemize}
 
 \subsection{Interacción con el usuario}
