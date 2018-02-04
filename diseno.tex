@@ -81,7 +81,7 @@ Es importante tener en cuenta que el sistema no integra en su hardware directame
 
 \begin{figure}[ht!]
 	\begin{center}
-		\includegraphics[width=8cm]{imagenes/esp12e-foto.jpg}
+		\includegraphics[width=0.4\textwidth]{imagenes/esp12e-foto.jpg}
 		\caption{Foto del módulo ESP12E sin su cubrimiento.}
 		\label{fig:foto-esp12e}
 	\end{center}
@@ -89,7 +89,7 @@ Es importante tener en cuenta que el sistema no integra en su hardware directame
 
 \begin{figure}[ht!]
 	\begin{center}
-		\includegraphics[width=0.95\textwidth]{imagenes/nodemcu-pinout.pdf}
+		\includegraphics[width=0.85\textwidth]{imagenes/nodemcu-pinout.pdf}
 		\caption{Asignación de pines del NodeMCU.}
 		\label{fig:nodemcu-pinout}
 	\end{center}
@@ -192,7 +192,7 @@ La tecla rocker switch controlará que se provea la alimentación al circuito, p
 Se puede ver en la figura \ref{fig:pcb-master} el diseño final de la PCB del maestro.
 \begin{figure}[ht!]
 	\centering
-	\includegraphics[width=\linewidth]{imagenes/pcb-master.pdf}
+	\includegraphics[width=0.7\linewidth]{imagenes/pcb-master.pdf}
 	\caption{PCB del módulo maestro.}
 	\label{fig:pcb-master}
 \end{figure}
@@ -258,6 +258,9 @@ Es necesario prestar atención en el conexionado con respecto a los pines de tie
 
 Por otro lado, el MAX7219 tiene un pin denominado DOUT (pin 24) se utiliza para encadenar varios MAX7219 y de esta forma pasar la información al que esta directamente conectado, éste pin nunca tiene alta impedancia.
 
+Los otros pines más reelevantes de este driver son los que utiliza el microcontrolador para transmitir los comandos requeridos. Estos son el pin DIN (pin 1)
+donde ingresan los datos al MAX7219. Adicionalmente se encuentra el LOAD (pin 12) requerido para indicarle a este dispositivo, que los últimos 16 bits recibidos deben ser cargados. Finalmente se encuentra la señal de CLCK (pin 13) que se utiliza para la transmisión sincrónica entre el maestro (microcontrolador) y los esclavos (drivers de LEDs).
+
 \begin{figure}[htp!]
 	\centering
 	\begin{center}
@@ -287,7 +290,7 @@ Pin               & Nombre          & Función    \\ \hline
 \end{table}
 
 El MAX7219, como se mencionó anteriormente, interpreta comandos de 16 bits. El byte mas significativo de esta palabra de 16 bits codifica el registro que se modificará con el comando. Hay 16 registros con lo cual cuatro bits de este byte se utilizan para direccionar a ellos. Se puede ver en la tabla \ref{tab:max-cmdaddr} parte del formato de un comando, específicamente la dedicada al direccionamiento del registro. Se puede ver también en mejor detalle el formato del contenido de cada comando (el byte menos significativo) en el datasheet del MAX7219 \cite{MAX7219}.
-\begin{table}[ht]
+\begin{table}[ht!]
 	\centering
 	\caption{Mapa de direccionamiento de registros del MAX7219.}
 	\vspace{0.2cm}
@@ -373,7 +376,8 @@ El procedimiento que se realiza para cargar los mapas de bits en cada esclavo co
 	\end{adjustbox}
 \end{table}
 
-Para realizar este proceso, la figura \ref{fig:spi-timing-diagram} muestra un diagrama a lo largo del tiempo de la forma de enviar cada bit. En ella se puede observar que el primer paso consiste en bajar la señal de LOAD y esperar un instante de tiempo (aproximadamente un microsegundo). Luego se genera una señal de CLK de onda cuadrada y de frecuencia de a lo sumo 1Mhz con ciclo de trabajo de $50 \%$. No es necesario que CLK sea una señal periódica, es suficiente que se respeten los tiempos de setup y hold, llevando CLK a alto luego de haber transcurrido $t_{DS}$ con el dato ya en DIN y mantenerlo por $t_{DH}$.
+Para realizar este proceso, la figura \ref{fig:spi-timing-diagram} muestra un diagrama a lo largo del tiempo de la forma de enviar cada bit. En ella se puede observar que el primer paso consiste en bajar la señal de LOAD y esperar un instante de tiempo (aproximadamente un microsegundo).
+Luego se genera una señal de CLK de onda cuadrada y de frecuencia de a lo sumo 1Mhz con ciclo de trabajo de $50 \%$. No es necesario que CLK sea una señal periódica, es suficiente que se respeten los tiempos de setup y hold, llevando CLK a alto luego de haber transcurrido $t_{DS}$ con el dato ya en DIN y mantenerlo por $t_{DH}$.
 
 % Cuando finaliza el envío de los 16 bits, se debe subir la señal de LATCH. En ese momento, el MAX7219 almacena, en sus registros internos, el comando recibido. Todos los comandos son de dos bytes, sin embargo, se puede enviar más de esa cantidad. Esta funcionalidad se utiliza para enviar instrucciones a los demás MAX7219 que están conectados en serie. Lo que ocurre es que la información se recibe en el flanco ascendente de CLK y se envía, hacia el siguiente chip, por el pin DATAOUT en el flanco descendente. De esta forma, en una iteración se pueden configurar una columna de cada módulo de 8x8 LEDs.
 
@@ -403,7 +407,7 @@ Se puede ver en la figura \ref{fig:pcb-slave} el diseño final de la PCB del esc
 
 \begin{figure}[ht!]
 	\centering
-	\includegraphics[width=\linewidth]{imagenes/pcb-slave.pdf}
+ 	\includegraphics[width=\linewidth]{imagenes/pcb-slave.pdf}
 	\caption{PCB del módulo esclavo.}
 	\label{fig:pcb-slave}
 \end{figure}
