@@ -276,62 +276,86 @@ $ ./Panel
 
 Con esto concluye la puesta en marcha del software del sistema.
 
-\subsection{Preparado del hardware}
+\newpage
+\subsection{Preparación del hardware}
 
-En la Tabla \ref{table:uso-instalacion} resume los diferentes elementos del sistema con las imágenes correspondientes a cada una y la forma en que se deben usar instalar.
+Tras haber finalizado completamente la guía de compilación e instalación del firmware sobre el microcontrolador que se describe a lo largo de éste apéndice, se debe proceder a interconectar los distintos módulos maestro y esclavos a fin de obtener un cartel funcional.
+
+En la tabla \ref{table:uso-instalacion} se resumen los diferentes elementos que se deben conectar en el maestro. Adicionalmente se adjuntan imágenes correspondientes a cada uno de dichos componentes y la forma en que se deben instalar.
 
 \begin{table}[ht!]
 	\centering
-	\caption{Detalle de los componentes en su uso e instalación.}
+	\caption{Identificación y funcionalidad de los componentes del módulo maestro.}
 	\label{table:uso-instalacion}
 	\begin{tabular}{lcp{.45\textwidth}}
-		\multicolumn{1}{c}{Elemento}	& Figura & \multicolumn{1}{c}{Descripción} \\ \hline
-		Switch de Power         		& \ref{fig:guia-master} (rectángulo rojo)	& Encender o apaga el cartel, el cartel no recibe energía eléctrica si esta apagado. \\ \hline
-		Switch de Formateo      		& \ref{fig:guia-master} (rectángulo azul)	& Formatea la memoria interna, y se carga los datos de fabrica, para este propósito es necesario que se mantenga en ese estado por al menos 3 segundos. \\ \hline
-		Jumpers de cantidad de letras	& \ref{fig:guia-master} (rectángulo verde)	& En total son tres. Antes de encender se debe seleccionar la cantidad de módulos esclavos que serán utilizados. \\ \hline
-		Cables de interfaz 				& \ref{fig:interfaz-master-slave}			& Son cinco cables en que conecta: GND, VCC, DATAIN, CLK y LOAD, entre módulo maestro-esclavo o esclavo-esclavo.
+		\multicolumn{1}{c}{Elemento}	& Figura & \multicolumn{1}{c}{Funcionalidad} \\ \hline
+		Switch de Power         		& \ref{fig:guia-master} (rectángulo rojo)	& Encender o apaga el cartel.  \\ \hline
+		Botón de RESET      		& \ref{fig:guia-master} (rectángulo azul)	& Coloca al sistema en un estado conocido por defecto,  para este propósito es necesario mantener presionado el botón durante 3 segundos. \\ \hline
+		Jumpers	& \ref{fig:guia-master} (rectángulo verde)	& Antes de encender el cartel debe seleccionarse la cantidad de módulos esclavos que serán utilizados en la representación del texto. \\ \hline
+		Interfaz entre módulos 				& \ref{fig:interfaz-master-slave}			& Son cinco cables en que conectan las señales de: GND, VCC, DATAIN, CLK y LOAD, entre módulo maestro-esclavo o incluso esclavo-esclavo.
 	\end{tabular}
 \end{table}
 
 \begin{figure}[!ht]
 	\centering
-	\includegraphics[width=\linewidth]{imagenes/guia/interfaz.jpeg}
-	\caption{Interfaz de entre maestro-esclavo.}
-	\label{fig:interfaz-master-slave}
-\end{figure}
-
-\begin{figure}[!ht]
-	\centering
-	\includegraphics[width=0.8\linewidth]{imagenes/guia/master-rec.jpg}
-	\caption{Módulo maestr del prototipo final.}
+	\includegraphics[width=0.7\linewidth]{imagenes/guia/master-rec.jpg}
+	\caption{Módulo maestro del prototipo final.}
 	\label{fig:guia-master}
 \end{figure}
 
-En primer lugar comprobar que todos los componentes del PCB estén debidamente conectados. Acción siguiente, conectar los módulos que se van a utilizar con los cables de interfaz prestando atención en el sentido en que son conectados.
-Para facilitar esta tarea \ref{fig:interfaz-master-slave} se puede observar que en el módulo maestro se tiene los cables: blanco (GND), rojo (DATAOUT), amarillo (VCC), gris (CLK) y verde (LOAD). Y en el módulo esclavo se invierte el sentido de derecha a izquierda.
-
-Y además, conectar por cada esclavo su matriz de LEDs correspondiente sabiendo que la regleta de ocho pines de la matriz que está a la izquierda son las filas de la matriz y la regleta de ocho pines de la derecha son las columnas.
-
-Luego de que decidiera la cantidad de esclavos que se tendrá en funcionamiento, configurar los jumpers que se encuentran en el maestro a través de lo detallado en la sección \ref{sec:config-jumpers}.
-
-Y por último, enchufar el cable de alimentación a un toma corriente cercano. Si no se observa el mensaje por default, pulse el de switch de formateo para revisar el reinicio del sistema.
-
-Cabe destacar que el prototipo final posee una tira de dos pines que son el ingreso de la fuente de energía. En el circulo amarillo de la imagen \ref{fig:guia-master} se puede apreciar los mismos, siendo el pin superior el VCC y el inferior GND. Actualmente se utiliza un jack de alimentación ya que se analizó en incorporar un gabinete para fijarlo a la pared, la ficha jack junto con el transformador de 5V se muestra en la figura \ref{fig:guia-trafo}.
+En la figura \ref{fig:interfaz-master-slave} se observa la interfaz a nivel físico de comunicación entre el módulo maestro y el primer esclavo. Entre ellos se comparten las señales de VCC, GND, CLK, LOAD y DATAIN.
+Cabe destacar que esta misma interfaz se repite para comunicar dos esclavos contiguos.
 
 \begin{figure}[!ht]
 	\centering
-	\includegraphics[width=0.8\linewidth]{imagenes/guia/trafo.jpeg}
+	\includegraphics[width=\linewidth]{imagenes/guia/interfaz.jpeg}
+	\caption{Interfaz entre maestro (izquierda) y esclavo (derecha).}
+	\label{fig:interfaz-master-slave}
+\end{figure}
+
+En primer lugar se debe comprobar que todos los componentes del PCB estén debidamente conectados. Acción siguiente, es importante conectar los módulos que se van a utilizar con los cables de interfaz prestando atención en el sentido en que son conectados.
+
+Para facilitar esta tarea en la figura \ref{fig:interfaz-master-slave} se observa que en el módulo maestro se tiene los cables: blanco (GND), rojo (DATAOUT), amarillo (VCC), gris (CLK) y verde (LOAD). Y en el módulo esclavo se invierte el sentido de derecha a izquierda.
+
+Por otra parte, se debe conectar, en cada esclavo, su matriz de LEDs correspondiente sabiendo que la regleta de ocho pines de la matriz que está a la izquierda son las filas de la misma, mientras que la de la derecha pertenece a las columnas. En la figura \ref{fig:regleta} se observa el módulo esclavo con las dos tiras de 8 pines cada unas conectadas a la matriz.
+Para no confundir el sentido del esclavo, prestar atención a la posición en que está colocado el MAX7219.
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=.75\linewidth]{imagenes/guia/regleta.jpeg}
+	\caption{Interfaz de comunicación entre un esclavo y su matriz asociada.}
+	\label{fig:regleta}
+\end{figure}
+
+Luego de que se decida la cantidad de esclavos que se tendrá en funcionamiento, es necesario configurar los jumpers que se encuentran en el maestro a través de lo detallado en la sección \ref{sec:config-jumpers}.
+Los jumpers le indican al firmware del microcontrolador la cantidad de esclavos que hay conectados al sistema.
+Ésto se traduce directamente en cuántas letras se van a mostrar en un determinado tiempo en el cartel.
+
+Finalmente, se debe enchufar el cable de alimentación a un toma corriente cercano. En caso de que no se observa el mensaje por default previamente detallado o se sospeche que el cartel está en un estado incorrecto, es necesario pulsar el botón de reset de forma de colocar al sistema en un estado conocido.
+
+Cabe destacar que el prototipo final posee una tira de dos pines que corresponde a la interfaz de comunicación con la fuente de energía. En el circulo amarillo de la imagen \ref{fig:guia-master} se puede apreciar los mismos, siendo el pin superior el VCC y el inferior GND. Actualmente se utiliza un jack de alimentación ya que se analizó en incorporar un gabinete para fijarlo a la pared. 
+
+La ficha jack junto con el transformador de 5V se muestra en la figura \ref{fig:guia-trafo}.
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=\linewidth]{imagenes/guia/trafo.jpeg}
 	\caption{Transformador con ficha jack para la alimentación del sistema.}
 	\label{fig:guia-trafo}
 \end{figure}
 
+\clearpage
 \subsubsection{Configuración de jumpers}\label{sec:config-jumpers}
 
-La cantidad de letras o la cantidad de módulos esclavos debe ser conocido por el microcontrolador al momento de iniciar la ejecución de su programa. Este valor se establece cortocircuitando los jumpers en una configuración predefinida. La figura \ref{fig:manual-jumpers} explica como deben configurarse.
+Como se mencionó anteriormente, a lo largo de este apéndice, la cantidad de módulos esclavos debe ser conocido por el microcontrolador al momento de iniciar la ejecución de su programa.
+
+De esta manera, el sistema sabe cuántos caracteres puede representar en un determinado momento y enviar los mensajes correspondientes hacia los esclavos.
+
+Este valor se establece cortocircuitando los jumpers en una configuración predefinida. La figura \ref{fig:manual-jumpers} explica como deben configurarse.
 
 \begin{figure}[ht!]
 	\centering
-	\includegraphics[width=0.6\linewidth]{imagenes/jumper.pdf}
+	\includegraphics[width=\linewidth]{imagenes/jumper.pdf}
 	\caption{Configuración de los jumpers para cada cantidad esclavos conectados.}
 	\label{fig:manual-jumpers}
 \end{figure}
