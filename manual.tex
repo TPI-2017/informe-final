@@ -16,19 +16,39 @@ La contraseña de acceso por defecto será \enquote{1234}. Ésta deberá ser mod
 
 Como siguiente paso, se debe cambiar la red a la que se conecta el cartel a una red WiFi fija, a la que siempre se conectará el cartel al encenderse. Este procedimiento se explica en la sección \ref{sec:guia-wifi}.
 
-%TODO completar las siguientes personas
 \subsection{Uso del cartel}\label{sec:guia-uso}
 \subsubsection{Conexión al cartel}\label{sec:guia-conexion}
 Para conectar al cartel, simplemente abra el programa. Al abrir, lo primero que aparecerá es un diálogo pidiendo la dirección (en nombre o IP) del cartel.  Se puede ver este diálogo en la figura \ref{fig:scr-login}.
 
-Ingrese la dirección y la contraseña y haga click en \enquote{Aceptar}. Si la contraseña es correcta, será llevado a la ventana principal de la aplicación. En caso contrario, se volverá a pedir los datos hasta que sean correctos.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[scale=0.8]{imagenes/scr-login.png}
+	\caption{Captura de pantalla de la ventana de login.}
+	\label{fig:scr-login}
+\end{figure}
+
+Ingrese la dirección y la contraseña y haga click en \enquote{Aceptar}. Si la contraseña es correcta, será llevado a la ventana principal de la aplicación. En caso contrario, se volverá a pedir los datos hasta que sean correctos. Se puede ver una captura de pantalla de la ventana principal en la figura \ref{fig:scr-principal}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[scale=0.8]{imagenes/scr-principal.png}
+	\caption{Captura de pantalla de la ventana principal.}
+	\label{fig:scr-principal}
+\end{figure}
 
 \subsubsection{Cambio de contraseña de acceso}\label{sec:guia-password}
 Para realizar esta acción se necesita haber ingresado previamente la contraseña de acceso y encontrarse en la ventana principal de la aplicación.
 
 Haga click sobre el menú \enquote{Panel} y luego en {Cambiar contraseña...}. Esto abrirá la ventana diálogo de cambio de la contraseña, que se puede ver la figura \ref{fig:scr-passwd}.
 
-Una vez en esta ventana, ingrese la nueva contraseña. Ésta no deberá ser más larga que 40 caracteres. % Esto de los caracteres me lo saque del culo. Está dado por una constante en el fuente del protocolo. Era un numero parecido.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[scale=0.8]{imagenes/scr-passwd.png}
+	\caption{Captura de pantalla de la ventana de cambio de contraseña.}
+	\label{fig:scr-passwd}
+\end{figure}
+
+Una vez en esta ventana, ingrese la nueva contraseña. Ésta no deberá ser más larga que 40 caracteres.
 Luego, presione \enquote{Aceptar} para realizar el cambio u \enquote{Cancelar} para cancelar.
 
 \subsubsection{Cambio de mensaje al cartel}\label{sec:guia-texto}
@@ -41,13 +61,20 @@ Opcionalmente se puede activar el parpadeo. Para esto haga click sobre la casill
 \subsubsection{Cambio de red WiFi}\label{sec:guia-wifi}
 Para realizar esta acción se necesita haber ingresado anteriormente la contraseña de acceso y encontrarse en la ventana principal de la aplicación.
 
-Haga click sobre el menú \enquote{Panel} y luego en \enquote{Cambiar configuración de red...}. Esto abrirá un dialogo con campos editables que corresponden al nombre de red y la contraseña de la red a la cual deberá conectarse el cartel al aplicar el cambio. Se puede ver esta ventana en la figura \ref{fig:sec:guia-wifi}.
+Haga click sobre el menú \enquote{Panel} y luego en \enquote{Cambiar configuración de red...}. Esto abrirá un dialogo con campos editables que corresponden al nombre de red y la contraseña de la red a la cual deberá conectarse el cartel al aplicar el cambio. Se puede ver esta ventana en la figura \ref{fig:scr-wifi}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[scale=0.8]{imagenes/scr-wifi.png}
+	\caption{Captura de pantalla de la ventana de cambio de configuración WiFi.}
+	\label{fig:scr-wifi}
+\end{figure}
 
 Luego, presione \enquote{Aceptar} para realizar el cambio u \enquote{Cancelar} para cancelar.
 
 \subsubsection{Reestablecimiento de configuración}\label{sec:guia-reset}
 Para realizar esta acción se necesita acceso físico al hardware.
 
-Puede ocurrir que la red a la cual el cartel se conectaba ya no esté disponible o el administrador del cartel se haya olvidado o perdido la contraseña. En estos casos es deseable llevar el cartel a un estado conocido.
+Puede ocurrir que la red a la cual el cartel se conecta ya no esté disponible o el administrador del cartel se haya olvidado o perdido la contraseña. En estos casos es deseable llevar el cartel a un estado conocido.
 
 Para reestablecer la configuración del cartel, presione el botón de RESET del cartel por aproximadamente 5 segundos. Sabrá que se reinicio cuando vea parpadear el cartel y aparezca un mensaje inicial genérico. A partir de este momento, el cartel volverá a conectarse a la red especificada en la sección \ref{sec:primer-uso}.
