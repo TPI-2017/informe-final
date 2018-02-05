@@ -157,7 +157,7 @@ Luego, como root:
 \end{lstlisting}
 
 
-\subsection{Generación de certificados TLS}\label{sec:cert-gen}
+\subsubsection{Generación de certificados TLS}\label{sec:cert-gen}
 Como se explicó en la sección \ref{sec:tls}, la dirección de IP que toma el dispositivo está asociada al certificado público que exhibe y por lo tanto debe ser estática. En esta sección se explicarán los pasos para, una vez decidida una dirección IP para el cartel, generar el certificado con la clave pública, además de la clave privada.
 
 El SDK provee un script que genera automáticamente el certificado y la clave privada. La clave privada y el certificado se almacenarán en el firmware del cartel y el certificado se almacenará en el ejecutable de la aplicación de PC. Esto es porque, normalmente, los certificados están firmados electrónicamente por una \enquote{Certificate Authority} o CA. En este caso el certificado de este proyecto se denomina \emph{self-signed}, con lo que es necesario \enquote{notificar} a la aplicación de PC que ese certificado es confiable.
@@ -187,7 +187,7 @@ $ ./makefile.sh
 
 Esto produce el certificado y clave privada en distintos formatos. Para el sistema solo se necesitan \code{private\_key.h}, \code{cert.h} y \code{TLS.ca\_x509.cer}. Los primeros dos se utilizan en el firmware del cartel y el último es para la aplicación de PC, con lo que no debe eliminarse ya que se utilizará mas adelante en esta guía.
 
-\subsubsection{Compilación del firmware}
+\subsection{Compilación}
 A este punto ya se pueden escribir programas para el ESP8266EX y compilarlos. Ahora falta descargar el código del software del cartel. El mismo se encuentra en un repositorio de Github.
 
 
@@ -213,7 +213,6 @@ esptool.py v1.2
 \end{lstlisting}
 
 \subsection{Configuración del hardware}
-% Nahuel y/o santi
 \subsubsection{Carga del firmware}
 Una vez que se han completado los pasos en la sección \ref{sec:comp-firmware}, se puede proceder a cargar el firmware al cartel ya preparado.
 
